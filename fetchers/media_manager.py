@@ -19,8 +19,9 @@ ANIMAL_SYNONYMS = {
     "orca": ["orca", "killer whale", "killer-whale", "cetacean"],
     "whale": ["whale", "humpback", "blue whale", "cetacean"],
     "shark": ["shark", "carcharodon", "great white", "hammerhead", "mako"],
-    "eagle": ["eagle", "harpy", "aquila", "bird of prey", "raptor"],
-    "shoebill": ["shoebill", "picozapato", "balaeniceps", "whalehead"],
+    "eagle": ["eagle", "harpy", "aquila", "bird of prey", "raptor", "bird"],
+    "harpy": ["harpy", "eagle", "harpy eagle", "raptor", "bird of prey"],
+    "shoebill": ["shoebill", "picozapato", "balaeniceps", "whalehead", "stork"],
     "wolf": ["wolf", "wolves", "lupus", "canis"],
     "bear": ["bear", "grizzly", "polar bear", "ursus"],
     "crocodile": ["crocodile", "alligator", "caiman", "croc", "reptile"],
@@ -76,6 +77,15 @@ class MediaManager:
 
         subject_clean = required_subject.lower().replace("-", " ").strip()
         primary_animal = subject_clean.split()[0] if subject_clean else "wildlife"
+        valid_synonyms = ANIMAL_SYNONYMS.get(primary_animal, [primary_animal])
+
+        # Expandir lista de palabras clave con sinónimos biológicos
+        expanded_keywords = list(keywords)
+        for syn in valid_synonyms:
+            if syn not in expanded_keywords:
+                expanded_keywords.append(f"{syn} 4k vertical")
+                expanded_keywords.append(f"{syn} wildlife 4k")
+                expanded_keywords.append(syn)
 
         # 1. Comprobar clips locales manuales en assets/clips/
         if subject_clean:
@@ -88,7 +98,7 @@ class MediaManager:
                 return output_file
 
         # 2. Búsqueda en Pexels 4K con validación estricta de especie
-        for kw in keywords:
+        for kw in expanded_keywords:
             print(f"[MediaManager] [BUSCAR PEXELS 4K] Escena {scene_id} -> '{kw}'...", flush=True)
             pex_results = search_pexels_videos(kw, orientation="portrait", max_results=8)
             for pex in pex_results:
@@ -130,7 +140,7 @@ class MediaManager:
 
         # 5. Respaldo limpio del hábitat natural
         print(f"[MediaManager] [PAISAJE HABITAT] Descargando paisaje del hábitat natural para escena {scene_id}...")
-        pex_hab = search_pexels_videos("wild nature landscape aerial vertical", orientation="portrait", max_results=4)
+        pex_hab = search_pexels_videos("wild nature landscape aerial vertical", orientation="portrait", max_results=6)
         for pex in pex_hab:
             url = pex.get('video_url', '')
             if url not in self.used_urls:
@@ -138,4 +148,24 @@ class MediaManager:
                 if download_pexels_video(url, output_file):
                     return output_file
 
+        # 6. Reutilizar cualquier clip válido ya descargado en la sesión
+        existing_raws = [f for f in self.temp_dir.glob("scene_*_raw.mp4") if f.exists() and f.stat().st_size > 10000]
+        if existing_raws:
+            chosen = random.choice(existing_raws)
+            import shutil
+            shutil.copy(chosen, output_file)
+            print(f"[MediaManager] [REUTILIZAR CLIP] Reutilizando clip de la sesión: {chosen.name}")
+            return output_file
+
+        # 7. Generar clip cinemático de emergencia con ffmpeg si todo falló
+        print(f"[MediaManager] [EMERGENCIA] Generando fondo cinemático para escena {scene_id}...")
+        cmd_gen = [
+            "ffmpeg", "-y",
+            "-f", "lavfi",
+            "-i", "color=c=0x0d1b2a:s=1080x1920:d=6,format=yuv420p",
+            "-c:v", "libx264",
+            "-r", "30",
+            str(output_file)
+        ]
+        subprocess.run(cmd_gen, capture_output=True)
         return output_file
