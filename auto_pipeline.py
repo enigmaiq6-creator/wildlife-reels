@@ -34,7 +34,7 @@ from core.history_manager import HistoryManager
 
 def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE, auto_publish: bool = True) -> Path:
     print("\n" + "=" * 65)
-    print("  🦁 STARTING WILDLIFE VIDEO ENGINE (100% SIMPLE ENGLISH) 🌿")
+    print("  🦅 STARTING WILDLIFE MICRO-DOCUMENTARY ENGINE (ARES G STYLE) 🌿")
     print("=" * 65 + "\n", flush=True)
 
     history = HistoryManager(Path("history.json"))
@@ -48,7 +48,7 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
         print(f"[Pipeline] [+] Using forced catalog topic: '{force_topic}'", flush=True)
         topic_data = get_wildlife_topic(force_topic)
     else:
-        # Generate fresh, unseen topic via Groq AI in Simple English
+        # Generate fresh 6-Act Micro-Documentary via Groq AI
         topic_data = ai_gen.generate_wildlife_script(seen_topics=seen_topics)
         
         # Fallback to pre-built catalog if AI is unreachable
@@ -60,14 +60,20 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
             topic_data = WILDLIFE_CATALOG[chosen_key]
 
     topic_id = topic_data.get("topic_id", "WILDLIFE-DOC").lower().replace(" ", "-")
-    title = topic_data.get("title", "5 Insane Facts About Wildlife!")
-    hook = topic_data.get("hook", "")
-    curiosities = topic_data.get("curiosities", [])
-    cta = topic_data.get("cta", "")
+    title = topic_data.get("title", "This Creature Looks Like a Monster!")
+    creature_name = topic_data.get("creature_name", topic_id.replace("-", " "))
     keywords = topic_data.get("pexels_keywords", [])
-    hashtags = topic_data.get("hashtags", ["#wildlife", "#animals", "#nature", "#predators"])
+    hashtags = topic_data.get("hashtags", ["#wildlife", "#animals", "#nature", "#predators", "#shorts"])
 
-    print(f"[Pipeline] [+] Selected Unseen Topic: '{topic_id.upper()}' (Language: SIMPLE ENGLISH)", flush=True)
+    # Extract 6 Narrative Acts
+    act1 = topic_data.get("act1_hook", "")
+    act2 = topic_data.get("act2_scale", "")
+    act3 = topic_data.get("act3_hunt", "")
+    act4 = topic_data.get("act4_behavior", "")
+    act5 = topic_data.get("act5_twist", "")
+    act6 = topic_data.get("act6_climax_cta", "")
+
+    print(f"[Pipeline] [+] Selected Creature: '{creature_name.upper()}' (Slug: {topic_id})", flush=True)
     print(f"[Pipeline] [+] Title: {title}", flush=True)
     print(f"[Pipeline] [+] Voice: {voice_key}", flush=True)
 
@@ -82,57 +88,53 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
     processed_clip_files = []
     global_time = 0.0
 
-    # Build raw scene list: Hook (0), 5 Curiosities (1..5), CTA (6)
-    raw_scenes_info = [
-        {"scene_id": 0, "text": hook, "is_hook": True, "is_cta": False, "kw": keywords[0] if len(keywords) > 0 else f"{topic_id} animal 4k vertical"},
-        {"scene_id": 1, "text": curiosities[0], "is_hook": False, "is_cta": False, "curiosity_num": 1, "kw": keywords[1] if len(keywords) > 1 else f"{topic_id} close up 4k"},
-        {"scene_id": 2, "text": curiosities[1], "is_hook": False, "is_cta": False, "curiosity_num": 2, "kw": keywords[2] if len(keywords) > 2 else f"{topic_id} hunting 4k"},
-        {"scene_id": 3, "text": curiosities[2], "is_hook": False, "is_cta": False, "curiosity_num": 3, "kw": keywords[3] if len(keywords) > 3 else f"{topic_id} wild action 4k"},
-        {"scene_id": 4, "text": curiosities[3], "is_hook": False, "is_cta": False, "curiosity_num": 4, "kw": keywords[4] if len(keywords) > 4 else f"{topic_id} eyes 4k vertical"},
-        {"scene_id": 5, "text": curiosities[4], "is_hook": False, "is_cta": False, "curiosity_num": 5, "kw": keywords[5] if len(keywords) > 5 else f"{topic_id} resting nature 4k"},
-        {"scene_id": 6, "text": cta, "is_hook": False, "is_cta": True, "kw": keywords[6] if len(keywords) > 6 else "wildlife nature cinematic vertical"}
+    raw_acts_info = [
+        {"act_num": 1, "name": "Hook", "text": act1, "is_hook": True, "is_cta": False, "kw": keywords[0] if len(keywords) > 0 else f"{creature_name} 4k vertical"},
+        {"act_num": 2, "name": "Monster Scale", "text": act2, "is_hook": False, "is_cta": False, "kw": keywords[1] if len(keywords) > 1 else f"{creature_name} close up head 4k"},
+        {"act_num": 3, "name": "Stealth & Strike", "text": act3, "is_hook": False, "is_cta": False, "kw": keywords[2] if len(keywords) > 2 else f"{creature_name} hunting slow motion 4k"},
+        {"act_num": 4, "name": "Death Stare / Trait", "text": act4, "is_hook": False, "is_cta": False, "kw": keywords[3] if len(keywords) > 3 else f"{creature_name} eyes stare camera 4k"},
+        {"act_num": 5, "name": "Twist / Vulnerability", "text": act5, "is_hook": False, "is_cta": False, "kw": keywords[4] if len(keywords) > 4 else f"{creature_name} walking nature 4k vertical"},
+        {"act_num": 6, "name": "Climax & CTA", "text": act6, "is_hook": False, "is_cta": True, "kw": keywords[5] if len(keywords) > 5 else f"{creature_name} mouth sound 4k"}
     ]
 
-    # Generate Voice and fetch strictly matched clips for each scene
-    for s_info in raw_scenes_info:
-        s_id = s_info["scene_id"]
-        text = s_info["text"]
-        kw = s_info["kw"]
-        c_num = s_info.get("curiosity_num")
+    # Process all 6 acts of the micro-documentary
+    for idx, act in enumerate(raw_acts_info):
+        act_idx = act["act_num"]
+        label = act["name"]
+        text = act["text"]
+        kw = act["kw"]
 
-        label = "Hook" if s_id == 0 else ("CTA" if s_id == 6 else f"Curiosity #{c_num}")
-        print(f"\n--- [Processing Scene {s_id} / {label}] ---", flush=True)
-        print(f"Text: \"{text}\"", flush=True)
-        print(f"Target Keyword: '{kw}'", flush=True)
+        print(f"\n--- [Act {act_idx}/6: {label}] ---", flush=True)
+        print(f"Narrative: \"{text}\"", flush=True)
+        print(f"Target Camera Angle: '{kw}'", flush=True)
 
-        # Synthesize Audio
-        audio_data = voice_engine.synthesize_scene(text, s_id)
+        # Synthesize Audio with natural pacing
+        audio_data = voice_engine.synthesize_scene(text, idx)
         duration = audio_data["duration"]
         word_timings = audio_data["word_timings"]
         audio_path = audio_data["audio_path"]
         print(f"[Voice] Duration: {duration:.2f}s | Word Timings: {len(word_timings)} words", flush=True)
 
-        # Fetch strictly matched 4K vertical clip
+        # Fetch strictly matched clip for this specific creature angle
         raw_clip = media_manager.fetch_clip_for_scene(
-            scene_id=s_id,
-            keywords=[kw, f"{topic_id} wildlife 4k vertical", "wildlife predator 4k vertical"],
-            required_subject=topic_id.split("-")[0].lower(),
+            scene_id=idx,
+            keywords=[kw, f"{creature_name} 4k vertical", f"{creature_name} wildlife 4k"],
+            required_subject=creature_name.split()[0].lower(),
             target_duration=duration
         )
 
-        # Normalize clip to exact 1080x1920 with smooth Ken Burns effect
-        norm_clip = TEMP_DIR / f"scene_{s_id}_norm.mp4"
+        # Normalize clip with Ken Burns motion
+        norm_clip = TEMP_DIR / f"act_{act_idx}_norm.mp4"
         composer.process_scene_clip(raw_clip, norm_clip, duration)
         processed_clip_files.append(norm_clip)
         scene_audio_files.append(audio_path)
 
         scene_dict = {
-            "index": s_id,
-            "scene_id": s_id,
+            "index": idx,
+            "act_num": act_idx,
             "text": text,
-            "is_hook": s_info["is_hook"],
-            "is_cta": s_info["is_cta"],
-            "curiosity_index": c_num,
+            "is_hook": act["is_hook"],
+            "is_cta": act["is_cta"],
             "duration": duration,
             "global_start": global_time,
             "word_timings": word_timings,
@@ -143,22 +145,22 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
         global_time += duration
 
     total_duration = global_time
-    print(f"\n[Pipeline] [+] Total Video Duration: {total_duration:.2f}s", flush=True)
+    print(f"\n[Pipeline] [+] Total Micro-Documentary Duration: {total_duration:.2f}s", flush=True)
 
     # 3. Concatenate video clips and audio tracks
     video_base_path = TEMP_DIR / f"wildlife_{topic_id}_base.mp4"
     audio_base_path = TEMP_DIR / f"wildlife_{topic_id}_audio.mp3"
 
-    print("[Composer] Concatenating 4K video clips at constant 30 FPS...", flush=True)
+    print("[Composer] Concatenating continuous 4K footage at constant 30 FPS...", flush=True)
     composer.concatenate_video_clips(processed_clip_files, video_base_path)
 
-    # Generate Whoosh SFX for each curiosity transition
+    # Whoosh SFX
     whoosh_path = SFX_DIR / "whoosh.wav"
     if not whoosh_path.exists():
         generate_cinematic_whoosh(whoosh_path)
 
     scene_durations = [s["duration"] for s in scenes]
-    print("[Composer] Concatenating audio tracks with cinematic SFX whooshes...", flush=True)
+    print("[Composer] Concatenating voice tracks with suspense SFX transitions...", flush=True)
     composer.concatenate_audio_tracks_with_sfx(
         scene_audio_files,
         scene_durations,
@@ -166,22 +168,22 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
         audio_base_path
     )
 
-    # 4. Generate Classic Documentary Subtitles (.ass)
+    # 4. Generate Cinematic Story Subtitles (.ass)
     timestamp_str = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
     ass_path = TEMP_DIR / f"subtitles_{topic_id}_{timestamp_str}.ass"
-    print("[Subtitles] Generating Classic Documentary Subtitles with Frame-Perfect Acoustic Sync...", flush=True)
+    print("[Subtitles] Burning Cinematic Story Subtitles with Frame-Perfect Acoustic Sync...", flush=True)
     subtitle_engine.create_ass_subtitles(scenes, ass_path, total_duration)
 
-    # 5. Render Final 1080x1920 Video with Subtitles and Music
+    # 5. Render Final 1080x1920 Micro-Documentary
     output_filename = f"wildlife_{topic_id}_{timestamp_str}.mp4"
     final_output_path = OUTPUT_DIR / output_filename
 
-    # Ambient nature music
+    # Ambient nature suspense music
     bg_music_path = MUSIC_DIR / "ambient_nature.wav"
     if not bg_music_path.exists():
         generate_ambient_cinematic_music(bg_music_path, duration=total_duration + 5.0)
 
-    print(f"[Composer] Burning subtitles and mixing audio into final video -> {output_filename}...", flush=True)
+    print(f"[Composer] Assembling final video -> {output_filename}...", flush=True)
     composer.build_final_video(
         video_path=video_base_path,
         voice_audio_path=audio_base_path,
@@ -190,16 +192,16 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
         total_duration=total_duration,
         bg_music_path=bg_music_path
     )
-    print(f"\n[Pipeline] [VIDEO GENERATED SUCCESSFULLY! 🎬] -> {final_output_path}", flush=True)
+    print(f"\n[Pipeline] [MICRO-DOCUMENTARY GENERATED SUCCESSFULLY! 🎬] -> {final_output_path}", flush=True)
 
-    # 6. Save Metadata
-    description = f"{title} 🦁🌿\n\n{hook}\n\n" + "\n".join(hashtags)
+    # 6. Save Metadata & Description
+    description = f"{title}\n\n{act1}\n\n" + "\n".join(hashtags)
     metadata_path = OUTPUT_DIR / f"metadata_{topic_id}_{timestamp_str}.txt"
     with open(metadata_path, "w", encoding="utf-8") as f:
         f.write(f"TITLE:\n{title}\n\nDESCRIPTION:\n{description}\n\nTOPIC_ID:\n{topic_id}\n")
     print(f"[Pipeline] [+] Metadata saved to: {metadata_path.name}", flush=True)
 
-    # 7. Meta Auto-Publish (if active)
+    # 7. Meta Auto-Publish (if enabled)
     fb_post_id = ""
     if auto_publish:
         fb_uploader = FacebookUploader()
@@ -214,14 +216,14 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
     history.record_published_topic(topic_id, title, fb_post_id)
 
     print("\n" + "=" * 65)
-    print(f"  🎉 WILDLIFE PIPELINE COMPLETED SUCCESSFULLY")
-    print(f"  Topic: {topic_id} | File: {output_filename}")
+    print(f"  🎉 MICRO-DOCUMENTARY PIPELINE COMPLETED SUCCESSFULLY")
+    print(f"  Creature: {creature_name} | File: {output_filename}")
     print("=" * 65 + "\n", flush=True)
     return final_output_path
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Autonomous Simple English Wildlife Video Engine")
-    parser.add_argument("--topic", type=str, default="", help="Specific catalog topic (optional)")
+    parser = argparse.ArgumentParser(description="Wildlife Micro-Documentary Engine (Ares G Style)")
+    parser.add_argument("--topic", type=str, default="", help="Specific catalog topic (e.g. shoebill_stork)")
     parser.add_argument("--voice", type=str, default=DEFAULT_VOICE, help="Neural voice key")
     parser.add_argument("--no-publish", action="store_true", help="Disable auto-upload to Meta")
     args = parser.parse_args()

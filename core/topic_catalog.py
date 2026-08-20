@@ -1,105 +1,71 @@
 from typing import Dict, Any, List
 
 WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
-    "jaguar_hunter": {
-        "topic_id": "JAGUAR-JUNGLE-HUNTER",
-        "title": "5 Insane Facts About the World's Strongest Cat Bite!",
-        "hook": "The jaguar has the most powerful bite of any big cat on Earth!",
-        "curiosities": [
-            "Number one: Its jaws can easily crush a turtle shell and pierce thick skull bones in a single bite.",
-            "Number two: Unlike other big cats who dislike water, jaguares are champion swimmers and hunt underwater.",
-            "Number three: They stalk their prey in total silence using special soft pads on their massive paws.",
-            "Number four: The unique spots on their fur are like human fingerprints, with no two jaguars ever looking identical.",
-            "Number five: Ancient civilizations worshipped them as sacred guardians of the night and kings of the jungle."
-        ],
-        "cta": "Who would win: a Jaguar or an African Lion? Drop your vote in the comments and follow for more!",
+    "shoebill_stork": {
+        "topic_id": "SHOEBILL-STORK-DINOSAUR",
+        "title": "This Bird Looks Straight Out of Jurassic Park! 🦅🦖",
+        "creature_name": "shoebill stork",
+        "act1_hook": "Did you know this bird looks like it walked straight out of Jurassic Park?",
+        "act2_scale": "Standing over five feet tall, the Shoebill Stork has a massive dinosaur-like beak with razor-sharp curved edges.",
+        "act3_hunt": "It stands completely frozen in the swamp for hours, waiting in total silence... and then—BAM! A lightning-fast strike that crushes lungfish and even baby crocodiles in seconds.",
+        "act4_behavior": "When it locks eyes on you, it performs the chilling death stare—gazing unblinkingly straight into your soul with cold predator eyes.",
+        "act5_twist": "Yet despite looking like a prehistoric monster, it is remarkably gentle around humans, but fewer than five thousand survive in the wild today.",
+        "act6_climax_cta": "There is one sound it makes that terrifies everyone... Would you ever dare get this close? Drop a comment and follow for more wild creatures!",
         "pexels_keywords": [
-            "jaguar in jungle 4k vertical",
-            "jaguar hunting water 4k",
-            "jaguar swimming river vertical",
-            "jaguar walking rainforest vertical",
-            "jaguar eyes close up 4k",
-            "wild jaguar resting branch 4k",
-            "amazon rainforest wildlife vertical"
+            "shoebill stork walking swamp 4k vertical",
+            "shoebill stork close up head dinosaur 4k",
+            "shoebill stork hunting water slow motion 4k",
+            "shoebill stork stare looking camera 4k vertical",
+            "shoebill stork swamp wild nature 4k vertical",
+            "shoebill stork beak bill clapping 4k"
         ],
-        "hashtags": ["#jaguar", "#wildlife", "#predators", "#animals", "#nature", "#bigcats"]
-    },
-    "killer_whale_orca": {
-        "topic_id": "ORCA-APEX-OCEAN-KING",
-        "title": "5 Reasons Why Orcas Rule the Entire Ocean!",
-        "hook": "Not even the Great White Shark dares to challenge an Orca in the open ocean!",
-        "curiosities": [
-            "Number one: Orcas are actually the largest and smartest members of the oceanic dolphin family.",
-            "Number two: Each family pod has its own unique vocal dialect passed down across generations.",
-            "Number three: To hunt Great White Sharks, orcas flip them upside down to paralyze them instantly.",
-            "Number four: They work as a team to create giant waves that wash seals off floating ice sheets.",
-            "Number five: In the wild, female killer whales can live for over 90 years."
-        ],
-        "cta": "Did you know wild orcas have never harmed a human? Comment your thoughts below and subscribe!",
-        "pexels_keywords": [
-            "killer whale orca ocean 4k vertical",
-            "orca breaching waves vertical",
-            "orca pod swimming underwater 4k",
-            "great white shark swimming 4k",
-            "orca iceberg arctic vertical",
-            "ocean predator wildlife 4k",
-            "killer whale close up underwater vertical"
-        ],
-        "hashtags": ["#orcas", "#killerwhales", "#ocean", "#wildlife", "#marinelife", "#predators"]
+        "hashtags": ["#shoebill", "#shoebillstork", "#wildlife", "#animals", "#nature", "#jurassicpark", "#birds"]
     },
     "harpy_eagle": {
-        "topic_id": "HARPY-EAGLE-MONSTER-TALONS",
-        "title": "5 Mind-Blowing Facts About the Harpy Eagle!",
-        "hook": "This gigantic bird of prey has talons larger than a grizzly bear's claws!",
-        "curiosities": [
-            "Number one: Its rear talons can grow up to five inches long and exert devastating crushing force.",
-            "Number two: It can lift monkeys and sloths that match its own body weight straight up into the trees.",
-            "Number three: Its eyesight is eight times sharper than a human, spotting small prey from over 600 feet away.",
-            "Number four: It has rounded wings designed to dodge thick tree branches at extreme flight speeds.",
-            "Number five: Harpy eagles mate for life and build massive nests over five feet wide."
-        ],
-        "cta": "Could you imagine seeing this apex raptor in person? Tell us in the comments and follow for more!",
+        "topic_id": "HARPY-EAGLE-APEX-RAPTOR",
+        "title": "The Terrifying Apex Raptor of the Rainforest! 🦅🌴",
+        "creature_name": "harpy eagle",
+        "act1_hook": "Deep in the Amazon rainforest lives an apex predator with talons larger than a grizzly bear's claws!",
+        "act2_scale": "The Harpy Eagle possesses wings spanning nearly seven feet and rear talons over five inches long capable of crushing bones instantly.",
+        "act3_hunt": "It glides silently through dense tree branches at fifty miles per hour... and then—BAM! Snatches monkeys and sloths straight off the treetops with devastating power.",
+        "act4_behavior": "With eyesight eight times sharper than a human, it can spot a small animal moving from over six hundred feet away.",
+        "act5_twist": "They mate for life and defend their nests fiercely, ruling the jungle canopy as undisputed royalty for decades.",
+        "act6_climax_cta": "Could you imagine looking up and seeing this giant raptor flying above you? Tell us in the comments and follow for more apex predators!",
         "pexels_keywords": [
-            "harpy eagle flight 4k vertical",
-            "giant eagle talons close up 4k",
-            "eagle perched tree rainforest vertical",
-            "eagle hunting jungle canopy 4k",
-            "bird of prey eyes 4k vertical",
-            "rainforest canopy flight 4k",
-            "wild eagle wings spread vertical"
+            "harpy eagle flight rainforest 4k vertical",
+            "harpy eagle close up talons claws 4k",
+            "eagle hunting jungle canopy slow motion 4k",
+            "harpy eagle eyes looking at camera 4k vertical",
+            "rainforest canopy flight bird of prey 4k",
+            "wild eagle perched tree rainforest 4k vertical"
         ],
-        "hashtags": ["#harpyeagle", "#eagles", "#birdsofprey", "#wildlife", "#nature", "#animals"]
+        "hashtags": ["#harpyeagle", "#eagles", "#birdsofprey", "#wildlife", "#nature", "#amazonrainforest"]
     },
-    "colossal_squid": {
-        "topic_id": "COLOSSAL-SQUID-DEEP-ABYSS",
-        "title": "5 Terrifying Secrets of the Colossal Squid!",
-        "hook": "In the pitch-black waters of Antarctica lives a deep sea monster with rotating swiveling claws!",
-        "curiosities": [
-            "Number one: The colossal squid is the heaviest invertebrate on Earth, weighing up to 1,100 pounds.",
-            "Number two: It possesses the largest eyes in the animal kingdom, measuring the size of a dinner plate.",
-            "Number three: Its tentacles feature razor-sharp rotating hooks that rip through thick prey.",
-            "Number four: Its only natural rival is the Sperm Whale, clashing in epic battles over a mile deep.",
-            "Number five: Its blood is blue because it uses copper-based molecules to carry oxygen in icy waters."
-        ],
-        "cta": "Would you ever dare to explore the deep ocean? Let us know in the comments and share this video!",
+    "mantis_shrimp": {
+        "topic_id": "MANTIS-SHRIMP-SONIC-PUNCH",
+        "title": "The Ocean Creature with a Bullet-Speed Punch! 🦐💥",
+        "creature_name": "mantis shrimp",
+        "act1_hook": "This tiny ocean creature punches with the same acceleration as a gunshot bullet!",
+        "act2_scale": "The Mantis Shrimp may look colorful and small, but its club-like arms are reinforced with shock-absorbing layers stronger than bulletproof glass.",
+        "act3_hunt": "It stalks unsuspecting crabs on the reef... and then—BAM! Strikes at fifty miles per hour, boiling the surrounding water and shattering thick shells in a single blow.",
+        "act4_behavior": "It possesses the most complex eyes on planet Earth, seeing sixteen primary colors and invisible polarized light that humans can't even dream of.",
+        "act5_twist": "Aquariums cannot keep them in standard glass tanks because a single punch can easily crack the glass.",
+        "act6_climax_cta": "Would you ever try to touch this rainbow boxer? Drop your reaction below and follow for more ocean mysteries!",
         "pexels_keywords": [
-            "giant squid deep ocean underwater 4k vertical",
-            "deep sea creature glowing underwater 4k",
-            "sperm whale deep diving vertical",
-            "dark abyss underwater ocean 4k",
-            "squid tentacles moving underwater 4k",
-            "antarctic ocean underwater ice vertical",
-            "mysterious ocean depths 4k vertical"
+            "mantis shrimp ocean coral reef 4k vertical",
+            "mantis shrimp colorful eyes close up 4k",
+            "mantis shrimp punching shell underwater slow motion 4k",
+            "underwater macro ocean creature reef 4k vertical",
+            "colorful coral reef ocean wildlife 4k vertical",
+            "deep ocean glowing marine life 4k vertical"
         ],
-        "hashtags": ["#colossalsquid", "#deepsea", "#oceanmonsters", "#wildlife", "#nature", "#abyss"]
+        "hashtags": ["#mantisshrimp", "#ocean", "#marinelife", "#wildlife", "#nature", "#sea"]
     }
 }
 
 def get_wildlife_topic(topic_name: str) -> Dict[str, Any]:
-    """Retrieves a wildlife topic from the predefined catalog."""
     key = topic_name.lower().replace("-", "_")
     return WILDLIFE_CATALOG.get(key, list(WILDLIFE_CATALOG.values())[0])
 
 def get_all_wildlife_topics() -> List[str]:
-    """Returns all keys from the Wildlife catalog."""
     return list(WILDLIFE_CATALOG.keys())

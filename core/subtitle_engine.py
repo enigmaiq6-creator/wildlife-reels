@@ -14,7 +14,7 @@ def format_ass_time(seconds: float) -> str:
         cs = 99
     return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
 
-def wrap_text_lines(text: str, max_chars_per_line: int = 32) -> str:
+def wrap_text_lines(text: str, max_chars_per_line: int = 30) -> str:
     """Wraps long sentences into max 2 balanced lines using \\N."""
     words = text.split()
     if len(text) <= max_chars_per_line or len(words) <= 4:
@@ -33,16 +33,15 @@ class SubtitleEngine:
 
     def create_ass_subtitles(self, scene_data: List[Dict[str, Any]], output_ass_path: Path, total_video_duration: float = 60.0):
         """
-        Generates CLASSIC DOCUMENTARY subtitles with FRAME-PERFECT ACOUSTIC SYNC in Simple English:
-        1. Elevated Position (MarginV=480 in vertical) to clear Reels UI, Page Name, and Audio Bar.
-        2. Acoustic synchronization (35ms perceptual lead, zero lingering lag).
-        3. Balanced natural sentence phrasing (4 to 6 words).
-        4. Subtle golden number badge (#01-#05) in top-left.
+        Generates CLASSIC DOCUMENTARY subtitles for Micro-Documentaries (Ares G style):
+        - Clean, modern, high-contrast typography in safe lower-third (MarginV=480).
+        - Highlights impact words ('BAM!', 'ZAS!', 'Jurassic Park') in glowing amber.
+        - Frame-perfect acoustic synchronization with 35ms perceptual lead.
         """
         output_ass_path.parent.mkdir(parents=True, exist_ok=True)
         
-        font_size = SUBTITLE_CONFIG["font_size_vertical"] if self.width == 1080 else 50
-        margin_v = SUBTITLE_CONFIG["margin_v_vertical"] if self.width == 1080 else 120
+        font_size = SUBTITLE_CONFIG.get("font_size_vertical", 46) if self.width == 1080 else 50
+        margin_v = SUBTITLE_CONFIG.get("margin_v_vertical", 480) if self.width == 1080 else 120
 
         header = f"""[Script Info]
 ScriptType: v4.00+
@@ -52,17 +51,16 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: NumberStamp,Arial,68,&H0000D4FF,&H00FFFFFF,&H00000000,&H90000000,-1,0,0,0,100,100,0,0,1,5,2,7,60,60,120,1
-Style: DocSubtitle,Arial,{font_size},&H00FFFFFF,&H0000D4FF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,4,2.5,2,60,60,{margin_v},1
-Style: DocHook,Arial,{font_size + 4},&H0000FFFF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,4.5,2.5,2,50,50,{margin_v},1
-Style: DocCTA,Arial,{font_size + 2},&H0000D4FF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,4.5,2.5,2,50,50,{margin_v},1
+Style: StoryDefault,Arial,{font_size},&H00FFFFFF,&H0000D4FF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,4.2,2.5,2,50,50,{margin_v},1
+Style: StoryHook,Arial,{font_size + 4},&H0000FFFF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,4.5,2.5,2,40,40,{margin_v},1
+Style: StoryImpact,Arial,{font_size + 10},&H0000D4FF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,110,110,0,0,1,5.5,3.0,2,40,40,{margin_v},1
+Style: StoryCTA,Arial,{font_size + 2},&H0000D4FF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,4.5,2.5,2,40,40,{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 
         events = []
-        curiosity_seen = set()
 
         for scene in scene_data:
             scene_start = scene.get("global_start", 0.0)
@@ -70,27 +68,16 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             scene_end = scene_start + scene_dur
             is_hook = scene.get("is_hook", False)
             is_cta = scene.get("is_cta", False)
-            curiosity_num = scene.get("curiosity_index", None)
+            is_impact = scene.get("is_impact", False)
 
-            # 1. Subtle top number stamp (#01 to #05)
-            if curiosity_num and curiosity_num not in curiosity_seen:
-                curiosity_seen.add(curiosity_num)
-                stamp_start = scene_start
-                stamp_end = scene_start + min(2.0, scene_dur)
-                
-                s_t = format_ass_time(stamp_start)
-                e_t = format_ass_time(stamp_end)
-                
-                stamp_text = f"{{\\fad(100,200)\\c&H0000D4FF&\\3c&H00000000&\\bord5\\shad2}}#{curiosity_num:02d}"
-                events.append(f"Dialogue: 1,{s_t},{e_t},NumberStamp,,0,0,0,,{stamp_text}")
-
-            # 2. Style selector
             if is_hook:
-                style_name = "DocHook"
+                style_name = "StoryHook"
             elif is_cta:
-                style_name = "DocCTA"
+                style_name = "StoryCTA"
+            elif is_impact:
+                style_name = "StoryImpact"
             else:
-                style_name = "DocSubtitle"
+                style_name = "StoryDefault"
 
             word_timings = scene.get("word_timings", [])
             raw_text = scene.get("text", "").strip()
@@ -102,7 +89,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 events.append(f"Dialogue: 0,{s_time},{e_time},{style_name},,0,0,0,,{{\\fad(50,50)}}{formatted_text}")
                 continue
 
-            # 3. Natural clause grouping
+            # Natural clause grouping
             sentence_chunks = []
             current_chunk = []
             
@@ -112,19 +99,18 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     continue
                 current_chunk.append(w_info)
                 
-                has_strong_punct = any(p in w_text for p in [".", "!", "?", ":", ";"])
-                has_soft_punct = any(p in w_text for p in [",", "—", "-"])
+                has_strong_punct = any(p in w_text for p in [".", "!", "?", ":", ";", "—"])
+                has_soft_punct = any(p in w_text for p in [",", "-"])
                 
                 if has_strong_punct or (has_soft_punct and len(current_chunk) >= 3) or len(current_chunk) >= 5 or w_idx == len(word_timings) - 1:
                     sentence_chunks.append(current_chunk)
                     current_chunk = []
 
-            # 4. Frame-perfect acoustic synchronization
+            # Acoustic synchronization
             for idx_c, chunk in enumerate(sentence_chunks):
                 chunk_raw_start = scene_start + chunk[0]["start"]
                 chunk_raw_end = scene_start + chunk[-1]["end"]
                 
-                # 35ms perceptual lead
                 c_start = max(scene_start, chunk_raw_start - 0.035)
                 
                 if idx_c < len(sentence_chunks) - 1:
@@ -139,9 +125,15 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 chunk_words = [w["word"] for w in chunk]
                 clause_text = " ".join(chunk_words)
                 
-                wrapped_clause = wrap_text_lines(clause_text, max_chars_per_line=32)
+                # Check for impact words
+                if any(imp in clause_text.upper() for imp in ["BAM", "ZAS", "BOOM", "CRUSH", "STRIKE"]):
+                    chunk_style = "StoryImpact"
+                else:
+                    chunk_style = style_name
+
+                wrapped_clause = wrap_text_lines(clause_text, max_chars_per_line=30)
                 dialogue_text = f"{{\\fad(50,50)}}{wrapped_clause}"
-                events.append(f"Dialogue: 0,{c_start_str},{c_end_str},{style_name},,0,0,0,,{dialogue_text}")
+                events.append(f"Dialogue: 0,{c_start_str},{c_end_str},{chunk_style},,0,0,0,,{dialogue_text}")
 
         with open(output_ass_path, "w", encoding="utf-8") as f:
             f.write(header + "\n".join(events) + "\n")
