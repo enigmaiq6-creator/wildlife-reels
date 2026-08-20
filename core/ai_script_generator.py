@@ -7,28 +7,29 @@ from typing import Dict, Any, List, Optional
 
 class AIScriptGenerator:
     """
-    Generador Autónomo de Guiones de Vida Salvaje con IA (Groq Cloud):
-    - Genera guiones documentales 100% en ESPAÑOL sobre fauna, depredadores y supervivencia animal.
-    - Soporta tolerancia a fallos con doble clave API (GROQ_API_KEY y GROQ_API_KEY_BACKUP).
-    - Conmutación en cascada entre los modelos más veloces y precisos de Groq.
-    - Consulta el historial para garantizar CERO REPETICIÓN de especies o temas.
+    Autonomous Wildlife AI Script Generator (Groq Cloud):
+    - Generates 100% SIMPLE, CLEAR, AND ENGAGING ENGLISH wildlife scripts.
+    - Uses easy-to-understand vocabulary (high retention for global & US viewers).
+    - Multi-Key failover support (GROQ_API_KEY and GROQ_API_KEY_BACKUP).
+    - 3-tier cascade model fallback.
+    - Zero topic repetition via history.json check.
     """
 
     GROQ_MODELS = [
-        "openai/gpt-oss-120b", # Modelo #1 ultra-inteligente y rápido (0.9s)
-        "openai/gpt-oss-20b",  # Modelo #2 de alta velocidad (0.6s)
-        "groq/compound-mini"   # Modelo #3 respaldo ligero (0.8s)
+        "openai/gpt-oss-120b", # Model #1 ultra-fast (0.9s)
+        "openai/gpt-oss-20b",  # Model #2 high speed (0.6s)
+        "groq/compound-mini"   # Model #3 fallback (0.8s)
     ]
 
     WILDLIFE_NICHES = [
-        "Depredadores alfa y cazadores letales de la sabana o la selva",
-        "Criaturas abisales y monstruos del océano profundo",
-        "Animales con venenos letales y toxinas mortales",
-        "Estrategias extremas de supervivencia y camuflaje animal",
-        "Aves rapaces y cazadores del cielo con sentidos hipersensibles",
-        "Insectos y artrópodos con habilidades biológicas increíbles",
-        "Gigantes prehistóricos o especies al borde de la extinción con adaptaciones únicas",
-        "Simbiosis y batallas territoriales en la naturaleza salvaje"
+        "Apex predators and extreme hunters of the savannah, jungle, or arctic",
+        "Deep sea ocean monsters and glowing abyss creatures",
+        "Deadly venomous animals and secret animal weapons",
+        "Extreme survival skills, mimicry, and camouflage in the wild",
+        "Eagles, owls, and birds of prey with supersonic vision",
+        "Superpowered insects and armored bugs that defy science",
+        "Giant animals, apex reptiles, and ancient living fossils",
+        "Animal rivalries and territorial battles in nature"
     ]
 
     def __init__(self, primary_key: Optional[str] = None, backup_key: Optional[str] = None):
@@ -39,31 +40,31 @@ class AIScriptGenerator:
         self.endpoint = "https://api.groq.com/openai/v1/chat/completions"
 
     def generate_wildlife_script(self, seen_topics: Optional[List[str]] = None) -> Optional[Dict[str, Any]]:
-        """Genera un guion documental inédito de Vida Salvaje en Español."""
+        """Generates a fresh, unseen wildlife documentary script in SIMPLE, EASY-TO-UNDERSTAND ENGLISH."""
         if not self.api_keys:
-            print("[AIScriptGenerator] [!] No se configuraron claves de Groq. Usando catálogo de respaldo.")
+            print("[AIScriptGenerator] [!] No Groq API keys configured. Using fallback catalog.")
             return None
 
         seen_topics = seen_topics or []
-        seen_str = ", ".join(seen_topics[-30:]) if seen_topics else "ninguno"
+        seen_str = ", ".join(seen_topics[-30:]) if seen_topics else "none"
         selected_niche = random.choice(self.WILDLIFE_NICHES)
 
-        prompt = f"""Eres un biólogo experto y director de documentales estilo National Geographic / BBC Earth.
-Tu misión es crear un guion VIRAL para un video corto (Reel de 50-55 segundos) sobre: {selected_niche}.
+        prompt = f"""You are a master wildlife documentary creator like BBC Earth and National Geographic.
+Create a VIRAL, highly engaging short video script (50-55 seconds) about: {selected_niche}.
 
-REGLAS CRÍTICAS:
-1. Idioma: 100% ESPAÑOL natural, cautivador, apasionante y cinematográfico.
-2. Formato:
-   - topic_id: Identificador único en mayúsculas y guiones (ej. 'AGUILA-ARPIA-CAZADORA', 'CALAMAR-COLOSAL-ABISMAL').
-   - title: Título atractivo (ej. '5 Secretos Letales del Águila Arpía').
-   - hook: Gancho magnético inicial de 2 a 3 segundos (ej. '¡Esta es el águila más poderosa del planeta y caza monos en segundos!').
-   - curiosities: Exactamente 5 datos asombrosos y científicamente verificados. Cada dato debe comenzar con 'Número uno:', 'Número dos:', 'Número tres:', 'Número cuatro:', 'Número cinco:'.
-   - cta: Llamado a la acción que invite a debatir en comentarios (ej. '¿Crees que este depredador podría vencer a un jaguar? ¡Comenta y síguenos para más vida salvaje!').
-   - pexels_keywords: Lista de exactamente 7 términos de búsqueda en INGLÉS para buscar clips de stock 4K de alta calidad (1 para el gancho, 5 para cada curiosidad, 1 para el llamado a la acción). Ej: ['harpy eagle hunting 4k', 'giant eagle talons close up', ...]
-   - hashtags: Lista de 6 hashtags virales en español (ej. ['#vidasalvaje', '#animales', '#naturaleza', '#depredadores', '#fauna', '#documental']).
-3. EXCLUSIÓN: No repitas ninguno de los siguientes temas ya publicados: [{seen_str}].
+CRITICAL RULES:
+1. Language: 100% SIMPLE, CLEAR, AND EXCITING ENGLISH. Use easy-to-understand words that anyone in the world can enjoy without feeling confused.
+2. Structure:
+   - topic_id: Unique uppercase slug with dashes (e.g. 'HARPY-EAGLE-MONSTER', 'COLOSSAL-SQUID-MYSTERY').
+   - title: Catchy, simple title (e.g. '5 Insane Facts About the World's Deadliest Eagle!').
+   - hook: 2-3 second magnetic hook (e.g. 'This massive eagle has talons larger than a grizzly bear!').
+   - curiosities: Exactly 5 mind-blowing facts. Each MUST start with 'Number one:', 'Number two:', 'Number three:', 'Number four:', 'Number five:'.
+   - cta: Simple call to action prompting comments (e.g. 'Who would win: a Jaguar or an Anaconda? Drop your answer below and follow for more wildlife!').
+   - pexels_keywords: List of exactly 7 search terms in English for 4K vertical stock videos (1 for hook, 5 for curiosities, 1 for CTA).
+   - hashtags: List of 6 viral English hashtags (e.g. ['#wildlife', '#animals', '#nature', '#predators', '#documentary', '#wild']).
+3. EXCLUSION: Do NOT repeat any of these previously published topics: [{seen_str}].
 
-Responde ÚNICA Y EXCLUSIVAMENTE con un objeto JSON válido con la siguiente estructura exacta:
+Respond ONLY with a valid JSON object matching this exact schema:
 {{
   "topic_id": "STRING",
   "title": "STRING",
@@ -77,7 +78,7 @@ Responde ÚNICA Y EXCLUSIVAMENTE con un objeto JSON válido con la siguiente est
         for key_idx, api_key in enumerate(self.api_keys, 1):
             for model_name in self.GROQ_MODELS:
                 try:
-                    print(f"[AIScriptGenerator] [+] Consultando Groq AI ({model_name}) [Key {key_idx}]...")
+                    print(f"[AIScriptGenerator] [+] Querying Groq AI ({model_name}) [Key {key_idx}] for simple English script...")
                     headers = {
                         "Authorization": f"Bearer {api_key}",
                         "Content-Type": "application/json",
@@ -87,7 +88,7 @@ Responde ÚNICA Y EXCLUSIVAMENTE con un objeto JSON válido con la siguiente est
                     payload = {
                         "model": model_name,
                         "messages": [
-                            {"role": "system", "content": "Eres un asistente que responde exclusivamente en JSON válido estructurado."},
+                            {"role": "system", "content": "You are a professional assistant that responds ONLY with valid structured JSON."},
                             {"role": "user", "content": prompt}
                         ],
                         "temperature": 0.75,
@@ -100,15 +101,14 @@ Responde ÚNICA Y EXCLUSIVAMENTE con un objeto JSON válido con la siguiente est
                         content_str = res_data["choices"][0]["message"]["content"]
                         script_json = json.loads(content_str)
                         
-                        # Validar campos obligatorios
                         req_fields = ["topic_id", "title", "hook", "curiosities", "cta", "pexels_keywords", "hashtags"]
                         if all(f in script_json for f in req_fields) and len(script_json["curiosities"]) == 5:
                             topic_id = script_json["topic_id"].strip().upper().replace(" ", "-")
                             script_json["topic_id"] = topic_id
-                            print(f"[AIScriptGenerator] [ÉXITO TOTAL] Tema de Vida Salvaje creado: '{topic_id}' - {script_json['title']}")
+                            print(f"[AIScriptGenerator] [SUCCESS] Created Simple English Wildlife Topic: '{topic_id}' - {script_json['title']}")
                             return script_json
                 except Exception as e:
-                    print(f"[AIScriptGenerator] [!] Falló {model_name} con Key {key_idx}: {str(e)[:80]}")
+                    print(f"[AIScriptGenerator] [!] Failed {model_name} with Key {key_idx}: {str(e)[:80]}")
                     continue
 
         return None

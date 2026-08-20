@@ -1,18 +1,18 @@
 from typing import Dict, Any, List
 
 WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
-    "jaguar_cazador": {
-        "topic_id": "JAGUAR-CAZADOR-SELVA",
-        "title": "5 Secretos Letales del Jaguar de la Selva",
-        "hook": "¡El jaguar posee la mordida más devastadora de todos los felinos del planeta!",
+    "jaguar_hunter": {
+        "topic_id": "JAGUAR-JUNGLE-HUNTER",
+        "title": "5 Insane Facts About the World's Strongest Cat Bite!",
+        "hook": "The jaguar has the most powerful bite of any big cat on Earth!",
         "curiosities": [
-            "Número uno: Su mandíbula es capaz de perforar el caparazón blindado de una tortuga marina y el cráneo de un caimán de un solo bocado.",
-            "Número dos: A diferencia de otros felinos que evitan el agua, los jaguares son nadadores olímpicos y cazan bajo el agua en ríos caudalosos.",
-            "Número tres: Cazan acechando en silencio absoluto gracias a almohadillas especiales en sus patas que absorben cualquier vibración.",
-            "Número cuatro: El patrón de rosetas en su pelaje es tan único e irrepetible como la huella dactilar de un ser humano.",
-            "Número cinco: En la mitología maya, eran considerados deidades guardianas de la noche y señores del inframundo."
+            "Number one: Its jaws can easily crush a turtle shell and pierce thick skull bones in a single bite.",
+            "Number two: Unlike other big cats who dislike water, jaguares are champion swimmers and hunt underwater.",
+            "Number three: They stalk their prey in total silence using special soft pads on their massive paws.",
+            "Number four: The unique spots on their fur are like human fingerprints, with no two jaguars ever looking identical.",
+            "Number five: Ancient civilizations worshipped them as sacred guardians of the night and kings of the jungle."
         ],
-        "cta": "¿Crees que un jaguar podría vencer a un león en la selva? ¡Deja tu opinión en los comentarios y síguenos!",
+        "cta": "Who would win: a Jaguar or an African Lion? Drop your vote in the comments and follow for more!",
         "pexels_keywords": [
             "jaguar in jungle 4k vertical",
             "jaguar hunting water 4k",
@@ -22,20 +22,20 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "wild jaguar resting branch 4k",
             "amazon rainforest wildlife vertical"
         ],
-        "hashtags": ["#jaguar", "#vidasalvaje", "#depredadores", "#naturaleza", "#animales", "#selva"]
+        "hashtags": ["#jaguar", "#wildlife", "#predators", "#animals", "#nature", "#bigcats"]
     },
-    "orca_depredador_supremo": {
-        "topic_id": "ORCA-DEPREDADOR-SUPREMO",
-        "title": "5 Razones por las que la Orca es el Rey del Océano",
-        "hook": "¡Ni siquiera el gran tiburón blanco se atreve a enfrentarse a una orca en el océano!",
+    "killer_whale_orca": {
+        "topic_id": "ORCA-APEX-OCEAN-KING",
+        "title": "5 Reasons Why Orcas Rule the Entire Ocean!",
+        "hook": "Not even the Great White Shark dares to challenge an Orca in the open ocean!",
         "curiosities": [
-            "Número uno: Las orcas no son ballenas, sino los miembros más grandes y poderosos de la familia de los delfines.",
-            "Número dos: Tienen dialectos acústicos únicos que se transmiten de generación en generación como un lenguaje familiar.",
-            "Número tres: Para cazar al tiburón blanco, las orcas lo voltean de espaldas para inducirle una parálisis tónica involuntaria.",
-            "Número cuatro: Trabajan en equipo coordinado creando olas gigantescas para derribar focas de los témpanos de hielo.",
-            "Número cinco: Tienen una esperanza de vida que en hembras salvajes puede superar los 90 años de edad."
+            "Number one: Orcas are actually the largest and smartest members of the oceanic dolphin family.",
+            "Number two: Each family pod has its own unique vocal dialect passed down across generations.",
+            "Number three: To hunt Great White Sharks, orcas flip them upside down to paralyze them instantly.",
+            "Number four: They work as a team to create giant waves that wash seals off floating ice sheets.",
+            "Number five: In the wild, female killer whales can live for over 90 years."
         ],
-        "cta": "¿Sabías que las orcas nunca han atacado a un humano en libertad? ¡Comenta y suscríbete para más fauna!",
+        "cta": "Did you know wild orcas have never harmed a human? Comment your thoughts below and subscribe!",
         "pexels_keywords": [
             "killer whale orca ocean 4k vertical",
             "orca breaching waves vertical",
@@ -45,20 +45,20 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "ocean predator wildlife 4k",
             "killer whale close up underwater vertical"
         ],
-        "hashtags": ["#orcas", "#oceanos", "#vidasalvaje", "#naturaleza", "#depredadores", "#faunamarina"]
+        "hashtags": ["#orcas", "#killerwhales", "#ocean", "#wildlife", "#marinelife", "#predators"]
     },
-    "aguila_arpia": {
-        "topic_id": "AGUILA-ARPIA-REINA-DEL-AIRE",
-        "title": "5 Datos Asombrosos del Águila Arpía",
-        "hook": "¡Esta gigantesca ave rapaz tiene garras más grandes que las de un oso pardo!",
+    "harpy_eagle": {
+        "topic_id": "HARPY-EAGLE-MONSTER-TALONS",
+        "title": "5 Mind-Blowing Facts About the Harpy Eagle!",
+        "hook": "This gigantic bird of prey has talons larger than a grizzly bear's claws!",
         "curiosities": [
-            "Número uno: Sus garras traseras pueden medir hasta 13 centímetros y ejercer una presión de más de 40 kilos por centímetro cuadrado.",
-            "Número dos: Es capaz de levantar presas que igualan su propio peso corporal en pleno vuelo vertical entre la densa selva.",
-            "Número tres: Su visión es ocho veces más potente que la del ojo humano, detectando presas a más de doscientos metros de distancia.",
-            "Número cuatro: Sus alas son redondeadas para maniobrar a gran velocidad entre las ramas de árboles gigantes sin colisionar.",
-            "Número cinco: Las parejas de águila arpía son monógamas de por vida y construyen nidos de más de un metro y medio de ancho."
+            "Number one: Its rear talons can grow up to five inches long and exert devastating crushing force.",
+            "Number two: It can lift monkeys and sloths that match its own body weight straight up into the trees.",
+            "Number three: Its eyesight is eight times sharper than a human, spotting small prey from over 600 feet away.",
+            "Number four: It has rounded wings designed to dodge thick tree branches at extreme flight speeds.",
+            "Number five: Harpy eagles mate for life and build massive nests over five feet wide."
         ],
-        "cta": "¿Te imaginas ver de cerca a esta reina de los cielos? ¡Cuéntanos en comentarios y síguenos para más!",
+        "cta": "Could you imagine seeing this apex raptor in person? Tell us in the comments and follow for more!",
         "pexels_keywords": [
             "harpy eagle flight 4k vertical",
             "giant eagle talons close up 4k",
@@ -68,20 +68,20 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "rainforest canopy flight 4k",
             "wild eagle wings spread vertical"
         ],
-        "hashtags": ["#aguilaarpia", "#avesrapaces", "#vidasalvaje", "#naturaleza", "#fauna", "#selvaamazonica"]
+        "hashtags": ["#harpyeagle", "#eagles", "#birdsofprey", "#wildlife", "#nature", "#animals"]
     },
-    "calamar_colosal": {
-        "topic_id": "CALAMAR-COLOSAL-ABISMO",
-        "title": "5 Misterios del Monstruoso Calamar Colosal",
-        "hook": "¡En las profundidades heladas de la Antártida habita un monstruo con garras giratorias!",
+    "colossal_squid": {
+        "topic_id": "COLOSSAL-SQUID-DEEP-ABYSS",
+        "title": "5 Terrifying Secrets of the Colossal Squid!",
+        "hook": "In the pitch-black waters of Antarctica lives a deep sea monster with rotating swiveling claws!",
         "curiosities": [
-            "Número uno: El calamar colosal es el invertebrado más masivo del planeta, alcanzando pesos de casi media tonelada.",
-            "Número dos: Posee los ojos más grandes del reino animal, con el diámetro exacto de un plato de comida o un balón de fútbol.",
-            "Número tres: Sus tentáculos no tienen ventosas comunes, sino garfios giratorios afilados que destrozan a sus presas.",
-            "Número cuatro: Su único depredador conocido en el abismo es el colosal cachalote, librando batallas titánicas a 2000 metros de profundidad.",
-            "Número cinco: Su sangre es de color azul porque utiliza hemocianina a base de cobre para transportar oxígeno en aguas heladas."
+            "Number one: The colossal squid is the heaviest invertebrate on Earth, weighing up to 1,100 pounds.",
+            "Number two: It possesses the largest eyes in the animal kingdom, measuring the size of a dinner plate.",
+            "Number three: Its tentacles feature razor-sharp rotating hooks that rip through thick prey.",
+            "Number four: Its only natural rival is the Sperm Whale, clashing in epic battles over a mile deep.",
+            "Number five: Its blood is blue because it uses copper-based molecules to carry oxygen in icy waters."
         ],
-        "cta": "¿Te atreverías a explorar las profundidades marinas? ¡Déjanos tu comentario y comparte este video!",
+        "cta": "Would you ever dare to explore the deep ocean? Let us know in the comments and share this video!",
         "pexels_keywords": [
             "giant squid deep ocean underwater 4k vertical",
             "deep sea creature glowing underwater 4k",
@@ -91,15 +91,15 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "antarctic ocean underwater ice vertical",
             "mysterious ocean depths 4k vertical"
         ],
-        "hashtags": ["#calamarcolosal", "#abismo", "#monstruosmarinos", "#vidasalvaje", "#oceanos", "#misterio"]
+        "hashtags": ["#colossalsquid", "#deepsea", "#oceanmonsters", "#wildlife", "#nature", "#abyss"]
     }
 }
 
 def get_wildlife_topic(topic_name: str) -> Dict[str, Any]:
-    """Obtiene un tema del catálogo predefinido."""
+    """Retrieves a wildlife topic from the predefined catalog."""
     key = topic_name.lower().replace("-", "_")
     return WILDLIFE_CATALOG.get(key, list(WILDLIFE_CATALOG.values())[0])
 
 def get_all_wildlife_topics() -> List[str]:
-    """Retorna todas las claves del catálogo de Vida Salvaje."""
+    """Returns all keys from the Wildlife catalog."""
     return list(WILDLIFE_CATALOG.keys())

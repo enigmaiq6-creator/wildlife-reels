@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 from config import RESOLUTIONS, SUBTITLE_CONFIG
 
 def format_ass_time(seconds: float) -> str:
-    """Convierte segundos a formato de tiempo ASS: H:MM:SS.cs con precisión de centésimas."""
+    """Converts seconds to ASS time format: H:MM:SS.cs with centisecond precision."""
     seconds = max(0.0, seconds)
     h = int(seconds // 3600)
     m = int((seconds % 3600) // 60)
@@ -15,7 +15,7 @@ def format_ass_time(seconds: float) -> str:
     return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
 
 def wrap_text_lines(text: str, max_chars_per_line: int = 32) -> str:
-    """Divide oraciones largas en máximo 2 líneas equilibradas usando \\N."""
+    """Wraps long sentences into max 2 balanced lines using \\N."""
     words = text.split()
     if len(text) <= max_chars_per_line or len(words) <= 4:
         return text
@@ -33,11 +33,11 @@ class SubtitleEngine:
 
     def create_ass_subtitles(self, scene_data: List[Dict[str, Any]], output_ass_path: Path, total_video_duration: float = 60.0):
         """
-        Genera subtítulos estilo DOCUMENTAL CLÁSICO en ESPAÑOL con ALINEACIÓN ACÚSTICA PERFECTA:
-        1. Posición elevada (MarginV=480 en vertical) para evitar la interfaz y nombre de página de Reels.
-        2. Sincronización milimétrica con la voz (lead-in perceptual de 35ms y corte exacto).
-        3. Frases completas equilibradas (4 a 6 palabras) con tipografía limpia y fade suave.
-        4. Sello numérico (#01-#05) dorado en la esquina superior.
+        Generates CLASSIC DOCUMENTARY subtitles with FRAME-PERFECT ACOUSTIC SYNC in Simple English:
+        1. Elevated Position (MarginV=480 in vertical) to clear Reels UI, Page Name, and Audio Bar.
+        2. Acoustic synchronization (35ms perceptual lead, zero lingering lag).
+        3. Balanced natural sentence phrasing (4 to 6 words).
+        4. Subtle golden number badge (#01-#05) in top-left.
         """
         output_ass_path.parent.mkdir(parents=True, exist_ok=True)
         
@@ -72,7 +72,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             is_cta = scene.get("is_cta", False)
             curiosity_num = scene.get("curiosity_index", None)
 
-            # 1. Sello numérico (#01 a #05)
+            # 1. Subtle top number stamp (#01 to #05)
             if curiosity_num and curiosity_num not in curiosity_seen:
                 curiosity_seen.add(curiosity_num)
                 stamp_start = scene_start
@@ -84,7 +84,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 stamp_text = f"{{\\fad(100,200)\\c&H0000D4FF&\\3c&H00000000&\\bord5\\shad2}}#{curiosity_num:02d}"
                 events.append(f"Dialogue: 1,{s_t},{e_t},NumberStamp,,0,0,0,,{stamp_text}")
 
-            # 2. Determinar estilo
+            # 2. Style selector
             if is_hook:
                 style_name = "DocHook"
             elif is_cta:
@@ -102,7 +102,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 events.append(f"Dialogue: 0,{s_time},{e_time},{style_name},,0,0,0,,{{\\fad(50,50)}}{formatted_text}")
                 continue
 
-            # 3. Agrupación natural por cláusulas y pausas de respiración
+            # 3. Natural clause grouping
             sentence_chunks = []
             current_chunk = []
             
@@ -115,16 +115,16 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 has_strong_punct = any(p in w_text for p in [".", "!", "?", ":", ";"])
                 has_soft_punct = any(p in w_text for p in [",", "—", "-"])
                 
-                # Partición equilibrada (4 a 6 palabras o ante puntuación natural)
                 if has_strong_punct or (has_soft_punct and len(current_chunk) >= 3) or len(current_chunk) >= 5 or w_idx == len(word_timings) - 1:
                     sentence_chunks.append(current_chunk)
                     current_chunk = []
 
-            # 4. Sincronización acústica milimétrica
+            # 4. Frame-perfect acoustic synchronization
             for idx_c, chunk in enumerate(sentence_chunks):
                 chunk_raw_start = scene_start + chunk[0]["start"]
                 chunk_raw_end = scene_start + chunk[-1]["end"]
                 
+                # 35ms perceptual lead
                 c_start = max(scene_start, chunk_raw_start - 0.035)
                 
                 if idx_c < len(sentence_chunks) - 1:
