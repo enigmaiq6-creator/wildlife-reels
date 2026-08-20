@@ -1,6 +1,46 @@
 from typing import Dict, Any, List
 
 WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
+    "great_white_shark": {
+        "topic_id": "GREAT-WHITE-SHARK-APEX",
+        "title": "The Ocean's Greatest Demon: The Great White! 🦈🌊",
+        "creature_name": "shark",
+        "act1_hook": "What if I told you the ultimate monster of the ocean has been roaming the deep for over sixteen million years?",
+        "act2_scale": "Reaching twenty feet in length and weighing over five thousand pounds, the Great White Shark is packed with three hundred razor-sharp serrated teeth arranged in rotating rows.",
+        "act3_hunt": "It stalks massive sea lions from the dark abyss below, accelerating to twenty-five miles per hour... and then—BAM! A terrifying breach that launches thousands of pounds of predator completely out of the water.",
+        "act4_behavior": "It possesses an electromagnetic sixth sense so acute that it can detect the single heartbeat of a fish from miles away.",
+        "act5_twist": "Yet despite its reputation as a mindless man-eater, humans are not on its menu—most bites are just curious test nibbles.",
+        "act6_climax_cta": "Would you ever dive into the open ocean with this ocean king? Tell us in the comments and hit follow for more apex beasts!",
+        "pexels_keywords": [
+            "great white shark swimming underwater 4k vertical",
+            "shark teeth close up underwater 4k",
+            "shark breaching ocean attack 4k",
+            "great white shark eyes underwater vertical",
+            "shark swimming deep blue ocean 4k",
+            "massive shark ocean surface 4k vertical"
+        ],
+        "hashtags": ["#shark", "#greatwhiteshark", "#ocean", "#wildlife", "#predators", "#marinelife", "#nature"]
+    },
+    "killer_orca": {
+        "topic_id": "ORCA-OCEAN-PSYCHOPATH",
+        "title": "The True King of the Deep: The Killer Orca! 🌊🐋",
+        "creature_name": "orca",
+        "act1_hook": "There is only one creature in the entire ocean that even the Great White Shark is terrified of.",
+        "act2_scale": "Weighing over ten tons with a brain four times the size of a human's, the Killer Orca is not a whale—it is the largest, most intelligent dolphin on Earth.",
+        "act3_hunt": "They hunt in calculated wolfpacks, creating massive tidal waves to wash seals off icebergs... and then—BAM! A devastating tail slap that paralyzes sharks in a single blow.",
+        "act4_behavior": "Each pod speaks its own complex dialect and passes down hunting traditions from generation to generation like a culture.",
+        "act5_twist": "In the wild, there has never been a single documented fatal attack by an orca on a human in recorded history.",
+        "act6_climax_cta": "Who do you think rules the ocean, the Shark or the Orca? Drop your vote in the comments and follow for daily wild nature!",
+        "pexels_keywords": [
+            "orca killer whale swimming ocean 4k vertical",
+            "killer whale breaching water 4k",
+            "orca pod swimming ocean vertical",
+            "orca dorsal fin ocean surface 4k",
+            "killer whale underwater close up 4k",
+            "orca jumping ocean sunset 4k vertical"
+        ],
+        "hashtags": ["#orca", "#killerwhale", "#ocean", "#sea", "#wildlife", "#nature", "#apexpredator"]
+    },
     "jaguar_hunter": {
         "topic_id": "JAGUAR-JUNGLE-PHANTOM",
         "title": "The Ghost Predator with an Armor-Crushing Bite! 🐆💥",
