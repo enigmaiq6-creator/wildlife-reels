@@ -4,36 +4,51 @@ from pathlib import Path
 # Project root directory
 BASE_DIR = Path(__file__).resolve().parent
 
-# Standard video resolutions
+# Working directories
+ASSETS_DIR = BASE_DIR / "assets"
+MUSIC_DIR = ASSETS_DIR / "music"
+FONTS_DIR = ASSETS_DIR / "fonts"
+SFX_DIR = ASSETS_DIR / "sfx"
+TEMP_DIR = BASE_DIR / "temp"
+OUTPUT_DIR = BASE_DIR / "output"
+
+for folder in [ASSETS_DIR, MUSIC_DIR, FONTS_DIR, SFX_DIR, TEMP_DIR, OUTPUT_DIR]:
+    folder.mkdir(parents=True, exist_ok=True)
+
+# Video Resolutions
 RESOLUTIONS = {
-    "vertical": {"width": 1080, "height": 1920, "aspect": "9:16"},   # Reels / TikTok / Shorts
-    "horizontal": {"width": 1920, "height": 1080, "aspect": "16:9"}  # YouTube horizontal
+    "vertical": {"width": 1080, "height": 1920, "aspect": "9:16"},    # TikTok / Shorts / Reels
+    "horizontal": {"width": 1920, "height": 1080, "aspect": "16:9"}   # Standard YouTube
 }
 
-# Neural Documentary Voices in Simple, Clear English
+DEFAULT_ASPECT = "vertical"
+DEFAULT_FPS = 30
+DEFAULT_VIDEO_BITRATE = "8500k"
+DEFAULT_AUDIO_BITRATE = "192k"
+
+# Neural Voices in Clear English
 VOICES = {
-    "en_narrator_clear": "en-US-ChristopherNeural", # Clear, authoritative, easy to understand
-    "en_narrator_deep": "en-US-GuyNeural",          # Deep, cinematic American narrator
-    "en_narrator_uk": "en-GB-RyanNeural",           # Classic BBC Earth British documentary tone
+    "en_narrator_clear": "en-US-ChristopherNeural",
+    "en_narrator_deep": "en-US-GuyNeural",
+    "en_narrator_uk": "en-GB-RyanNeural"
 }
 
-DEFAULT_VOICE = "en_narrator_clear"
+DEFAULT_VOICE = "en-US-ChristopherNeural"
 
-# Classic Documentary Subtitle Configuration
+# Classic Documentary Subtitle Settings
 SUBTITLE_CONFIG = {
     "font_name": "Arial",
     "font_size_vertical": 46,
-    "margin_v_vertical": 480,       # Clear of Reels UI, page name, and audio tag
+    "margin_v_vertical": 480,       # Clears Reels page name and audio UI
     "primary_color": "&H00FFFFFF&", # Pure White
     "highlight_color": "&H0000D4FF&",# Amber Gold
     "outline_color": "&H00000000&", # Deep Black Outline
     "outline_size": 4.0,
     "shadow_size": 2.5,
     "fade_ms": 50,                   # Snappy fade
-    "perceptual_lead_s": 0.035       # 35ms perceptual acoustic lead
+    "perceptual_lead_s": 0.035       # 35ms perceptual lead
 }
 
-# Video and Audio Settings
 VIDEO_SETTINGS = {
     "fps": 30,
     "video_bitrate": "8500k",
@@ -43,12 +58,6 @@ VIDEO_SETTINGS = {
     "target_duration_range": (50, 60)
 }
 
-# Directories
-OUTPUT_DIR = BASE_DIR / "output"
-TEMP_DIR = BASE_DIR / "temp"
-ASSETS_DIR = BASE_DIR / "assets"
-MUSIC_DIR = ASSETS_DIR / "music"
-SFX_DIR = ASSETS_DIR / "sfx"
-
-for d in [OUTPUT_DIR, TEMP_DIR, ASSETS_DIR, MUSIC_DIR, SFX_DIR]:
-    d.mkdir(parents=True, exist_ok=True)
+# API Keys
+PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY", "qbp4umsXdbrpdEUx2NgVdlCudGEhtJ7rXgZZ5Uql2Euo0S1y5LxpQ4zm")
+PIXABAY_API_KEY = os.environ.get("PIXABAY_API_KEY", "57182356-903be23968c4863c98e1f2f78")

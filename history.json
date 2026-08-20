@@ -1,5 +1,12 @@
 {
-  "published_topics": [],
-  "total_published": 0,
-  "last_updated": ""
+  "published_topics": [
+    {
+      "topic_id": "extreme-survival-mimicry-camouflage",
+      "title": "Amazing Survival Tricks: Mimicry & Camouflage!",
+      "published_at": "2026-08-20T19:14:50.503940",
+      "post_id": ""
+    }
+  ],
+  "total_published": 1,
+  "last_updated": "2026-08-20T19:14:50.503940"
 }
