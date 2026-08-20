@@ -19,7 +19,8 @@ from config import (
     SFX_DIR,
     DEFAULT_VOICE,
     VIDEO_SETTINGS,
-    SUBTITLE_CONFIG
+    SUBTITLE_CONFIG,
+    PACING_SETTINGS
 )
 from core.ai_script_generator import AIScriptGenerator
 from core.topic_catalog import get_wildlife_topic, get_all_wildlife_topics, WILDLIFE_CATALOG
@@ -34,7 +35,7 @@ from core.history_manager import HistoryManager
 
 def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE, auto_publish: bool = True) -> Path:
     print("\n" + "=" * 65)
-    print("  🦅 STARTING WILDLIFE MICRO-DOCUMENTARY ENGINE (ARES G STYLE) 🌿")
+    print("  🦅 WILDLIFE ENGINE: MULTI-CLIP & BIG SUBTITLES (ARES G STYLE) 🌿")
     print("=" * 65 + "\n", flush=True)
 
     history = HistoryManager(Path("history.json"))
@@ -43,20 +44,17 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
     topic_data = None
     ai_gen = AIScriptGenerator()
 
-    # 1. Script Generation / Selection
+    # 1. Generación / Selección del Micro-Documental
     if force_topic:
-        print(f"[Pipeline] [+] Using forced catalog topic: '{force_topic}'", flush=True)
+        print(f"[Pipeline] [+] Usando tema del catálogo: '{force_topic}'", flush=True)
         topic_data = get_wildlife_topic(force_topic)
     else:
-        # Generate fresh 6-Act Micro-Documentary via Groq AI
         topic_data = ai_gen.generate_wildlife_script(seen_topics=seen_topics)
-        
-        # Fallback to pre-built catalog if AI is unreachable
         if not topic_data:
             all_topics = get_all_wildlife_topics()
             available = [t for t in all_topics if t not in seen_topics]
             chosen_key = available[0] if available else all_topics[0]
-            print(f"[Pipeline] [!] Using fallback catalog topic: '{chosen_key}'", flush=True)
+            print(f"[Pipeline] [!] Usando tema del catálogo de respaldo: '{chosen_key}'", flush=True)
             topic_data = WILDLIFE_CATALOG[chosen_key]
 
     topic_id = topic_data.get("topic_id", "WILDLIFE-DOC").lower().replace(" ", "-")
@@ -65,7 +63,7 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
     keywords = topic_data.get("pexels_keywords", [])
     hashtags = topic_data.get("hashtags", ["#wildlife", "#animals", "#nature", "#predators", "#shorts"])
 
-    # Extract 6 Narrative Acts
+    # 6 Actos Narrativos
     act1 = topic_data.get("act1_hook", "")
     act2 = topic_data.get("act2_scale", "")
     act3 = topic_data.get("act3_hunt", "")
@@ -73,11 +71,11 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
     act5 = topic_data.get("act5_twist", "")
     act6 = topic_data.get("act6_climax_cta", "")
 
-    print(f"[Pipeline] [+] Selected Creature: '{creature_name.upper()}' (Slug: {topic_id})", flush=True)
-    print(f"[Pipeline] [+] Title: {title}", flush=True)
-    print(f"[Pipeline] [+] Voice: {voice_key}", flush=True)
+    print(f"[Pipeline] [+] Criatura: '{creature_name.upper()}' (Slug: {topic_id})", flush=True)
+    print(f"[Pipeline] [+] Título: {title}", flush=True)
+    print(f"[Pipeline] [+] Voz: {voice_key}", flush=True)
 
-    # 2. Initialize Engines
+    # 2. Inicializar Motores
     voice_engine = VoiceEngine(voice_key=voice_key)
     media_manager = MediaManager(temp_dir=TEMP_DIR)
     subtitle_engine = SubtitleEngine(aspect_ratio="vertical")
@@ -88,45 +86,66 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
     processed_clip_files = []
     global_time = 0.0
 
-    raw_acts_info = [
-        {"act_num": 1, "name": "Hook", "text": act1, "is_hook": True, "is_cta": False, "kw": keywords[0] if len(keywords) > 0 else f"{creature_name} 4k vertical"},
-        {"act_num": 2, "name": "Monster Scale", "text": act2, "is_hook": False, "is_cta": False, "kw": keywords[1] if len(keywords) > 1 else f"{creature_name} close up head 4k"},
-        {"act_num": 3, "name": "Stealth & Strike", "text": act3, "is_hook": False, "is_cta": False, "kw": keywords[2] if len(keywords) > 2 else f"{creature_name} hunting slow motion 4k"},
-        {"act_num": 4, "name": "Death Stare / Trait", "text": act4, "is_hook": False, "is_cta": False, "kw": keywords[3] if len(keywords) > 3 else f"{creature_name} eyes stare camera 4k"},
-        {"act_num": 5, "name": "Twist / Vulnerability", "text": act5, "is_hook": False, "is_cta": False, "kw": keywords[4] if len(keywords) > 4 else f"{creature_name} walking nature 4k vertical"},
-        {"act_num": 6, "name": "Climax & CTA", "text": act6, "is_hook": False, "is_cta": True, "kw": keywords[5] if len(keywords) > 5 else f"{creature_name} mouth sound 4k"}
+    raw_acts = [
+        {"act_num": 1, "name": "Hook", "text": act1, "is_hook": True, "is_cta": False, "kw": keywords[0] if len(keywords) > 0 else f"{creature_name} close up 4k"},
+        {"act_num": 2, "name": "Monster Scale", "text": act2, "is_hook": False, "is_cta": False, "kw": keywords[1] if len(keywords) > 1 else f"{creature_name} head dinosaur 4k"},
+        {"act_num": 3, "name": "Stealth & Strike", "text": act3, "is_hook": False, "is_cta": False, "kw": keywords[2] if len(keywords) > 2 else f"{creature_name} hunting attack 4k"},
+        {"act_num": 4, "name": "Death Stare / Trait", "text": act4, "is_hook": False, "is_cta": False, "kw": keywords[3] if len(keywords) > 3 else f"{creature_name} stare eyes camera 4k"},
+        {"act_num": 5, "name": "Twist / Vulnerability", "text": act5, "is_hook": False, "is_cta": False, "kw": keywords[4] if len(keywords) > 4 else f"{creature_name} walking nature 4k"},
+        {"act_num": 6, "name": "Climax & CTA", "text": act6, "is_hook": False, "is_cta": True, "kw": keywords[5] if len(keywords) > 5 else f"{creature_name} sound mouth 4k"}
     ]
 
-    # Process all 6 acts of the micro-documentary
-    for idx, act in enumerate(raw_acts_info):
+    total_shot_counter = 0
+
+    # Procesar cada acto dividiéndolo en múltiples tomas dinámicas (cortes cada 2.5 - 3.5s)
+    for idx, act in enumerate(raw_acts):
         act_idx = act["act_num"]
         label = act["name"]
         text = act["text"]
-        kw = act["kw"]
+        base_kw = act["kw"]
 
-        print(f"\n--- [Act {act_idx}/6: {label}] ---", flush=True)
-        print(f"Narrative: \"{text}\"", flush=True)
-        print(f"Target Camera Angle: '{kw}'", flush=True)
+        print(f"\n--- [Acto {act_idx}/6: {label}] ---", flush=True)
+        print(f"Narrativa: \"{text}\"", flush=True)
 
-        # Synthesize Audio with natural pacing
+        # Sintetizar audio del acto completo
         audio_data = voice_engine.synthesize_scene(text, idx)
-        duration = audio_data["duration"]
+        act_duration = audio_data["duration"]
         word_timings = audio_data["word_timings"]
         audio_path = audio_data["audio_path"]
-        print(f"[Voice] Duration: {duration:.2f}s | Word Timings: {len(word_timings)} words", flush=True)
+        print(f"[Voz] Duración del Acto: {act_duration:.2f}s | Palabras: {len(word_timings)}", flush=True)
 
-        # Fetch strictly matched clip for this specific creature angle
-        raw_clip = media_manager.fetch_clip_for_scene(
-            scene_id=idx,
-            keywords=[kw, f"{creature_name} 4k vertical", f"{creature_name} wildlife 4k"],
-            required_subject=creature_name.split()[0].lower(),
-            target_duration=duration
-        )
+        # Calcular número de tomas requeridas para este acto (máx 3.5 segundos por toma)
+        num_sub_shots = max(1, round(act_duration / PACING_SETTINGS["max_shot_duration"]))
+        sub_shot_duration = act_duration / num_sub_shots
+        print(f"[Multi-Clip] Dividiendo acto en {num_sub_shots} tomas dinámicas ({sub_shot_duration:.2f}s c/u)...", flush=True)
 
-        # Normalize clip with Ken Burns motion
-        norm_clip = TEMP_DIR / f"act_{act_idx}_norm.mp4"
-        composer.process_scene_clip(raw_clip, norm_clip, duration)
-        processed_clip_files.append(norm_clip)
+        # Descargar y procesar clips variados para cada sub-toma
+        for s_idx in range(num_sub_shots):
+            total_shot_counter += 1
+            # Variaciones de búsqueda para cada ángulo de cámara
+            angle_variations = [
+                base_kw,
+                f"{creature_name} close up 4k vertical",
+                f"{creature_name} eyes looking camera 4k",
+                f"{creature_name} hunting slow motion 4k",
+                f"{creature_name} walking wild 4k",
+                f"{creature_name} wildlife 4k vertical"
+            ]
+            chosen_kw = angle_variations[(s_idx + act_idx) % len(angle_variations)]
+            
+            # Descargar clip verificado
+            raw_clip = media_manager.fetch_clip_for_scene(
+                scene_id=total_shot_counter,
+                keywords=[chosen_kw, f"{creature_name} 4k", f"{creature_name} wildlife"],
+                required_subject=creature_name.split()[0].lower(),
+                target_duration=sub_shot_duration
+            )
+
+            # Normalizar clip a 1080x1920 con micro-zoom Ken Burns
+            norm_clip = TEMP_DIR / f"shot_{total_shot_counter:02d}_norm.mp4"
+            composer.process_scene_clip(raw_clip, norm_clip, sub_shot_duration)
+            processed_clip_files.append(norm_clip)
+
         scene_audio_files.append(audio_path)
 
         scene_dict = {
@@ -135,32 +154,32 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
             "text": text,
             "is_hook": act["is_hook"],
             "is_cta": act["is_cta"],
-            "duration": duration,
+            "duration": act_duration,
             "global_start": global_time,
             "word_timings": word_timings,
-            "clip_path": norm_clip,
             "audio_path": audio_path
         }
         scenes.append(scene_dict)
-        global_time += duration
+        global_time += act_duration
 
     total_duration = global_time
-    print(f"\n[Pipeline] [+] Total Micro-Documentary Duration: {total_duration:.2f}s", flush=True)
+    print(f"\n[Pipeline] [+] Total de Tomas Dinámicas Ensambladas: {len(processed_clip_files)} cortes", flush=True)
+    print(f"[Pipeline] [+] Duración Total del Video: {total_duration:.2f}s", flush=True)
 
-    # 3. Concatenate video clips and audio tracks
+    # 3. Concatenar clips de video y pistas de audio
     video_base_path = TEMP_DIR / f"wildlife_{topic_id}_base.mp4"
     audio_base_path = TEMP_DIR / f"wildlife_{topic_id}_audio.mp3"
 
-    print("[Composer] Concatenating continuous 4K footage at constant 30 FPS...", flush=True)
+    print(f"[Composer] Concatenando {len(processed_clip_files)} clips a 30 FPS constantes...", flush=True)
     composer.concatenate_video_clips(processed_clip_files, video_base_path)
 
-    # Whoosh SFX
+    # Efectos de sonido Whoosh
     whoosh_path = SFX_DIR / "whoosh.wav"
     if not whoosh_path.exists():
         generate_cinematic_whoosh(whoosh_path)
 
     scene_durations = [s["duration"] for s in scenes]
-    print("[Composer] Concatenating voice tracks with suspense SFX transitions...", flush=True)
+    print("[Composer] Concatenando audio con transiciones de suspenso...", flush=True)
     composer.concatenate_audio_tracks_with_sfx(
         scene_audio_files,
         scene_durations,
@@ -168,22 +187,22 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
         audio_base_path
     )
 
-    # 4. Generate Cinematic Story Subtitles (.ass)
+    # 4. Generar Subtítulos Grandes ASS
     timestamp_str = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
     ass_path = TEMP_DIR / f"subtitles_{topic_id}_{timestamp_str}.ass"
-    print("[Subtitles] Burning Cinematic Story Subtitles with Frame-Perfect Acoustic Sync...", flush=True)
+    print("[Subtitles] Quemando subtítulos GRANDES (Tamaño 60-76) con sincronización acústica...", flush=True)
     subtitle_engine.create_ass_subtitles(scenes, ass_path, total_duration)
 
-    # 5. Render Final 1080x1920 Micro-Documentary
+    # 5. Render Final 1080x1920 con Subtítulos Grandes y Música
     output_filename = f"wildlife_{topic_id}_{timestamp_str}.mp4"
     final_output_path = OUTPUT_DIR / output_filename
 
-    # Ambient nature suspense music
+    # Música ambiental
     bg_music_path = MUSIC_DIR / "ambient_nature.wav"
     if not bg_music_path.exists():
         generate_ambient_cinematic_music(bg_music_path, duration=total_duration + 5.0)
 
-    print(f"[Composer] Assembling final video -> {output_filename}...", flush=True)
+    print(f"[Composer] Renderizando video final -> {output_filename}...", flush=True)
     composer.build_final_video(
         video_path=video_base_path,
         voice_audio_path=audio_base_path,
@@ -192,16 +211,16 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
         total_duration=total_duration,
         bg_music_path=bg_music_path
     )
-    print(f"\n[Pipeline] [MICRO-DOCUMENTARY GENERATED SUCCESSFULLY! 🎬] -> {final_output_path}", flush=True)
+    print(f"\n[Pipeline] [¡VIDEO GENERADO CON ÉXITO! 🎬] -> {final_output_path}", flush=True)
 
-    # 6. Save Metadata & Description
+    # 6. Guardar Metadatos
     description = f"{title}\n\n{act1}\n\n" + "\n".join(hashtags)
     metadata_path = OUTPUT_DIR / f"metadata_{topic_id}_{timestamp_str}.txt"
     with open(metadata_path, "w", encoding="utf-8") as f:
         f.write(f"TITLE:\n{title}\n\nDESCRIPTION:\n{description}\n\nTOPIC_ID:\n{topic_id}\n")
-    print(f"[Pipeline] [+] Metadata saved to: {metadata_path.name}", flush=True)
+    print(f"[Pipeline] [+] Metadatos guardados en: {metadata_path.name}", flush=True)
 
-    # 7. Meta Auto-Publish (if enabled)
+    # 7. Publicación en Meta (si está activa)
     fb_post_id = ""
     if auto_publish:
         fb_uploader = FacebookUploader()
@@ -212,20 +231,20 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
         ig_uploader = InstagramUploader()
         ig_uploader.upload_reel_resumable(final_output_path, description)
 
-    # Record in history
+    # Registrar en historial
     history.record_published_topic(topic_id, title, fb_post_id)
 
     print("\n" + "=" * 65)
-    print(f"  🎉 MICRO-DOCUMENTARY PIPELINE COMPLETED SUCCESSFULLY")
-    print(f"  Creature: {creature_name} | File: {output_filename}")
+    print(f"  🎉 PIPELINE MULTI-CLIP COMPLETADO CON ÉXITO")
+    print(f"  Criatura: {creature_name} | Cortes: {len(processed_clip_files)} tomas | Archivo: {output_filename}")
     print("=" * 65 + "\n", flush=True)
     return final_output_path
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Wildlife Micro-Documentary Engine (Ares G Style)")
-    parser.add_argument("--topic", type=str, default="", help="Specific catalog topic (e.g. shoebill_stork)")
-    parser.add_argument("--voice", type=str, default=DEFAULT_VOICE, help="Neural voice key")
-    parser.add_argument("--no-publish", action="store_true", help="Disable auto-upload to Meta")
+    parser = argparse.ArgumentParser(description="Wildlife Multi-Clip Micro-Documentary Engine")
+    parser.add_argument("--topic", type=str, default="", help="Tema específico del catálogo (ej: jaguar_hunter)")
+    parser.add_argument("--voice", type=str, default=DEFAULT_VOICE, help="Clave de voz neuronal")
+    parser.add_argument("--no-publish", action="store_true", help="Desactivar subida automática a Meta")
     args = parser.parse_args()
 
     run_wildlife_pipeline(force_topic=args.topic, voice_key=args.voice, auto_publish=not args.no_publish)

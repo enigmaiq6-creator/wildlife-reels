@@ -14,10 +14,10 @@ def format_ass_time(seconds: float) -> str:
         cs = 99
     return f"{h}:{m:02d}:{s:02d}.{cs:02d}"
 
-def wrap_text_lines(text: str, max_chars_per_line: int = 30) -> str:
+def wrap_text_lines(text: str, max_chars_per_line: int = 24) -> str:
     """Wraps long sentences into max 2 balanced lines using \\N."""
     words = text.split()
-    if len(text) <= max_chars_per_line or len(words) <= 4:
+    if len(text) <= max_chars_per_line or len(words) <= 3:
         return text
 
     mid = len(words) // 2
@@ -33,14 +33,16 @@ class SubtitleEngine:
 
     def create_ass_subtitles(self, scene_data: List[Dict[str, Any]], output_ass_path: Path, total_video_duration: float = 60.0):
         """
-        Generates CLASSIC DOCUMENTARY subtitles for Micro-Documentaries (Ares G style):
-        - Clean, modern, high-contrast typography in safe lower-third (MarginV=480).
-        - Highlights impact words ('BAM!', 'ZAS!', 'Jurassic Park') in glowing amber.
-        - Frame-perfect acoustic synchronization with 35ms perceptual lead.
+        Generates BIGGER, HIGH-IMPACT CLASSIC DOCUMENTARY subtitles:
+        - Font sizes: 60 (default), 66 (hook), 76 (impact words).
+        - Thick outline (5.2px) & crisp shadow (3.0px) for 100% legibility over any background.
+        - Safe lower-third position (MarginV=480) completely clearing Reels UI.
         """
         output_ass_path.parent.mkdir(parents=True, exist_ok=True)
         
-        font_size = SUBTITLE_CONFIG.get("font_size_vertical", 46) if self.width == 1080 else 50
+        font_size = SUBTITLE_CONFIG.get("font_size_vertical", 60) if self.width == 1080 else 55
+        font_hook = SUBTITLE_CONFIG.get("font_size_hook", 66) if self.width == 1080 else 60
+        font_impact = SUBTITLE_CONFIG.get("font_size_impact", 76) if self.width == 1080 else 68
         margin_v = SUBTITLE_CONFIG.get("margin_v_vertical", 480) if self.width == 1080 else 120
 
         header = f"""[Script Info]
@@ -51,10 +53,10 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: StoryDefault,Arial,{font_size},&H00FFFFFF,&H0000D4FF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,4.2,2.5,2,50,50,{margin_v},1
-Style: StoryHook,Arial,{font_size + 4},&H0000FFFF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,4.5,2.5,2,40,40,{margin_v},1
-Style: StoryImpact,Arial,{font_size + 10},&H0000D4FF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,110,110,0,0,1,5.5,3.0,2,40,40,{margin_v},1
-Style: StoryCTA,Arial,{font_size + 2},&H0000D4FF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,4.5,2.5,2,40,40,{margin_v},1
+Style: StoryDefault,Arial,{font_size},&H00FFFFFF,&H0000D4FF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,5.2,3.0,2,40,40,{margin_v},1
+Style: StoryHook,Arial,{font_hook},&H0000FFFF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,5.5,3.2,2,35,35,{margin_v},1
+Style: StoryImpact,Arial,{font_impact},&H0000D4FF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,110,110,0,0,1,6.5,3.5,2,30,30,{margin_v},1
+Style: StoryCTA,Arial,{font_size + 4},&H0000D4FF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,100,100,0,0,1,5.2,3.0,2,35,35,{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -83,13 +85,13 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             raw_text = scene.get("text", "").strip()
 
             if not word_timings:
-                formatted_text = wrap_text_lines(raw_text)
+                formatted_text = wrap_text_lines(raw_text, max_chars_per_line=24)
                 s_time = format_ass_time(scene_start)
                 e_time = format_ass_time(scene_end)
-                events.append(f"Dialogue: 0,{s_time},{e_time},{style_name},,0,0,0,,{{\\fad(50,50)}}{formatted_text}")
+                events.append(f"Dialogue: 0,{s_time},{e_time},{style_name},,0,0,0,,{{\\fad(40,40)}}{formatted_text}")
                 continue
 
-            # Natural clause grouping
+            # Natural clause grouping (3-5 words max for large font size 60)
             sentence_chunks = []
             current_chunk = []
             
@@ -102,7 +104,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 has_strong_punct = any(p in w_text for p in [".", "!", "?", ":", ";", "—"])
                 has_soft_punct = any(p in w_text for p in [",", "-"])
                 
-                if has_strong_punct or (has_soft_punct and len(current_chunk) >= 3) or len(current_chunk) >= 5 or w_idx == len(word_timings) - 1:
+                if has_strong_punct or (has_soft_punct and len(current_chunk) >= 2) or len(current_chunk) >= 4 or w_idx == len(word_timings) - 1:
                     sentence_chunks.append(current_chunk)
                     current_chunk = []
 
@@ -115,9 +117,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 
                 if idx_c < len(sentence_chunks) - 1:
                     next_start = scene_start + sentence_chunks[idx_c + 1][0]["start"]
-                    c_end = min(next_start, chunk_raw_end + 0.05)
+                    c_end = min(next_start, chunk_raw_end + 0.04)
                 else:
-                    c_end = min(scene_end, chunk_raw_end + 0.08)
+                    c_end = min(scene_end, chunk_raw_end + 0.06)
 
                 c_start_str = format_ass_time(c_start)
                 c_end_str = format_ass_time(c_end)
@@ -131,8 +133,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 else:
                     chunk_style = style_name
 
-                wrapped_clause = wrap_text_lines(clause_text, max_chars_per_line=30)
-                dialogue_text = f"{{\\fad(50,50)}}{wrapped_clause}"
+                wrapped_clause = wrap_text_lines(clause_text, max_chars_per_line=24)
+                dialogue_text = f"{{\\fad(40,40)}}{wrapped_clause}"
                 events.append(f"Dialogue: 0,{c_start_str},{c_end_str},{chunk_style},,0,0,0,,{dialogue_text}")
 
         with open(output_ass_path, "w", encoding="utf-8") as f:

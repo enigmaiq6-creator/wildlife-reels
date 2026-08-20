@@ -9,10 +9,11 @@ ASSETS_DIR = BASE_DIR / "assets"
 MUSIC_DIR = ASSETS_DIR / "music"
 FONTS_DIR = ASSETS_DIR / "fonts"
 SFX_DIR = ASSETS_DIR / "sfx"
+CLIPS_DIR = ASSETS_DIR / "clips"
 TEMP_DIR = BASE_DIR / "temp"
 OUTPUT_DIR = BASE_DIR / "output"
 
-for folder in [ASSETS_DIR, MUSIC_DIR, FONTS_DIR, SFX_DIR, TEMP_DIR, OUTPUT_DIR]:
+for folder in [ASSETS_DIR, MUSIC_DIR, FONTS_DIR, SFX_DIR, CLIPS_DIR, TEMP_DIR, OUTPUT_DIR]:
     folder.mkdir(parents=True, exist_ok=True)
 
 # Video Resolutions
@@ -23,7 +24,7 @@ RESOLUTIONS = {
 
 DEFAULT_ASPECT = "vertical"
 DEFAULT_FPS = 30
-DEFAULT_VIDEO_BITRATE = "8500k"
+DEFAULT_VIDEO_BITRATE = "9500k"
 DEFAULT_AUDIO_BITRATE = "192k"
 
 # Neural Voices in Clear English
@@ -35,27 +36,35 @@ VOICES = {
 
 DEFAULT_VOICE = "en-US-ChristopherNeural"
 
-# Classic Documentary Subtitle Settings
+# SUBTÍTULOS GRANDES DE ALTO IMPACTO (Mobile-First / Reels)
 SUBTITLE_CONFIG = {
     "font_name": "Arial",
-    "font_size_vertical": 46,
-    "margin_v_vertical": 480,       # Clears Reels page name and audio UI
-    "primary_color": "&H00FFFFFF&", # Pure White
-    "highlight_color": "&H0000D4FF&",# Amber Gold
-    "outline_color": "&H00000000&", # Deep Black Outline
-    "outline_size": 4.0,
-    "shadow_size": 2.5,
-    "fade_ms": 50,                   # Snappy fade
-    "perceptual_lead_s": 0.035       # 35ms perceptual lead
+    "font_size_vertical": 60,        # Aumentado a tamaño 60 para máxima legibilidad
+    "font_size_hook": 66,            # Tamaño 66 para ganchos
+    "font_size_impact": 76,          # Tamaño 76 para palabras de impacto (BAM!, etc.)
+    "margin_v_vertical": 480,        # Libre de nombres de página y barras de Reels
+    "primary_color": "&H00FFFFFF&",  # Blanco puro
+    "highlight_color": "&H0000D4FF&", # Dorado ámbar brillante
+    "outline_color": "&H00000000&",  # Contorno negro grueso
+    "outline_size": 5.2,             # Borde reforzado para contraste perfecto
+    "shadow_size": 3.0,
+    "fade_ms": 40,
+    "perceptual_lead_s": 0.035
+}
+
+# RITMO DINÁMICO MULTI-CLIP (Cambio de tomas cada 2.5 - 3.5 segundos)
+PACING_SETTINGS = {
+    "max_shot_duration": 3.5,        # Ninguna toma dura más de 3.5 segundos (cero monotonía)
+    "min_shot_duration": 2.0
 }
 
 VIDEO_SETTINGS = {
     "fps": 30,
-    "video_bitrate": "8500k",
+    "video_bitrate": "9500k",
     "audio_bitrate": "192k",
     "music_volume": 0.12,
     "voice_volume": 1.0,
-    "target_duration_range": (50, 60)
+    "target_duration_range": (50, 55)
 }
 
 # API Keys
