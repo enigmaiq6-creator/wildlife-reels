@@ -1,6 +1,26 @@
 from typing import Dict, Any, List
 
 WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
+    "jaguar_hunter": {
+        "topic_id": "JAGUAR-JUNGLE-PHANTOM",
+        "title": "The Ghost Predator with an Armor-Crushing Bite! 🐆💥",
+        "creature_name": "jaguar",
+        "act1_hook": "Deep in the Amazon rainforest lurks a predator with the most devastating bite of any big cat on Earth.",
+        "act2_scale": "Weighing up to three hundred pounds of pure muscle, the Jaguar has jaws powerful enough to pierce an alligator skull and crush a turtle shell in a single snap.",
+        "act3_hunt": "Unlike other cats who avoid water, it swims silently beneath river currents... and then—BAM! An explosive underwater ambush that drags massive caimans right out of the river.",
+        "act4_behavior": "It stalks through dense jungle leaves without making a single sound, moving like a phantom phantom through the shadows.",
+        "act5_twist": "Its golden rosette pattern is so unique that no two jaguars in history have ever shared the exact same spots.",
+        "act6_climax_cta": "Would you survive an encounter with this jungle king? Drop your thoughts in the comments and follow for more apex predators!",
+        "pexels_keywords": [
+            "jaguar in jungle 4k vertical",
+            "jaguar hunting water 4k",
+            "jaguar swimming river vertical",
+            "jaguar eyes close up 4k",
+            "jaguar walking rainforest vertical",
+            "wild jaguar resting branch 4k"
+        ],
+        "hashtags": ["#jaguar", "#bigcats", "#wildlife", "#animals", "#nature", "#predators", "#amazon"]
+    },
     "shoebill_stork": {
         "topic_id": "SHOEBILL-STORK-DINOSAUR",
         "title": "This Bird Looks Straight Out of Jurassic Park! 🦅🦖",
