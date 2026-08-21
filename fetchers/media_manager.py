@@ -11,13 +11,14 @@ from fetchers.pixabay_fetcher import search_pixabay_videos, download_pixabay_vid
 from fetchers.web_social_harvester import WebSocialHarvester
 from fetchers.wikimedia_fetcher import WikimediaFetcher
 from fetchers.ai_motion_generator import AIMotionGenerator
+from fetchers.youtube_wildlife_harvester import YouTubeWildlifeHarvester
 from core.clip_validator import validate_clip_metadata
 
 class MediaManager:
     """
     Motor Omnicanal Autónomo de Cosecha y Generación de Videos (OmniMediaEngine):
     Ejecuta una búsqueda en cascada de 6 niveles hasta obtener SIEMPRE el clip exacto del guion:
-      - Nivel 1: Bóveda Curada Local (assets/clips/{creatura}/)
+      - Nivel 1: Bóveda Curada Local (assets/clips/{creatura}/) + Auto-Cosechador Documental BBC/NatGeo
       - Nivel 2: Pexels 4K + Pixabay HD (con Validador Estricto anti-falsos positivos)
       - Nivel 3: Cosechador de Redes Sociales (Facebook Reels / Shorts con yt-dlp)
       - Nivel 4: Archivos Científicos Abiertos (Wikimedia Commons API)
@@ -48,12 +49,16 @@ class MediaManager:
                 pass
 
         subject_clean = required_subject.lower().replace("-", " ").strip()
-        primary_creature = subject_clean.split()[0] if subject_clean else "wildlife"
+        primary_creature = subject_clean.replace(" ", "_") if subject_clean else "wildlife"
 
         # =====================================================================
-        # NIVEL 1: BÓVEDA CURADA LOCAL (assets/clips/{creatura}/)
+        # NIVEL 1: BÓVEDA CURADA LOCAL + AUTO-COSECHADOR DOCUMENTAL BBC/NAT GEO
         # =====================================================================
         creature_folder = self.local_clips_dir / primary_creature
+        # Si no existe la carpeta o tiene menos de 4 clips, cosechar automáticamente de documentales
+        if not creature_folder.exists() or len(list(creature_folder.glob("*.mp4"))) < 4:
+            YouTubeWildlifeHarvester.harvest_creature_vault(primary_creature)
+
         if creature_folder.exists():
             local_candidates = sorted([c for c in creature_folder.glob("*.mp4") if c.stat().st_size > 10000])
             if local_candidates:
@@ -63,7 +68,7 @@ class MediaManager:
                 
                 import shutil
                 shutil.copy(chosen, output_file)
-                print(f"[OmniMediaEngine] [NIVEL 1 - BÓVEDA CURADA] Usando toma: '{chosen.name}' ({action_description})")
+                print(f"[OmniMediaEngine] [NIVEL 1 - BÓVEDA CURADA EXACTA] Usando toma: '{chosen.name}' ({action_description})")
                 return output_file
 
         # =====================================================================
