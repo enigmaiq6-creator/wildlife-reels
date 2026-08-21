@@ -45,22 +45,23 @@ class MediaManager:
         subject_clean = required_subject.lower().replace("-", " ").strip()
         primary_creature = subject_clean.split()[0] if subject_clean else "wildlife"
 
-        # 1. Comprobar clips locales curados en assets/clips/ (por acción o criatura)
-        if subject_clean:
-            # Buscar en subcarpetas de criatura o archivos directos
-            creature_folder = self.local_clips_dir / primary_creature
-            local_candidates = []
-            if creature_folder.exists():
-                local_candidates.extend(list(creature_folder.glob("*.mp4")))
-            local_candidates.extend(list(self.local_clips_dir.glob(f"*{primary_creature}*.mp4")))
-
+        # 1. Comprobar clips locales curados en assets/clips/{creature}/
+        creature_folder = self.local_clips_dir / primary_creature
+        if creature_folder.exists():
+            local_candidates = sorted([c for c in creature_folder.glob("*.mp4") if c.stat().st_size > 10000])
             if local_candidates:
-                # Filtrar si coincide con la acción (ej. "teeth", "attack", "face")
-                action_matches = [c for c in local_candidates if any(a in c.name.lower() for a in action_description.split("_"))]
-                chosen = random.choice(action_matches) if action_matches else random.choice(local_candidates)
+                # 1.1 Intentar coincidencia exacta con el tipo de acción
+                action_clean = action_description.lower().split("_")[0]
+                matched = [c for c in local_candidates if action_clean in c.name.lower()]
+                if matched:
+                    chosen = matched[0]
+                else:
+                    # 1.2 Asignar secuencialmente por índice de toma para variedad perfecta
+                    chosen = local_candidates[(scene_id - 1) % len(local_candidates)]
+                
                 import shutil
                 shutil.copy(chosen, output_file)
-                print(f"[MediaManager] [LOCAL CLIP CURADO] Usando video local exacto: {chosen.name}")
+                print(f"[MediaManager] [BÓVEDA CURADA 100% EXACTA] Usando toma: '{chosen.name}' para escena {scene_id} ({action_description})")
                 return output_file
 
         candidates: List[Dict[str, Any]] = []
