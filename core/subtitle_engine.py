@@ -105,7 +105,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     for idx_w, w_text in enumerate(chunk_words):
                         if idx_w == active_idx:
                             # Palabra activa resaltada
-                            if any(imp in w_text for imp in ["BAM", "ZAS", "BOOM", "MONSTER", "JAWS", "STRIKE", "DEATH"]):
+                            if any(imp in w_text for imp in ["MONSTER", "JAWS", "STRIKE", "DEATH", "PREDATOR"]):
                                 is_impact_word = True
                                 formatted_parts.append(f"{{{impact_color}}}{w_text}{{{white_color}}}")
                             else:

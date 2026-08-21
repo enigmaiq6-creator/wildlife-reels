@@ -67,7 +67,7 @@ CRITICAL FORMAT RULES:
 3. 6-ACT NARRATIVE STRUCTURE:
    - act1_hook: 1 sentence. Shock comparison / Jurassic hook (e.g. 'Did you know this bird looks like it walked straight out of Jurassic Park?').
    - act2_scale: 1-2 sentences. Monster physical scale and anatomy (e.g. 'Standing over five feet tall, it has a massive dinosaur-like beak with razor sharp edges.').
-   - act3_hunt: 2 sentences. The stealth and sudden strike with an impact word like 'BAM!' or 'ZAP!' (e.g. 'It stays completely frozen for hours, waiting silently... and then—BAM! A lightning-fast strike that crushes fish and even baby crocodiles in seconds.').
+   - act3_hunt: 2 sentences. The stealth and sudden predatory strike (e.g. 'It stays completely frozen for hours in total silence before unleashing a lightning-fast strike that crushes prey in seconds.').
    - act4_behavior: 1-2 sentences. Bizarre psychological trait or death stare (e.g. 'When it locks eyes on you, it does what scientists call the death gaze—staring without blinking into your soul.').
    - act5_twist: 1-2 sentences. Surprising reality or vulnerability (e.g. 'Yet despite looking like a prehistoric monster, it is calm around humans, but fewer than five thousand remain in the wild.').
    - act6_climax_cta: 1-2 sentences. Sensory climax & question (e.g. 'There is one sound it makes that terrifies everyone... Would you dare get close to it? Drop a comment and follow for more wild creatures!').
