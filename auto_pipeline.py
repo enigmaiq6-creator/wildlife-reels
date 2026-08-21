@@ -91,6 +91,7 @@ def run_single_creature_pipeline(force_topic: str = "", voice_key: str = DEFAULT
     processed_clip_files = []
     global_time = 0.0
     total_shot_counter = 0
+    media_manager.reset_session()
 
     for idx, act in enumerate(acts):
         act_idx = idx + 1
@@ -246,6 +247,7 @@ def run_top_countdown_pipeline(force_topic: str = "", voice_key: str = DEFAULT_V
     processed_clip_files = []
     global_time = 0.0
     total_shot_counter = 0
+    media_manager.reset_session()
 
     # 1. Gancho Inicial del Top (0-4s)
     print(f"\n--- [Sección: Gancho del Top] ---", flush=True)
