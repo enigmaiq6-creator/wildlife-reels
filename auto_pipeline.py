@@ -1,5 +1,6 @@
 import os
 import sys
+import random
 import argparse
 from pathlib import Path
 from datetime import datetime
@@ -24,6 +25,8 @@ from config import (
 )
 from core.ai_script_generator import AIScriptGenerator
 from core.topic_catalog import get_wildlife_topic, get_all_wildlife_topics, WILDLIFE_CATALOG
+from core.top_catalog import get_top_topic, get_all_top_topics, TOP_CATALOG
+from core.ai_top_generator import AITopGenerator
 from core.voice_engine import VoiceEngine
 from core.subtitle_engine import SubtitleEngine
 from core.video_composer import VideoComposer
@@ -33,9 +36,12 @@ from core.facebook_uploader import FacebookUploader
 from core.instagram_uploader import InstagramUploader
 from core.history_manager import HistoryManager
 
-def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE, auto_publish: bool = True) -> Path:
+# =====================================================================
+#  MODO 1: MICRO-DOCUMENTAL DE CRIATURA ÚNICA (ARES G STYLE)
+# =====================================================================
+def run_single_creature_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE, auto_publish: bool = True) -> Path:
     print("\n" + "=" * 65)
-    print("  🦅 WILDLIFE ENGINE: MULTI-CLIP & BIG SUBTITLES (ARES G STYLE) 🌿")
+    print("  🦅 MODO 1: MICRO-DOCUMENTAL DE CRIATURA ÚNICA (ARES G STYLE) 🌿")
     print("=" * 65 + "\n", flush=True)
 
     history = HistoryManager(Path("history.json"))
@@ -44,7 +50,6 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
     topic_data = None
     ai_gen = AIScriptGenerator()
 
-    # 1. Generación / Selección del Micro-Documental
     if force_topic:
         print(f"[Pipeline] [+] Usando tema del catálogo: '{force_topic}'", flush=True)
         topic_data = get_wildlife_topic(force_topic)
@@ -60,22 +65,22 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
     topic_id = topic_data.get("topic_id", "WILDLIFE-DOC").lower().replace(" ", "-")
     title = topic_data.get("title", "This Creature Looks Like a Monster!")
     creature_name = topic_data.get("creature_name", topic_id.replace("-", " "))
-    keywords = topic_data.get("pexels_keywords", [])
     hashtags = topic_data.get("hashtags", ["#wildlife", "#animals", "#nature", "#predators", "#shorts"])
 
     # 6 Actos Narrativos
-    act1 = topic_data.get("act1_hook", "")
-    act2 = topic_data.get("act2_scale", "")
-    act3 = topic_data.get("act3_hunt", "")
-    act4 = topic_data.get("act4_behavior", "")
-    act5 = topic_data.get("act5_twist", "")
-    act6 = topic_data.get("act6_climax_cta", "")
+    acts = [
+        {"label": "Hook", "text": topic_data.get("act1_hook", ""), "is_hook": True, "is_cta": False},
+        {"label": "Monster Scale", "text": topic_data.get("act2_scale", ""), "is_hook": False, "is_cta": False},
+        {"label": "Stealth & Strike", "text": topic_data.get("act3_hunt", ""), "is_hook": False, "is_cta": False},
+        {"label": "Death Stare / Trait", "text": topic_data.get("act4_behavior", ""), "is_hook": False, "is_cta": False},
+        {"label": "Twist / Vulnerability", "text": topic_data.get("act5_twist", ""), "is_hook": False, "is_cta": False},
+        {"label": "Climax & CTA", "text": topic_data.get("act6_climax_cta", ""), "is_hook": False, "is_cta": True}
+    ]
 
     print(f"[Pipeline] [+] Criatura: '{creature_name.upper()}' (Slug: {topic_id})", flush=True)
     print(f"[Pipeline] [+] Título: {title}", flush=True)
     print(f"[Pipeline] [+] Voz: {voice_key}", flush=True)
 
-    # 2. Inicializar Motores
     voice_engine = VoiceEngine(voice_key=voice_key)
     media_manager = MediaManager(temp_dir=TEMP_DIR)
     subtitle_engine = SubtitleEngine(aspect_ratio="vertical")
@@ -85,41 +90,25 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
     scene_audio_files = []
     processed_clip_files = []
     global_time = 0.0
-
-    raw_acts = [
-        {"act_num": 1, "name": "Hook", "text": act1, "is_hook": True, "is_cta": False, "kw": keywords[0] if len(keywords) > 0 else f"{creature_name} close up 4k"},
-        {"act_num": 2, "name": "Monster Scale", "text": act2, "is_hook": False, "is_cta": False, "kw": keywords[1] if len(keywords) > 1 else f"{creature_name} head dinosaur 4k"},
-        {"act_num": 3, "name": "Stealth & Strike", "text": act3, "is_hook": False, "is_cta": False, "kw": keywords[2] if len(keywords) > 2 else f"{creature_name} hunting attack 4k"},
-        {"act_num": 4, "name": "Death Stare / Trait", "text": act4, "is_hook": False, "is_cta": False, "kw": keywords[3] if len(keywords) > 3 else f"{creature_name} stare eyes camera 4k"},
-        {"act_num": 5, "name": "Twist / Vulnerability", "text": act5, "is_hook": False, "is_cta": False, "kw": keywords[4] if len(keywords) > 4 else f"{creature_name} walking nature 4k"},
-        {"act_num": 6, "name": "Climax & CTA", "text": act6, "is_hook": False, "is_cta": True, "kw": keywords[5] if len(keywords) > 5 else f"{creature_name} sound mouth 4k"}
-    ]
-
     total_shot_counter = 0
 
-    # Procesar cada acto dividiéndolo en múltiples tomas dinámicas (cortes cada 2.5 - 3.5s)
-    for idx, act in enumerate(raw_acts):
-        act_idx = act["act_num"]
-        label = act["name"]
-        text = act["text"]
-        base_kw = act["kw"]
-
+    for idx, act in enumerate(acts):
+        act_idx = idx + 1
+        text = act["text"].strip()
+        label = act["label"]
         print(f"\n--- [Acto {act_idx}/6: {label}] ---", flush=True)
         print(f"Narrativa: \"{text}\"", flush=True)
 
-        # Sintetizar audio del acto completo
-        audio_data = voice_engine.synthesize_scene(text, idx)
-        act_duration = audio_data["duration"]
-        word_timings = audio_data["word_timings"]
-        audio_path = audio_data["audio_path"]
+        synth = voice_engine.synthesize_scene(text, idx)
+        audio_path = synth["audio_path"]
+        word_timings = synth["word_timings"]
+        act_duration = synth["duration"]
         print(f"[Voz] Duración del Acto: {act_duration:.2f}s | Palabras: {len(word_timings)}", flush=True)
 
-        # Calcular número de tomas requeridas para este acto (máx 3.5 segundos por toma)
         num_sub_shots = max(1, round(act_duration / PACING_SETTINGS["max_shot_duration"]))
         sub_shot_duration = act_duration / num_sub_shots
         print(f"[Multi-Clip] Dividiendo acto en {num_sub_shots} tomas dinámicas ({sub_shot_duration:.2f}s c/u)...", flush=True)
 
-        # Generar plan de búsqueda visual alineado exactamente con la frase del guion
         from core.visual_director import generate_scene_search_plan
         shots_plan = generate_scene_search_plan(
             creature_name=creature_name,
@@ -129,15 +118,12 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
             num_shots=num_sub_shots
         )
 
-        # Descargar y procesar clips variados para cada sub-toma
         for s_idx, shot_info in enumerate(shots_plan):
             total_shot_counter += 1
             action_desc = shot_info["action_desc"]
             search_queries = shot_info["search_queries"]
-            
             print(f"[Director Visual] Toma {total_shot_counter} -> Acción: '{action_desc}'", flush=True)
-            
-            # Descargar clip estrictamente verificado y alineado con el guion
+
             raw_clip = media_manager.fetch_clip_for_scene(
                 scene_id=total_shot_counter,
                 keywords=search_queries,
@@ -146,7 +132,6 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
                 target_duration=sub_shot_duration
             )
 
-            # Normalizar clip a 1080x1920 con micro-zoom Ken Burns
             norm_clip = TEMP_DIR / f"shot_{total_shot_counter:02d}_norm.mp4"
             composer.process_scene_clip(raw_clip, norm_clip, sub_shot_duration)
             processed_clip_files.append(norm_clip)
@@ -167,89 +152,292 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
         scenes.append(scene_dict)
         global_time += act_duration
 
-    total_duration = global_time
-    print(f"\n[Pipeline] [+] Total de Tomas Dinámicas Ensambladas: {len(processed_clip_files)} cortes", flush=True)
-    print(f"[Pipeline] [+] Duración Total del Video: {total_duration:.2f}s", flush=True)
+    print(f"\n[Pipeline] [+] Total de Tomas Dinámicas Ensambladas: {len(processed_clip_files)} cortes")
+    print(f"[Pipeline] [+] Duración Total del Video: {global_time:.2f}s")
 
-    # 3. Concatenar clips de video y pistas de audio
-    video_base_path = TEMP_DIR / f"wildlife_{topic_id}_base.mp4"
-    audio_base_path = TEMP_DIR / f"wildlife_{topic_id}_audio.mp3"
+    # 3. Ensamblado y Subtítulos
+    video_concat_raw = TEMP_DIR / f"wildlife_{topic_id}_video_raw.mp4"
+    audio_concat = TEMP_DIR / f"wildlife_{topic_id}_voice.mp3"
+    subtitles_ass = TEMP_DIR / f"wildlife_{topic_id}_karaoke.ass"
+    timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+    final_output = OUTPUT_DIR / f"wildlife_{topic_id}_{timestamp_str}.mp4"
 
-    print(f"[Composer] Concatenando {len(processed_clip_files)} clips a 30 FPS constantes...", flush=True)
-    composer.concatenate_video_clips(processed_clip_files, video_base_path)
+    composer.concatenate_video_clips(processed_clip_files, video_concat_raw)
+    scene_durs = [s["duration"] for s in scenes]
+    whoosh_path = SFX_DIR / "cinematic_whoosh.wav"
+    generate_cinematic_whoosh(whoosh_path)
+    composer.concatenate_audio_tracks_with_sfx(scene_audio_files, scene_durs, whoosh_path, audio_concat)
 
-    # Efectos de sonido Whoosh
-    whoosh_path = SFX_DIR / "whoosh.wav"
-    if not whoosh_path.exists():
-        generate_cinematic_whoosh(whoosh_path)
+    # Música de Fondo Cinemática
+    music_path = MUSIC_DIR / "ambient_music.wav"
+    generate_ambient_cinematic_music(music_path, duration=global_time + 5.0)
 
-    scene_durations = [s["duration"] for s in scenes]
-    print("[Composer] Concatenando audio con transiciones de suspenso...", flush=True)
-    composer.concatenate_audio_tracks_with_sfx(
-        scene_audio_files,
-        scene_durations,
-        whoosh_path,
-        audio_base_path
-    )
+    print("[Subtitles] Quemando subtítulos GRANDES con sincronización acústica...", flush=True)
+    subtitle_engine.create_ass_subtitles(scenes, subtitles_ass, global_time)
 
-    # 4. Generar Subtítulos Grandes ASS
-    timestamp_str = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    ass_path = TEMP_DIR / f"subtitles_{topic_id}_{timestamp_str}.ass"
-    print("[Subtitles] Quemando subtítulos GRANDES (Tamaño 60-76) con sincronización acústica...", flush=True)
-    subtitle_engine.create_ass_subtitles(scenes, ass_path, total_duration)
-
-    # 5. Render Final 1080x1920 con Subtítulos Grandes y Música
-    output_filename = f"wildlife_{topic_id}_{timestamp_str}.mp4"
-    final_output_path = OUTPUT_DIR / output_filename
-
-    # Música ambiental
-    bg_music_path = MUSIC_DIR / "ambient_nature.wav"
-    if not bg_music_path.exists():
-        generate_ambient_cinematic_music(bg_music_path, duration=total_duration + 5.0)
-
-    print(f"[Composer] Renderizando video final -> {output_filename}...", flush=True)
     composer.build_final_video(
-        video_path=video_base_path,
-        voice_audio_path=audio_base_path,
-        ass_subtitles_path=ass_path,
-        output_final_path=final_output_path,
-        total_duration=total_duration,
-        bg_music_path=bg_music_path
+        video_path=video_concat_raw,
+        voice_audio_path=audio_concat,
+        ass_subtitles_path=subtitles_ass,
+        output_final_path=final_output,
+        total_duration=global_time,
+        bg_music_path=music_file
     )
-    print(f"\n[Pipeline] [¡VIDEO GENERADO CON ÉXITO! 🎬] -> {final_output_path}", flush=True)
 
-    # 6. Guardar Metadatos
-    description = f"{title}\n\n{act1}\n\n" + "\n".join(hashtags)
-    metadata_path = OUTPUT_DIR / f"metadata_{topic_id}_{timestamp_str}.txt"
-    with open(metadata_path, "w", encoding="utf-8") as f:
-        f.write(f"TITLE:\n{title}\n\nDESCRIPTION:\n{description}\n\nTOPIC_ID:\n{topic_id}\n")
-    print(f"[Pipeline] [+] Metadatos guardados en: {metadata_path.name}", flush=True)
+    print(f"\n[Pipeline] [¡VIDEO GENERADO CON ÉXITO! 🎬] -> {final_output}")
 
-    # 7. Publicación en Meta (si está activa)
-    fb_post_id = ""
-    if auto_publish:
-        fb_uploader = FacebookUploader()
-        fb_res = fb_uploader.upload_reel(final_output_path, description)
-        if fb_res.get("success"):
-            fb_post_id = str(fb_res.get("data", {}).get("post_id", ""))
+    # Guardar metadatos y registrar historial
+    meta_path = OUTPUT_DIR / f"metadata_{topic_id}_{timestamp_str}.txt"
+    with open(meta_path, "w", encoding="utf-8") as f:
+        f.write(f"TITLE: {title}\n\nDESCRIPTION:\n{title}\n\n" + " ".join(hashtags) + "\n")
+    history.record_published_topic(topic_id, title)
 
-        ig_uploader = InstagramUploader()
-        ig_uploader.upload_reel_resumable(final_output_path, description)
+    print(f"\n=================================================================")
+    print(f"  🎉 MICRO-DOC COMPLETADO CON ÉXITO")
+    print(f"  Criatura: {creature_name} | Cortes: {len(processed_clip_files)} tomas | Archivo: {final_output.name}")
+    print(f"=================================================================\n", flush=True)
 
-    # Registrar en historial
-    history.record_published_topic(topic_id, title, fb_post_id)
+    return final_output
 
+# =====================================================================
+#  MODO 2: TOPS / CUENTA REGRESIVA (#3, #2, #1) ESTILO YOUTUBE SHORTS
+# =====================================================================
+def run_top_countdown_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE, auto_publish: bool = True) -> Path:
     print("\n" + "=" * 65)
-    print(f"  🎉 PIPELINE MULTI-CLIP COMPLETADO CON ÉXITO")
-    print(f"  Criatura: {creature_name} | Cortes: {len(processed_clip_files)} tomas | Archivo: {output_filename}")
+    print("  🏆 MODO 2: TOPS / CUENTA REGRESIVA (#3, #2, #1) SHORTS 📹")
     print("=" * 65 + "\n", flush=True)
-    return final_output_path
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Wildlife Multi-Clip Micro-Documentary Engine")
-    parser.add_argument("--topic", type=str, default="", help="Tema específico del catálogo (ej: jaguar_hunter)")
-    parser.add_argument("--voice", type=str, default=DEFAULT_VOICE, help="Clave de voz neuronal")
-    parser.add_argument("--no-publish", action="store_true", help="Desactivar subida automática a Meta")
+    history = HistoryManager(Path("history.json"))
+    seen_topics = history.get_seen_topics()
+
+    topic_data = None
+    ai_top_gen = AITopGenerator()
+
+    if force_topic:
+        print(f"[Pipeline] [+] Usando Top del catálogo: '{force_topic}'", flush=True)
+        topic_data = get_top_topic(force_topic)
+    else:
+        topic_data = ai_top_gen.generate_top_script(seen_topics=seen_topics)
+        if not topic_data:
+            all_tops = get_all_top_topics()
+            available = [t for t in all_tops if t not in seen_topics]
+            chosen_key = available[0] if available else all_tops[0]
+            print(f"[Pipeline] [!] Usando Top del catálogo de respaldo: '{chosen_key}'", flush=True)
+            topic_data = TOP_CATALOG[chosen_key]
+
+    topic_id = topic_data.get("topic_id", "TOP-ANIMALS").lower().replace(" ", "-")
+    title = topic_data.get("title", "Top 3 Shocking Animal Encounters Caught on Camera!")
+    hook_text = topic_data.get("hook", "Here are the top three most terrifying animal encounters!")
+    items = topic_data.get("items", [])
+    climax_cta = topic_data.get("climax_cta", "Which one shocked you the most? Drop your vote in the comments!")
+    hashtags = topic_data.get("hashtags", ["#wildlife", "#animals", "#top3", "#caughtoncamera", "#shorts"])
+
+    print(f"[Pipeline] [+] Top: '{title}' (Slug: {topic_id})", flush=True)
+    print(f"[Pipeline] [+] Puestos: {len(items)} items (#3 a #1)", flush=True)
+    print(f"[Pipeline] [+] Voz: {voice_key}", flush=True)
+
+    voice_engine = VoiceEngine(voice_key=voice_key)
+    media_manager = MediaManager(temp_dir=TEMP_DIR)
+    subtitle_engine = SubtitleEngine(aspect_ratio="vertical")
+    composer = VideoComposer(aspect_ratio="vertical")
+
+    scenes = []
+    scene_audio_files = []
+    processed_clip_files = []
+    global_time = 0.0
+    total_shot_counter = 0
+
+    # 1. Gancho Inicial del Top (0-4s)
+    print(f"\n--- [Sección: Gancho del Top] ---", flush=True)
+    print(f"Narrativa: \"{hook_text}\"", flush=True)
+    hook_synth = voice_engine.synthesize_scene(hook_text, 0)
+    hook_audio = hook_synth["audio_path"]
+    hook_timings = hook_synth["word_timings"]
+    hook_dur = hook_synth["duration"]
+    print(f"[Voz] Duración del Gancho: {hook_dur:.2f}s", flush=True)
+
+    # Clip inicial de alta tensión
+    total_shot_counter += 1
+    raw_hook_clip = media_manager.fetch_clip_for_scene(
+        scene_id=total_shot_counter,
+        keywords=["wildlife cinematic predator 4k vertical", "wolf eyes staring 4k"],
+        required_subject="wildlife",
+        action_description="hook_reveal",
+        target_duration=hook_dur
+    )
+    norm_hook = TEMP_DIR / f"shot_{total_shot_counter:02d}_norm.mp4"
+    composer.process_scene_clip(raw_hook_clip, norm_hook, hook_dur)
+    processed_clip_files.append(norm_hook)
+    scene_audio_files.append(hook_audio)
+
+    scenes.append({
+        "index": 0,
+        "act_num": 1,
+        "text": hook_text,
+        "is_hook": True,
+        "is_cta": False,
+        "duration": hook_dur,
+        "global_start": global_time,
+        "word_timings": hook_timings,
+        "audio_path": hook_audio
+    })
+    global_time += hook_dur
+
+    # 2. Puestos del Top (#3, #2, #1)
+    for idx, item in enumerate(items, 1):
+        rank = item.get("rank", 4 - idx)
+        badge = item.get("badge", f"#{rank}")
+        creature = item.get("creature_name", "predator")
+        item_text = item.get("text", "")
+        action = item.get("action_type", "explosive_strike")
+
+        print(f"\n--- [PUESTO #{rank}: {badge} - {creature.upper()}] ---", flush=True)
+        print(f"Narrativa: \"{item_text}\"", flush=True)
+
+        item_synth = voice_engine.synthesize_scene(item_text, idx)
+        item_audio = item_synth["audio_path"]
+        item_timings = item_synth["word_timings"]
+        item_dur = item_synth["duration"]
+        print(f"[Voz] Duración Puesto #{rank}: {item_dur:.2f}s | Palabras: {len(item_timings)}", flush=True)
+
+        num_sub_shots = max(2, round(item_dur / PACING_SETTINGS["max_shot_duration"]))
+        sub_dur = item_dur / num_sub_shots
+        print(f"[Multi-Clip] Dividiendo Puesto #{rank} en {num_sub_shots} tomas dinámicas de '{creature}' ({sub_dur:.2f}s c/u)...", flush=True)
+
+        for s_idx in range(num_sub_shots):
+            total_shot_counter += 1
+            cur_action = action if s_idx > 0 else "predator_reveal"
+            print(f"[Director Top] Puesto #{rank} -> Toma {total_shot_counter} ({creature} - {cur_action})", flush=True)
+
+            raw_clip = media_manager.fetch_clip_for_scene(
+                scene_id=total_shot_counter,
+                keywords=[f"{creature} {cur_action} 4k", f"{creature} close up 4k", f"{creature} wildlife"],
+                required_subject=creature.lower(),
+                action_description=cur_action,
+                target_duration=sub_dur
+            )
+
+            norm_clip = TEMP_DIR / f"shot_{total_shot_counter:02d}_norm.mp4"
+            composer.process_scene_clip(raw_clip, norm_clip, sub_dur)
+            processed_clip_files.append(norm_clip)
+
+        scene_audio_files.append(item_audio)
+        scenes.append({
+            "index": idx,
+            "act_num": idx + 1,
+            "text": item_text,
+            "is_hook": False,
+            "is_cta": False,
+            "duration": item_dur,
+            "global_start": global_time,
+            "word_timings": item_timings,
+            "audio_path": item_audio
+        })
+        global_time += item_dur
+
+    # 3. Cierre y Llamado a la Acción (CTA)
+    print(f"\n--- [Sección: Cierre del Top] ---", flush=True)
+    print(f"Narrativa: \"{climax_cta}\"", flush=True)
+    cta_synth = voice_engine.synthesize_scene(climax_cta, len(items) + 1)
+    cta_audio = cta_synth["audio_path"]
+    cta_timings = cta_synth["word_timings"]
+    cta_dur = cta_synth["duration"]
+    print(f"[Voz] Duración Cierre: {cta_dur:.2f}s", flush=True)
+
+    total_shot_counter += 1
+    last_creature = items[-1].get("creature_name", "jaguar")
+    raw_cta_clip = media_manager.fetch_clip_for_scene(
+        scene_id=total_shot_counter,
+        keywords=[f"{last_creature} roar open mouth 4k", f"{last_creature} dramatic close up 4k"],
+        required_subject=last_creature.lower(),
+        action_description="climax_dramatic",
+        target_duration=cta_dur
+    )
+    norm_cta = TEMP_DIR / f"shot_{total_shot_counter:02d}_norm.mp4"
+    composer.process_scene_clip(raw_cta_clip, norm_cta, cta_dur)
+    processed_clip_files.append(norm_cta)
+    scene_audio_files.append(cta_audio)
+
+    scenes.append({
+        "index": len(items) + 1,
+        "act_num": len(items) + 2,
+        "text": climax_cta,
+        "is_hook": False,
+        "is_cta": True,
+        "duration": cta_dur,
+        "global_start": global_time,
+        "word_timings": cta_timings,
+        "audio_path": cta_audio
+    })
+    global_time += cta_dur
+
+    print(f"\n[Pipeline] [+] Total de Tomas Dinámicas Ensambladas: {len(processed_clip_files)} cortes")
+    print(f"[Pipeline] [+] Duración Total del Top: {global_time:.2f}s")
+
+    # 4. Ensamblado y Subtítulos
+    video_concat_raw = TEMP_DIR / f"top_{topic_id}_video_raw.mp4"
+    audio_concat = TEMP_DIR / f"top_{topic_id}_voice.mp3"
+    subtitles_ass = TEMP_DIR / f"top_{topic_id}_karaoke.ass"
+    timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+    final_output = OUTPUT_DIR / f"top_{topic_id}_{timestamp_str}.mp4"
+
+    composer.concatenate_video_clips(processed_clip_files, video_concat_raw)
+    scene_durs = [s["duration"] for s in scenes]
+    whoosh_path = SFX_DIR / "cinematic_whoosh.wav"
+    generate_cinematic_whoosh(whoosh_path)
+    composer.concatenate_audio_tracks_with_sfx(scene_audio_files, scene_durs, whoosh_path, audio_concat)
+
+    # Música de Fondo Cinemática
+    music_path = MUSIC_DIR / "ambient_music.wav"
+    generate_ambient_cinematic_music(music_path, duration=global_time + 5.0)
+
+    print("[Subtitles] Quemando subtítulos Karaoke y badges de cuenta regresiva...", flush=True)
+    subtitle_engine.create_ass_subtitles(scenes, subtitles_ass, global_time)
+
+    composer.build_final_video(
+        video_path=video_concat_raw,
+        voice_audio_path=audio_concat,
+        ass_subtitles_path=subtitles_ass,
+        output_final_path=final_output,
+        total_duration=global_time,
+        bg_music_path=music_path
+    )
+
+    print(f"\n[Pipeline] [¡VIDEO TOP GENERADO CON ÉXITO! 🎬] -> {final_output}")
+
+    meta_path = OUTPUT_DIR / f"metadata_{topic_id}_{timestamp_str}.txt"
+    with open(meta_path, "w", encoding="utf-8") as f:
+        f.write(f"TITLE: {title}\n\nDESCRIPTION:\n{title}\n\n" + " ".join(hashtags) + "\n")
+    history.record_published_topic(topic_id, title)
+
+    print(f"\n=================================================================")
+    print(f"  🎉 TOP 3 CUENTA REGRESIVA COMPLETADO CON ÉXITO")
+    print(f"  Título: {title} | Cortes: {len(processed_clip_files)} tomas | Archivo: {final_output.name}")
+    print(f"=================================================================\n", flush=True)
+
+    return final_output
+
+# =====================================================================
+#  PUNTO DE ENTRADA PRINCIPAL (CLI)
+# =====================================================================
+def main():
+    parser = argparse.ArgumentParser(description="Wildlife Video Engine - Micro-Docs & Top Countdowns")
+    parser.add_argument("--mode", type=str, choices=["single", "top", "auto"], default="single",
+                        help="Modo de generación: 'single' (Micro-Doc 1 animal), 'top' (Cuenta regresiva #3-#1), 'auto' (alterna)")
+    parser.add_argument("--topic", type=str, default="", help="ID o nombre del tema a forzar")
+    parser.add_argument("--voice", type=str, default=DEFAULT_VOICE, help="Voz TTS a utilizar")
+    parser.add_argument("--no-publish", action="store_true", help="No publicar automáticamente")
+
     args = parser.parse_args()
 
-    run_wildlife_pipeline(force_topic=args.topic, voice_key=args.voice, auto_publish=not args.no_publish)
+    mode = args.mode
+    if mode == "auto":
+        mode = random.choice(["single", "top"])
+
+    if mode == "top":
+        run_top_countdown_pipeline(force_topic=args.topic, voice_key=args.voice, auto_publish=not args.no_publish)
+    else:
+        run_single_creature_pipeline(force_topic=args.topic, voice_key=args.voice, auto_publish=not args.no_publish)
+
+if __name__ == "__main__":
+    main()
