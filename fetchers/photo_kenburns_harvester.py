@@ -8,14 +8,14 @@ from pathlib import Path
 from typing import Optional, List
 from config import TEMP_DIR
 from core.clip_validator import validate_clip_metadata
+from fetchers.gcp_vertex_image_generator import GCPVertexImageGenerator
 
 class PhotoKenBurnsHarvester:
     """
     Cosechador y Generador de Fotografías de Alta Resolución con Efecto Ken Burns Cinemático.
     Cuando los clips de video se agotan o para evitar repeticiones:
-      1. Busca fotos reales en ultra alta definición (Wikimedia Commons / APIs de fotografía).
-      2. Si no hay fotos de esa acción, genera una imagen fotorrealista 4K estilo National Geographic.
-      3. Anima la imagen con movimientos de cámara 3D (Zoom In a los ojos, Zoom Out revelador, Paneo anatómico).
+      1. Genera o busca fotos en ultra alta definición con Google Cloud Vertex AI (facebookbot-502117).
+      2. Aplica movimientos de cámara 3D (Zoom In a los ojos, Zoom Out revelador, Paneo anatómico).
     """
 
     @classmethod
@@ -38,10 +38,15 @@ class PhotoKenBurnsHarvester:
         clean_creature = creature_name.lower().replace("-", " ").replace("_", " ").strip()
         clean_action = action_desc.lower().replace("_", " ").strip()
 
-        # 1. Intentar buscar fotografía real en Wikimedia Commons
-        photo_found = cls._search_wikimedia_photo(clean_creature, clean_action, img_temp)
+        # 1. Intentar generar imagen de ultra alta definición con Google Cloud Vertex AI
+        gcp_prompt = f"wild {clean_creature} {clean_action} in natural habitat, intense wildlife action"
+        photo_found = GCPVertexImageGenerator.generate_image(gcp_prompt, img_temp)
 
-        # 2. Si no se encontró foto real, generar visual fotorrealista 4K
+        # 2. Respaldo en Wikimedia Commons si fuera necesario
+        if not photo_found or not img_temp.exists() or img_temp.stat().st_size < 10000:
+            photo_found = cls._search_wikimedia_photo(clean_creature, clean_action, img_temp)
+
+        # 3. Respaldo secundario
         if not photo_found or not img_temp.exists() or img_temp.stat().st_size < 10000:
             photo_found = cls._generate_ai_photo(clean_creature, clean_action, img_temp)
 
@@ -91,7 +96,7 @@ class PhotoKenBurnsHarvester:
             pass
 
         if res.returncode == 0 and output_mp4_path.exists() and output_mp4_path.stat().st_size > 20000:
-            print(f"[KenBurnsEngine] [✨ IMAGEN ANIMADA KEN BURNS CREADA] -> {output_mp4_path.name} ({clean_action})")
+            print(f"[KenBurnsEngine] [IMAGEN ANIMADA KEN BURNS CREADA] -> {output_mp4_path.name} ({clean_action})")
             return True
 
         return False
