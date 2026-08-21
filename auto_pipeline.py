@@ -119,25 +119,30 @@ def run_wildlife_pipeline(force_topic: str = "", voice_key: str = DEFAULT_VOICE,
         sub_shot_duration = act_duration / num_sub_shots
         print(f"[Multi-Clip] Dividiendo acto en {num_sub_shots} tomas dinámicas ({sub_shot_duration:.2f}s c/u)...", flush=True)
 
+        # Generar plan de búsqueda visual alineado exactamente con la frase del guion
+        from core.visual_director import generate_scene_search_plan
+        shots_plan = generate_scene_search_plan(
+            creature_name=creature_name,
+            act_num=act_idx,
+            act_name=label,
+            act_text=text,
+            num_shots=num_sub_shots
+        )
+
         # Descargar y procesar clips variados para cada sub-toma
-        for s_idx in range(num_sub_shots):
+        for s_idx, shot_info in enumerate(shots_plan):
             total_shot_counter += 1
-            # Variaciones de búsqueda para cada ángulo de cámara
-            angle_variations = [
-                base_kw,
-                f"{creature_name} close up 4k vertical",
-                f"{creature_name} eyes looking camera 4k",
-                f"{creature_name} hunting slow motion 4k",
-                f"{creature_name} walking wild 4k",
-                f"{creature_name} wildlife 4k vertical"
-            ]
-            chosen_kw = angle_variations[(s_idx + act_idx) % len(angle_variations)]
+            action_desc = shot_info["action_desc"]
+            search_queries = shot_info["search_queries"]
             
-            # Descargar clip verificado
+            print(f"[Director Visual] Toma {total_shot_counter} -> Acción: '{action_desc}'", flush=True)
+            
+            # Descargar clip estrictamente verificado y alineado con el guion
             raw_clip = media_manager.fetch_clip_for_scene(
                 scene_id=total_shot_counter,
-                keywords=[chosen_kw, f"{creature_name} 4k", f"{creature_name} wildlife"],
-                required_subject=creature_name.split()[0].lower(),
+                keywords=search_queries,
+                required_subject=creature_name.lower(),
+                action_description=action_desc,
                 target_duration=sub_shot_duration
             )
 

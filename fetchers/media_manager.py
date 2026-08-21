@@ -3,61 +3,21 @@ import re
 import random
 import subprocess
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 from config import TEMP_DIR, ASSETS_DIR
 
 from fetchers.pexels_fetcher import search_pexels_videos, download_pexels_video
 from fetchers.pixabay_fetcher import search_pixabay_videos, download_pixabay_video
 from fetchers.web_social_harvester import WebSocialHarvester
-
-ANIMAL_SYNONYMS = {
-    "jaguar": ["jaguar", "panther", "leopard", "onca", "felid", "big cat"],
-    "lion": ["lion", "lioness", "leo", "big cat"],
-    "tiger": ["tiger", "tigris", "big cat"],
-    "cheetah": ["cheetah", "acinonyx", "big cat"],
-    "leopard": ["leopard", "panther", "big cat"],
-    "orca": ["orca", "killer whale", "killer-whale", "cetacean"],
-    "whale": ["whale", "humpback", "blue whale", "cetacean"],
-    "shark": ["shark", "carcharodon", "great white", "hammerhead", "mako"],
-    "eagle": ["eagle", "harpy", "aquila", "bird of prey", "raptor", "bird"],
-    "harpy": ["harpy", "eagle", "harpy eagle", "raptor", "bird of prey"],
-    "shoebill": ["shoebill", "picozapato", "balaeniceps", "whalehead", "stork"],
-    "wolf": ["wolf", "wolves", "lupus", "canis"],
-    "bear": ["bear", "grizzly", "polar bear", "ursus"],
-    "crocodile": ["crocodile", "alligator", "caiman", "croc", "reptile"],
-    "snake": ["snake", "cobra", "viper", "python", "anaconda", "taipan", "rattlesnake"],
-    "octopus": ["octopus", "cephalopod", "kraken"],
-    "squid": ["squid", "calamar", "architeuthis", "cuttlefish"],
-    "shrimp": ["shrimp", "mantis shrimp", "crustacean", "lobster"],
-    "gecko": ["gecko", "lizard", "chameleon", "reptile"],
-    "falcon": ["falcon", "peregrine", "kestrel", "raptor"]
-}
-
-def verify_title_against_subject(title_slug: str, required_subject: str) -> bool:
-    """Verifica estrictamente que el clip contenga el nombre del animal requerido o sus sinónimos."""
-    slug = title_slug.lower().replace("-", " ")
-    subj = required_subject.lower().strip().split()[0] if required_subject else ""
-    
-    if not subj:
-        return True
-
-    if subj in slug:
-        return True
-
-    valid_synonyms = ANIMAL_SYNONYMS.get(subj, [subj])
-    for syn in valid_synonyms:
-        if syn in slug:
-            return True
-
-    return False
+from core.clip_validator import validate_clip_metadata
 
 class MediaManager:
     """
-    Gestor Inteligente Multi-Fuente con Cosechador Automático de Facebook y Pexels 4K:
-    - 1. Prioriza clips locales manuales en assets/clips/ si existen.
-    - 2. Búsqueda y descarga en Pexels 4K con validación biológica estricta.
-    - 3. Búsqueda y descarga automática en Facebook (Facebook Reels & Videos públicos) para animales exóticos.
-    - 4. Búsqueda y descarga en Pixabay HD.
+    Gestor Inteligente de Medios con Selección Visual de Precisión y Validación Estricta:
+    - 1. Validador anti-falsos positivos (elimina acuarios, buzos, caricaturas y especies erróneas).
+    - 2. Clasificación por Puntuación de Relevancia (Score) para elegir la mejor toma de acción.
+    - 3. Soporte para bóveda local de clips curados en assets/clips/{creatura}/.
+    - 4. Respaldo cinemático limpio garantizado.
     """
 
     def __init__(self, temp_dir: Path = TEMP_DIR):
@@ -67,7 +27,14 @@ class MediaManager:
         self.local_clips_dir = ASSETS_DIR / "clips"
         self.local_clips_dir.mkdir(parents=True, exist_ok=True)
 
-    def fetch_clip_for_scene(self, scene_id: int, keywords: List[str], required_subject: str = "", target_duration: float = 5.0) -> Path:
+    def fetch_clip_for_scene(
+        self,
+        scene_id: int,
+        keywords: List[str],
+        required_subject: str = "",
+        action_description: str = "",
+        target_duration: float = 4.0
+    ) -> Path:
         output_file = self.temp_dir / f"scene_{scene_id}_raw.mp4"
         if output_file.exists():
             try:
@@ -76,29 +43,30 @@ class MediaManager:
                 pass
 
         subject_clean = required_subject.lower().replace("-", " ").strip()
-        primary_animal = subject_clean.split()[0] if subject_clean else "wildlife"
-        valid_synonyms = ANIMAL_SYNONYMS.get(primary_animal, [primary_animal])
+        primary_creature = subject_clean.split()[0] if subject_clean else "wildlife"
 
-        # Expandir lista de palabras clave con sinónimos biológicos
-        expanded_keywords = list(keywords)
-        for syn in valid_synonyms:
-            if syn not in expanded_keywords:
-                expanded_keywords.append(f"{syn} 4k vertical")
-                expanded_keywords.append(f"{syn} wildlife 4k")
-                expanded_keywords.append(syn)
-
-        # 1. Comprobar clips locales manuales en assets/clips/
+        # 1. Comprobar clips locales curados en assets/clips/ (por acción o criatura)
         if subject_clean:
-            local_matches = list(self.local_clips_dir.glob(f"*{primary_animal}*.mp4"))
-            if local_matches:
-                chosen = random.choice(local_matches)
+            # Buscar en subcarpetas de criatura o archivos directos
+            creature_folder = self.local_clips_dir / primary_creature
+            local_candidates = []
+            if creature_folder.exists():
+                local_candidates.extend(list(creature_folder.glob("*.mp4")))
+            local_candidates.extend(list(self.local_clips_dir.glob(f"*{primary_creature}*.mp4")))
+
+            if local_candidates:
+                # Filtrar si coincide con la acción (ej. "teeth", "attack", "face")
+                action_matches = [c for c in local_candidates if any(a in c.name.lower() for a in action_description.split("_"))]
+                chosen = random.choice(action_matches) if action_matches else random.choice(local_candidates)
                 import shutil
                 shutil.copy(chosen, output_file)
-                print(f"[MediaManager] [LOCAL CLIP] Usando video local exacto: {chosen.name}")
+                print(f"[MediaManager] [LOCAL CLIP CURADO] Usando video local exacto: {chosen.name}")
                 return output_file
 
-        # 2. Búsqueda en Pexels 4K con validación estricta de especie
-        for kw in expanded_keywords:
+        candidates: List[Dict[str, Any]] = []
+
+        # 2. Búsqueda y Validación en Pexels 4K
+        for kw in keywords:
             print(f"[MediaManager] [BUSCAR PEXELS 4K] Escena {scene_id} -> '{kw}'...", flush=True)
             pex_results = search_pexels_videos(kw, orientation="portrait", max_results=8)
             for pex in pex_results:
@@ -107,22 +75,25 @@ class MediaManager:
                     continue
                 
                 title_slug = pex.get('title', '').lower()
-                if not verify_title_against_subject(title_slug, subject_clean):
-                    continue
+                is_valid, score, reason = validate_clip_metadata(
+                    video_title=title_slug,
+                    video_tags=title_slug,
+                    target_creature=subject_clean,
+                    target_action=action_description
+                )
+                
+                if is_valid:
+                    candidates.append({
+                        "source": "pexels",
+                        "url": url,
+                        "title": title_slug,
+                        "score": score
+                    })
+                else:
+                    # Log de descarte para transparencia
+                    pass
 
-                self.used_urls.add(url)
-                if download_pexels_video(url, output_file):
-                    print(f"  -> [Pexels 4K Verificado] {title_slug[:60]}")
-                    return output_file
-
-        # 3. Cosechador Automático de Facebook para animales exóticos / raros
-        print(f"[MediaManager] [COSECHADOR FACEBOOK] Buscando videos reales de '{primary_animal}' en Facebook...")
-        action_kw = keywords[0] if keywords else f"{primary_animal} wildlife"
-        if WebSocialHarvester.harvest_best_clip(primary_animal, action_kw, output_file, target_duration):
-            print(f"  -> [Facebook Video Verificado] Descargado clip real de {primary_animal}")
-            return output_file
-
-        # 4. Búsqueda en Pixabay HD con validación estricta de especie
+        # 3. Búsqueda y Validación en Pixabay HD
         for kw in keywords:
             pix_results = search_pixabay_videos(kw, max_results=8)
             for pix in pix_results:
@@ -130,17 +101,57 @@ class MediaManager:
                 if url in self.used_urls:
                     continue
                 tags_str = pix.get('tags', '').lower()
-                if not verify_title_against_subject(tags_str, subject_clean):
-                    continue
+                is_valid, score, reason = validate_clip_metadata(
+                    video_title=tags_str,
+                    video_tags=tags_str,
+                    target_creature=subject_clean,
+                    target_action=action_description
+                )
+                if is_valid:
+                    candidates.append({
+                        "source": "pixabay",
+                        "url": url,
+                        "title": tags_str,
+                        "score": score
+                    })
 
-                self.used_urls.add(url)
+        # 4. Ordenar candidatos por PUNTUACIÓN DE RELEVANCIA (el más preciso primero)
+        candidates.sort(key=lambda x: x["score"], reverse=True)
+
+        for cand in candidates:
+            url = cand["url"]
+            source = cand["source"]
+            self.used_urls.add(url)
+            
+            if source == "pexels":
+                if download_pexels_video(url, output_file):
+                    print(f"  -> [Pexels 4K Aprobado (Score: {cand['score']})] {cand['title'][:55]}")
+                    return output_file
+            elif source == "pixabay":
                 if download_pixabay_video(url, output_file):
-                    print(f"  -> [Pixabay HD Verificado] {tags_str[:60]}")
+                    print(f"  -> [Pixabay HD Aprobado (Score: {cand['score']})] {cand['title'][:55]}")
                     return output_file
 
-        # 5. Respaldo limpio del hábitat natural
+        # 5. Cosechador de Redes Sociales si no hubo stock limpio
+        print(f"[MediaManager] [COSECHADOR WEB] Buscando metraje real de '{subject_clean}' en la web...")
+        action_kw = keywords[0] if keywords else f"{subject_clean} wildlife"
+        if WebSocialHarvester.harvest_best_clip(primary_creature, action_kw, output_file, target_duration):
+            print(f"  -> [Video Web Aprobado] Clip descargado para '{subject_clean}'")
+            return output_file
+
+        # 6. Reutilizar cualquier clip aprobado de esta especie en la sesión
+        existing_raws = [f for f in self.temp_dir.glob("scene_*_raw.mp4") if f.exists() and f.stat().st_size > 50000]
+        if existing_raws:
+            chosen = random.choice(existing_raws)
+            import shutil
+            shutil.copy(chosen, output_file)
+            print(f"[MediaManager] [REUTILIZAR CLIP VERIFICADO] Usando toma válida de la sesión: {chosen.name}")
+            return output_file
+
+        # 7. Respaldo cinemático del hábitat (limpio de humanos/acuarios)
         print(f"[MediaManager] [PAISAJE HABITAT] Descargando paisaje del hábitat natural para escena {scene_id}...")
-        pex_hab = search_pexels_videos("wild nature landscape aerial vertical", orientation="portrait", max_results=6)
+        habitat_query = "deep blue ocean underwater sunlight" if "shark" in subject_clean or "orca" in subject_clean else "amazon rainforest jungle canopy vertical"
+        pex_hab = search_pexels_videos(habitat_query, orientation="portrait", max_results=4)
         for pex in pex_hab:
             url = pex.get('video_url', '')
             if url not in self.used_urls:
@@ -148,21 +159,11 @@ class MediaManager:
                 if download_pexels_video(url, output_file):
                     return output_file
 
-        # 6. Reutilizar cualquier clip válido ya descargado en la sesión
-        existing_raws = [f for f in self.temp_dir.glob("scene_*_raw.mp4") if f.exists() and f.stat().st_size > 10000]
-        if existing_raws:
-            chosen = random.choice(existing_raws)
-            import shutil
-            shutil.copy(chosen, output_file)
-            print(f"[MediaManager] [REUTILIZAR CLIP] Reutilizando clip de la sesión: {chosen.name}")
-            return output_file
-
-        # 7. Generar clip cinemático de emergencia con ffmpeg si todo falló
-        print(f"[MediaManager] [EMERGENCIA] Generando fondo cinemático para escena {scene_id}...")
+        # 8. Generación de emergencia con ffmpeg
         cmd_gen = [
             "ffmpeg", "-y",
             "-f", "lavfi",
-            "-i", "color=c=0x0d1b2a:s=1080x1920:d=6,format=yuv420p",
+            "-i", "color=c=0x0a1128:s=1080x1920:d=6,format=yuv420p",
             "-c:v", "libx264",
             "-r", "30",
             str(output_file)
