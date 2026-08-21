@@ -74,8 +74,9 @@ SPECIES_RULES: Dict[str, Dict[str, Any]] = {
         "primary_name": "killer orca"
     },
     "mantis_shrimp": {
-        "required_any": ["mantis shrimp", "odontodactylus", "stomatopod", "peacock mantis"],
+        "required_any": ["mantis shrimp", "odontodactylus", "stomatopod", "peacock mantis", "stomatopoda"],
         "banned": [
+            "praying mantis", "insect", "hand", "leaf", "plant", "garden", "grass",
             "cooking", "recipe", "fried shrimp", "restaurant", "food", "plate"
         ],
         "primary_name": "mantis shrimp"
@@ -123,7 +124,7 @@ def validate_clip_metadata(
             return False, -100, f"Contiene palabra prohibida global: '{banned}'"
 
     # 2. Comprobar reglas específicas de la especie
-    creature_key = target_creature.lower().replace("-", "_").strip()
+    creature_key = target_creature.lower().replace("-", "_").replace(" ", "_").strip()
     # Buscar regla que coincida
     rule = None
     for k, r in SPECIES_RULES.items():

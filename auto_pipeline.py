@@ -181,7 +181,7 @@ def run_single_creature_pipeline(force_topic: str = "", voice_key: str = DEFAULT
         ass_subtitles_path=subtitles_ass,
         output_final_path=final_output,
         total_duration=global_time,
-        bg_music_path=music_file
+        bg_music_path=music_path
     )
 
     print(f"\n[Pipeline] [¡VIDEO GENERADO CON ÉXITO! 🎬] -> {final_output}")
