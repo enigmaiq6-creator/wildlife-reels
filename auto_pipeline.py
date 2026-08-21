@@ -32,8 +32,7 @@ from core.subtitle_engine import SubtitleEngine
 from core.video_composer import VideoComposer
 from core.audio_sfx_engine import generate_cinematic_whoosh, generate_ambient_cinematic_music
 from fetchers.media_manager import MediaManager
-from core.facebook_uploader import FacebookUploader
-from core.instagram_uploader import InstagramUploader
+from publisher.facebook_publisher import FacebookPublisher
 from core.history_manager import HistoryManager
 
 # =====================================================================
@@ -192,6 +191,17 @@ def run_single_creature_pipeline(force_topic: str = "", voice_key: str = DEFAULT
     with open(meta_path, "w", encoding="utf-8") as f:
         f.write(f"TITLE: {title}\n\nDESCRIPTION:\n{title}\n\n" + " ".join(hashtags) + "\n")
     history.record_published_topic(topic_id, title)
+
+    # Publicación Automática en Facebook Reels (Wild Vault)
+    if auto_publish:
+        fb_pub = FacebookPublisher()
+        if fb_pub.is_configured():
+            fb_pub.publish_reel(
+                video_path=final_output,
+                title=title,
+                description=f"Discover the untamed secrets of the {creature_name}! 🦅🌿 Follow Wild Vault for daily 4K micro-docs!",
+                hashtags=" ".join(hashtags)
+            )
 
     print(f"\n=================================================================")
     print(f"  🎉 MICRO-DOC COMPLETADO CON ÉXITO")
@@ -411,6 +421,17 @@ def run_top_countdown_pipeline(force_topic: str = "", voice_key: str = DEFAULT_V
     with open(meta_path, "w", encoding="utf-8") as f:
         f.write(f"TITLE: {title}\n\nDESCRIPTION:\n{title}\n\n" + " ".join(hashtags) + "\n")
     history.record_published_topic(topic_id, title)
+
+    # Publicación Automática en Facebook Reels (Wild Vault)
+    if auto_publish:
+        fb_pub = FacebookPublisher()
+        if fb_pub.is_configured():
+            fb_pub.publish_reel(
+                video_path=final_output,
+                title=title,
+                description=f"{title}\n\nWhich moment shocked you the most? Drop your vote in the comments and follow Wild Vault!",
+                hashtags=" ".join(hashtags)
+            )
 
     print(f"\n=================================================================")
     print(f"  🎉 TOP 3 CUENTA REGRESIVA COMPLETADO CON ÉXITO")
