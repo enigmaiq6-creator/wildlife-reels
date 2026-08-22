@@ -161,8 +161,14 @@
       "title": "IMAGE_format_5_creature_profile",
       "published_at": "2026-08-22T18:32:34.732167",
       "post_id": ""
+    },
+    {
+      "topic_id": "PIP-ECLYSE-ZEBROID",
+      "title": "IMAGE_format_3_curiosity_pip",
+      "published_at": "2026-08-22T18:34:21.027725",
+      "post_id": ""
     }
   ],
-  "total_published": 27,
-  "last_updated": "2026-08-22T18:32:34.732167"
+  "total_published": 28,
+  "last_updated": "2026-08-22T18:34:21.027738"
 }
