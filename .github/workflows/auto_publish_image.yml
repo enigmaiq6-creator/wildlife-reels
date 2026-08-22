@@ -2,9 +2,13 @@ name: Wild Vault - Wildlife Image Generator & Publisher
 
 on:
   schedule:
-    # 2 Publicaciones de imágenes al día (Horarios complementarios a los Reels)
-    - cron: '0 15 * * *'  # 10:00 AM COT / 11:00 AM EST (Media mañana)
-    - cron: '0 23 * * *'  # 6:00 PM COT / 7:00 PM EST (Atardecer)
+    # 6 Publicaciones estratégicas de imágenes al día (Distribución equilibrada a lo largo del día)
+    - cron: '0 11 * * *'  # 6:00 AM COT / 7:00 AM EST (Pico Temprano)
+    - cron: '0 14 * * *'  # 9:00 AM COT / 10:00 AM EST (Media Mañana)
+    - cron: '0 18 * * *'  # 1:00 PM COT / 2:00 PM EST (Sobremesa / Tarde)
+    - cron: '0 21 * * *'  # 4:00 PM COT / 5:00 PM EST (Regreso / Tarde)
+    - cron: '0 0 * * *'   # 7:00 PM COT / 8:00 PM EST (Prime Time Noche)
+    - cron: '0 3 * * *'   # 10:00 PM COT / 11:00 PM EST (Última hora de la noche)
   workflow_dispatch:
     inputs:
       format:
