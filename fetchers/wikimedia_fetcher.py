@@ -10,10 +10,16 @@ class WikimediaFetcher:
     """
     Cosechador de Archivos Científicos y Biológicos Abiertos de Wikimedia Commons.
     Descarga metraje real de acceso libre categorizado por taxonomía biológica.
+    Control de Anti-repetición estricto por sesión.
     """
 
     BASE_API = "https://commons.wikimedia.org/w/api.php"
     HEADERS = {"User-Agent": "WildlifeOmniEngine/2.0 (contact@wildlife.com)"}
+    used_urls: set = set()
+
+    @classmethod
+    def reset_session(cls):
+        cls.used_urls.clear()
 
     @classmethod
     def search_and_download(
@@ -75,8 +81,9 @@ class WikimediaFetcher:
                         for pid, pdata in pages.items():
                             imginfo = pdata.get("imageinfo", [{}])[0]
                             file_direct_url = imginfo.get("url")
-                            if file_direct_url:
-                                print(f"[WikimediaFetcher] [+] Descargando archivo científico: {title[:50]}...")
+                            if file_direct_url and file_direct_url not in cls.used_urls:
+                                cls.used_urls.add(file_direct_url)
+                                print(f"[WikimediaFetcher] [+] Descargando archivo científico único: {title[:50]}...")
                                 temp_dl = output_path.parent / f"wiki_temp_{output_path.stem}.webm"
                                 urllib.request.urlretrieve(file_direct_url, temp_dl)
                                 if temp_dl.exists() and temp_dl.stat().st_size > 15000:

@@ -10,7 +10,14 @@ class WebSocialHarvester:
     Cosechador Automático de Videos de Redes Sociales (Facebook Reels, TikTok, YouTube):
     - Busca videos públicos en Facebook, TikTok y YouTube usando palabras ultra-específicas.
     - Descarga el video en HD con yt-dlp directamente y sin bloqueos de sesión.
+    - Control de Anti-repetición estricto por sesión.
     """
+
+    used_urls: set = set()
+
+    @classmethod
+    def reset_session(cls):
+        cls.used_urls.clear()
 
     @staticmethod
     def search_social_video_urls(query: str, platform: str = "facebook.com", max_results: int = 4) -> List[str]:
@@ -29,7 +36,7 @@ class WebSocialHarvester:
                 for link in raw_links:
                     unquoted = urllib.parse.unquote(link)
                     if platform in unquoted and any(p in unquoted for p in ["video", "reel", "watch", "post"]):
-                        if unquoted not in found_links:
+                        if unquoted not in found_links and unquoted not in WebSocialHarvester.used_urls:
                             found_links.append(unquoted)
                             if len(found_links) >= max_results:
                                 break
@@ -38,10 +45,11 @@ class WebSocialHarvester:
 
         return found_links
 
-    @staticmethod
-    def harvest_best_clip(animal_name: str, specific_action: str, output_path: Path, target_duration: float = 6.0) -> bool:
+    @classmethod
+    def harvest_best_clip(cls, animal_name: str, specific_action: str, output_path: Path, target_duration: float = 6.0) -> bool:
         """
         Busca y descarga automáticamente un clip real del animal desde Facebook o redes sociales.
+        Garantiza CERO REPETICIÓN de URLs.
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
         search_terms = [
@@ -53,8 +61,11 @@ class WebSocialHarvester:
         # 1. Intentar buscar en Facebook
         for term in search_terms:
             print(f"[WebSocialHarvester] Buscando video en Facebook para '{term}'...", flush=True)
-            fb_urls = WebSocialHarvester.search_social_video_urls(term, platform="facebook.com", max_results=3)
+            fb_urls = cls.search_social_video_urls(term, platform="facebook.com", max_results=3)
             for fb_url in fb_urls:
+                if fb_url in cls.used_urls:
+                    continue
+                cls.used_urls.add(fb_url)
                 cmd = [
                     "yt-dlp",
                     "--no-playlist",

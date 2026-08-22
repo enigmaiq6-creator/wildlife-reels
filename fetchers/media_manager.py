@@ -34,9 +34,11 @@ class MediaManager:
         self.local_clips_dir.mkdir(parents=True, exist_ok=True)
 
     def reset_session(self):
-        """Reinicia el registro de clips usados para un nuevo video."""
+        """Reinicia el registro de clips usados para un nuevo video garantizando cero repetición."""
         self.used_urls.clear()
         self.used_local_clips.clear()
+        WebSocialHarvester.reset_session()
+        WikimediaFetcher.reset_session()
 
     def fetch_clip_for_scene(
         self,
