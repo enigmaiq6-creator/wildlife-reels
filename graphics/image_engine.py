@@ -339,13 +339,13 @@ class ImageEngine:
                 img = ImageOps.fit(img.convert("RGB"), (cls.WIDTH, cls.HEIGHT), method=Image.Resampling.LANCZOS)
                 canvas.paste(img, (0, 0))
 
-        # 1. Badge Superior Rojo "WILD VAULT / NOTICIA"
+        # 1. Badge Superior Rojo "WILD VAULT / SCIENCE DISCOVERY"
         draw = ImageDraw.Draw(canvas)
-        draw.rectangle([(cls.WIDTH // 2 - 110, 40), (cls.WIDTH // 2 + 110, 95)], fill=(220, 20, 30))
+        draw.rectangle([(cls.WIDTH // 2 - 130, 40), (cls.WIDTH // 2 + 130, 95)], fill=(220, 20, 30))
         font_brand = FontManager.get_font("black", 22)
         draw.text((cls.WIDTH // 2, 60), "WILD VAULT", font=font_brand, fill=(255, 255, 255), anchor="mm")
         font_subbrand = FontManager.get_font("bold", 14)
-        draw.text((cls.WIDTH // 2, 82), "NOTICIA CIENTÍFICA", font=font_subbrand, fill=(255, 255, 255), anchor="mm")
+        draw.text((cls.WIDTH // 2, 82), "SCIENCE DISCOVERY", font=font_subbrand, fill=(255, 255, 255), anchor="mm")
 
         # 2. Degradado Inferior Profundo
         gradient = cls._create_dark_gradient(cls.WIDTH, cls.HEIGHT, start_y=680, max_alpha=240)
@@ -382,7 +382,7 @@ class ImageEngine:
         cls,
         four_image_paths: List[Path],
         output_path: Path,
-        overlay_title: Optional[str] = "4 TITANES DE LA NATURALEZA"
+        overlay_title: Optional[str] = "4 TITANS OF NATURE"
     ) -> Path:
         canvas = Image.new("RGB", (cls.WIDTH, cls.HEIGHT), (10, 10, 12))
         half_w = cls.WIDTH // 2

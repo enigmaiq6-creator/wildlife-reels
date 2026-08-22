@@ -46,10 +46,10 @@ def run_image_pipeline(forced_format: str = "", auto_publish: bool = True) -> Op
         seen_topic_ids=seen_topics
     )
     topic_id = topic_data.get("topic_id", f"IMG-{int(time.time())}")
-    caption = topic_data.get("caption", "🌿 Descubre los secretos más fascinantes de la vida salvaje en Wild Vault.")
+    caption = topic_data.get("caption", "🌿 Discover the most breathtaking secrets of wildlife on planet Earth with Wild Vault.")
 
-    # Añadir hashtags de marca
-    full_caption = caption + "\n\n#WildVault #VidaSalvaje #Naturaleza #Animales #Ciencia #Wildlife"
+    # Añadir hashtags de marca en inglés
+    full_caption = caption + "\n\n#WildVault #Wildlife #Nature #Animals #NatureLovers #WildFacts #Science"
 
     timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
     final_output_path = img_output_dir / f"wildvault_{format_type}_{topic_id.lower()}_{timestamp_str}.jpg"
@@ -59,7 +59,7 @@ def run_image_pipeline(forced_format: str = "", auto_publish: bool = True) -> Op
 
     # 2. Generar imágenes y renderizar según el formato elegido
     if format_type == "format_1_taxonomic_catalog":
-        title = topic_data.get("title", "8 Tipos de Especies")
+        title = topic_data.get("title", "8 Types of Species")
         species_raw = topic_data.get("species", [])
         rendered_species = []
         for s_idx, sp in enumerate(species_raw):
@@ -77,7 +77,7 @@ def run_image_pipeline(forced_format: str = "", auto_publish: bool = True) -> Op
         bot_p = temp_dir / "illustrated.jpg"
         GCPVertexImageGenerator.generate_image(topic_data.get("prompt_real", ""), top_p)
         GCPVertexImageGenerator.generate_image(topic_data.get("prompt_illustrated", ""), bot_p)
-        dialogue = topic_data.get("dialogue", "¿Podemos ser amigos?")
+        dialogue = topic_data.get("dialogue", "Can we be friends?")
         ImageEngine.render_format_2_real_vs_illustrated(top_p, bot_p, dialogue, final_output_path)
 
     elif format_type == "format_3_curiosity_pip":
@@ -85,19 +85,19 @@ def run_image_pipeline(forced_format: str = "", auto_publish: bool = True) -> Op
         pip_p = temp_dir / "pip.jpg"
         GCPVertexImageGenerator.generate_image(topic_data.get("prompt_main", ""), main_p)
         GCPVertexImageGenerator.generate_image(topic_data.get("prompt_pip", ""), pip_p)
-        badge = topic_data.get("badge", "HÍBRIDO INSÓLITO")
-        headline = topic_data.get("headline", ["ANIMAL ASOMBROSO", "DESCUBRIMIENTO"])
+        badge = topic_data.get("badge", "RARE DISCOVERY")
+        headline = topic_data.get("headline", ["AMAZING CREATURE", "DISCOVERY"])
         ImageEngine.render_format_3_curiosity_pip(main_p, pip_p, headline, final_output_path, badge_text=badge)
 
     elif format_type == "format_5_creature_profile":
         profile_p = temp_dir / "profile.jpg"
         GCPVertexImageGenerator.generate_image(topic_data.get("prompt", ""), profile_p)
-        title = topic_data.get("title", "El Nautilo")
+        title = topic_data.get("title", "The Nautilus")
         paragraphs = topic_data.get("paragraphs", [])
         ImageEngine.render_format_5_creature_profile(profile_p, title, paragraphs, final_output_path)
 
     elif format_type == "format_6_vintage_guide":
-        title = topic_data.get("title", "Los 9 Peces Más Peligrosos")
+        title = topic_data.get("title", "The 9 Most Dangerous Species")
         species_raw = topic_data.get("species", [])
         rendered_species = []
         for s_idx, sp in enumerate(species_raw):
@@ -114,7 +114,7 @@ def run_image_pipeline(forced_format: str = "", auto_publish: bool = True) -> Op
     elif format_type == "format_7_breaking_news":
         news_p = temp_dir / "news.jpg"
         GCPVertexImageGenerator.generate_image(topic_data.get("prompt", ""), news_p)
-        headline = topic_data.get("headline", "Noticia de Impacto")
+        headline = topic_data.get("headline", "Breaking Prehistoric Discovery")
         ImageEngine.render_format_7_breaking_news(news_p, headline, final_output_path)
 
     elif format_type == "format_8_quad_collage":
@@ -124,7 +124,7 @@ def run_image_pipeline(forced_format: str = "", auto_publish: bool = True) -> Op
             qp = temp_dir / f"quad_{q_idx}.jpg"
             GCPVertexImageGenerator.generate_image(pr, qp)
             quad_paths.append(qp)
-        title = topic_data.get("title", "4 TITANES DE LA NATURALEZA")
+        title = topic_data.get("title", "4 TITANS OF NATURE")
         ImageEngine.render_format_8_quad_collage(quad_paths, final_output_path, overlay_title=title)
 
     print(f"\n[ImagePipeline] [¡IMAGEN COMPILADA CON ÉXITO! 🎨] -> {final_output_path}")
