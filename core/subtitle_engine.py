@@ -50,6 +50,7 @@ ScaledBorderAndShadow: yes
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: ViralText,Arial Black,{font_size},&H00FFFFFF,&H0000FFFF,&H00000000,&H80000000,-1,0,0,0,100,100,1,0,1,6.0,3.5,2,40,40,{margin_v},1
 Style: ImpactText,Arial Black,{font_size + 8},&H0000D4FF,&H00FFFFFF,&H00000000,&H90000000,-1,0,0,0,110,110,1,0,1,7.0,4.0,2,30,30,{margin_v},1
+Style: HookViralText,Arial Black,{font_size + 10},&H0000FFFF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,115,115,1,0,1,8.0,4.5,2,25,25,{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -115,7 +116,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                             formatted_parts.append(f"{{{white_color}}}{w_text}")
 
                     display_line = " ".join(formatted_parts)
-                    style_to_use = "ImpactText" if is_impact_word else "ViralText"
+                    if w_start <= 3.5:
+                        style_to_use = "HookViralText"
+                    elif is_impact_word:
+                        style_to_use = "ImpactText"
+                    else:
+                        style_to_use = "ViralText"
 
                     events.append(f"Dialogue: 0,{s_time_str},{e_time_str},{style_to_use},,0,0,0,,{display_line}")
 

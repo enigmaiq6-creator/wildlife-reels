@@ -127,6 +127,15 @@ def generate_ambient_cinematic_music(output_wav: Path, duration: float = 65.0, s
     master_gain = 0.11 # Nivel de mezcla de fondo profesional
     music_final = music_mix * master_gain
     
+    # 💥 IMPACTO VIRAL DE LOS PRIMEROS 3 SEGUNDOS (Scroll-Stopping Sub-Bass Hit & Tension Riser)
+    hook_len = min(int(3.2 * sample_rate), num_samples)
+    hook_t = np.linspace(0, 3.2, hook_len, endpoint=False)
+    # Impacto de golpe profundo (55 Hz a 28 Hz con caída exponencial)
+    hook_sub_hit = np.sin(2 * np.pi * (55.0 - 27.0 * (hook_t / 3.2)) * hook_t) * np.exp(-2.2 * hook_t) * 0.35
+    # Riser de tensión de alta frecuencia (220 Hz subiendo a 1200 Hz)
+    hook_riser = np.sin(2 * np.pi * np.cumsum(220 + 980 * (hook_t / 3.2) ** 2) / sample_rate) * (hook_t / 3.2) * 0.12
+    music_final[:hook_len] += (hook_sub_hit + hook_riser)
+
     # Pulso rítmico ultra-suave (heartbeat sub-bass sutil cada 2 segundos)
     heartbeat = np.sin(2 * np.pi * 45 * t) * np.exp(-12 * (t % 2.0)) * 0.05
     music_final += heartbeat

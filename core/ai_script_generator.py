@@ -58,21 +58,28 @@ class AIScriptGenerator:
         seen_str = ", ".join(seen_topics[-30:]) if seen_topics else "none"
         chosen_creature = random.choice(self.CREATURE_CANDIDATES)
 
-        prompt = f"""You are a master nature documentary filmmaker like BBC Earth and Ares G.
-Create a VIRAL, highly suspenseful 45-second MICRO-DOCUMENTARY script about ONE single creature: {chosen_creature}.
+        prompt = f"""You are a master viral nature documentary filmmaker (style: BBC Earth, Ares G, Nat Geo Wild).
+Create a VIRAL, ultra-suspenseful 45-second MICRO-DOCUMENTARY script about ONE single creature: {chosen_creature}.
 
-CRITICAL FORMAT RULES:
-1. DO NOT MAKE A LISTICLE (Do NOT use 'Number one', 'Number two', etc.). Tell ONE continuous suspense story.
-2. Language: 100% SIMPLE, CLEAR, DRAMATIC ENGLISH (A2/B1 level). Easy to understand worldwide.
-3. 6-ACT NARRATIVE STRUCTURE:
-   - act1_hook: 1 sentence. Shock comparison / Jurassic hook (e.g. 'Did you know this bird looks like it walked straight out of Jurassic Park?').
-   - act2_scale: 1-2 sentences. Monster physical scale and anatomy (e.g. 'Standing over five feet tall, it has a massive dinosaur-like beak with razor sharp edges.').
-   - act3_hunt: 2 sentences. The stealth and sudden predatory strike (e.g. 'It stays completely frozen for hours in total silence before unleashing a lightning-fast strike that crushes prey in seconds.').
-   - act4_behavior: 1-2 sentences. Bizarre psychological trait or death stare (e.g. 'When it locks eyes on you, it does what scientists call the death gaze—staring without blinking into your soul.').
-   - act5_twist: 1-2 sentences. Surprising reality or vulnerability (e.g. 'Yet despite looking like a prehistoric monster, it is calm around humans, but fewer than five thousand remain in the wild.').
-   - act6_climax_cta: 1-2 sentences. Sensory climax & question (e.g. 'There is one sound it makes that terrifies everyone... Would you dare get close to it? Drop a comment and follow for more wild creatures!').
-4. pexels_keywords: EXACTLY 6 visual search queries for stock footage of THIS EXACT CREATURE (varied angles: close up head, hunting in water, eyes looking at camera, full body walking, extreme close up beak/claws, landscape habitat).
-5. hashtags: 6 viral hashtags (e.g. ['#wildlife', '#animals', '#nature', '#predators', '#documentary', '#shorts']).
+CRITICAL VIRAL HOOK & PACING RULES (FIRST 3 SECONDS MUST STOP THE SCROLL):
+1. ACT 1 (THE 3-SECOND VIRAL HOOK):
+   - MUST be an INSTANT CURIOSITY TRAP that makes it impossible to scroll away.
+   - BANNED CLICHES: Do NOT start with 'Did you know', 'What if I told you', 'Meet the...', or 'In the wild'.
+   - USE ONE OF THESE 4 PROVEN VIRAL HOOK FORMULAS:
+     a) The Forbidden Warning: "Whatever you do, NEVER look this creature in the eyes if you encounter it..."
+     b) The Impossible Fact: "This animal is officially banned from public aquariums because it can literally shatter bulletproof glass..."
+     c) The Survival Threat: "If you ever hear this bizarre sound in the rainforest, you have three seconds to run..."
+     d) The Mind-Bending Mystery: "Scientists were terrified when they first examined the jaw of this ancient predator..."
+2. NARRATIVE FLOW (Continuous 45s story, NOT a listicle):
+   - act1_hook: 1 punchy curiosity-gap sentence (0-3s).
+   - act2_scale: 1-2 sentences. Terrifying physical scale, weapons, and anatomy (3-9s).
+   - act3_hunt: 2 sentences. The stealth stalking and sudden explosive predatory strike (9-20s).
+   - act4_behavior: 1-2 sentences. Bizarre psychological trait, death stare, or unique superpower (20-28s).
+   - act5_twist: 1-2 sentences. Surprising reality, rare vulnerability, or secret adaptation (28-36s).
+   - act6_climax_cta: 1-2 sentences. Sensory climax & provocative question asking the viewer to comment (36-45s).
+3. LANGUAGE: Simple, dramatic, impactful English (A2/B1 level). Clear, punchy, cinematic.
+4. pexels_keywords: EXACTLY 6 varied action visual search queries for this exact creature (extreme close up eyes, predatory strike, stalking in wild, full body scale, teeth/claws, natural habitat).
+5. hashtags: 6 viral hashtags (e.g. ['#wildlife', '#animals', '#nature', '#predators', '#documentary', '#wildvault']).
 6. EXCLUSION: Do NOT repeat any previously seen topic slugs: [{seen_str}].
 
 Respond ONLY with valid JSON matching this schema:

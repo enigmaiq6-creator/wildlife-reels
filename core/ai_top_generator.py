@@ -46,12 +46,16 @@ class AITopGenerator:
 
         chosen_theme = random.choice(self.TOP_THEMES)
 
-        prompt = f"""You are a master viral video producer creating a TOP 3 COUNTDOWN YouTube Short / Reel about: '{chosen_theme}'.
+        prompt = f"""You are a master viral video producer creating a TOP 3 COUNTDOWN YouTube Short / Facebook Reel about: '{chosen_theme}'.
 
-FORMAT RULES:
-1. Language: 100% SIMPLE, ENGAGING, DRAMATIC ENGLISH (A2/B1 level).
+VIRAL HOOK & PACING RULES (FIRST 3 SECONDS MUST STOP THE SCROLL):
+1. HOOK (0-3 SECONDS):
+   - MUST be an immediate curiosity-gap hook that forces the viewer to stay until #1.
+   - Example 1: "These three creatures possess abilities so terrifying, scientists couldn't believe they were real."
+   - Example 2: "Whatever you do, NEVER get close to number one on this list."
+   - Example 3: "Number one on this list has a strike that literally shatters bulletproof glass."
 2. STRUCTURE:
-   - hook: 1 punchy sentence opening the countdown (e.g. 'Here are the top three most terrifying animal encounters caught on camera!').
+   - hook: 1 punchy curiosity-gap sentence opening the countdown (0-3s).
    - items: EXACTLY 3 items in descending order (#3, #2, #1).
      Each item must contain:
      - rank: integer (3, 2, or 1)
@@ -59,8 +63,8 @@ FORMAT RULES:
      - creature_name: the specific animal (e.g. 'shoebill stork', 'jaguar', 'great white shark', 'harpy eagle', 'orca', 'mantis shrimp')
      - text: 2 dramatic sentences starting with 'Number [three/two/one]: The [Animal Name]...' describing its shocking trait or attack.
      - action_type: one of ('predator_reveal', 'teeth_jaws', 'stealth_stalking', 'explosive_strike', 'death_stare_eyes', 'wild_habitat')
-   - climax_cta: 1 closing question asking viewers which one shocked them most and to comment & follow.
-   - hashtags: 6 viral hashtags.
+   - climax_cta: 1 closing question asking viewers which one was the most terrifying and to follow Wild Vault.
+   - hashtags: 6 viral hashtags (e.g. ['#wildvault', '#wildlife', '#animals', '#top3', '#predators', '#nature']).
 
 Respond ONLY with valid JSON matching this schema:
 {{

@@ -5,7 +5,7 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
         "topic_id": "GREAT-WHITE-SHARK-APEX",
         "title": "The Ocean's Greatest Demon: The Great White! 🦈🌊",
         "creature_name": "shark",
-        "act1_hook": "What if I told you the ultimate monster of the ocean has been roaming the deep for over sixteen million years?",
+        "act1_hook": "Whatever you do, NEVER swim in the open ocean at sunrise—and this terrifying predator is the exact reason why.",
         "act2_scale": "Reaching twenty feet in length and weighing over five thousand pounds, the Great White Shark is packed with three hundred razor-sharp serrated teeth arranged in rotating rows.",
         "act3_hunt": "It stalks massive sea lions from the dark abyss below, accelerating to twenty-five miles per hour into an explosive breach that launches thousands of pounds of predator completely out of the water.",
         "act4_behavior": "It possesses an electromagnetic sixth sense so acute that it can detect the single heartbeat of a fish from miles away.",
@@ -19,13 +19,13 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "shark swimming deep blue ocean 4k",
             "massive shark ocean surface 4k vertical"
         ],
-        "hashtags": ["#shark", "#greatwhiteshark", "#ocean", "#wildlife", "#predators", "#marinelife", "#nature"]
+        "hashtags": ["#wildvault", "#shark", "#greatwhiteshark", "#ocean", "#wildlife", "#predators", "#nature"]
     },
     "killer_orca": {
         "topic_id": "ORCA-OCEAN-PSYCHOPATH",
         "title": "The True King of the Deep: The Killer Orca! 🌊🐋",
         "creature_name": "orca",
-        "act1_hook": "There is only one creature in the entire ocean that even the Great White Shark is terrified of.",
+        "act1_hook": "There is one terrifying predator in the deep ocean that even the Great White Shark flees from in pure panic.",
         "act2_scale": "Weighing over ten tons with a brain four times the size of a human's, the Killer Orca is not a whale—it is the largest, most intelligent dolphin on Earth.",
         "act3_hunt": "They hunt in calculated wolfpacks, creating massive tidal waves to wash seals off icebergs, delivering a devastating tail slap that paralyzes sharks in a single blow.",
         "act4_behavior": "Each pod speaks its own complex dialect and passes down hunting traditions from generation to generation like a culture.",
@@ -39,13 +39,13 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "killer whale underwater close up 4k",
             "orca jumping ocean sunset 4k vertical"
         ],
-        "hashtags": ["#orca", "#killerwhale", "#ocean", "#sea", "#wildlife", "#nature", "#apexpredator"]
+        "hashtags": ["#wildvault", "#orca", "#killerwhale", "#ocean", "#sea", "#wildlife", "#nature"]
     },
     "jaguar_hunter": {
         "topic_id": "JAGUAR-JUNGLE-PHANTOM",
         "title": "The Ghost Predator with an Armor-Crushing Bite! 🐆💥",
         "creature_name": "jaguar",
-        "act1_hook": "Deep in the Amazon rainforest lurks a predator with the most devastating bite of any big cat on Earth.",
+        "act1_hook": "If you ever hear complete silence in the Amazon jungle, you are already standing in this monster's crosshairs.",
         "act2_scale": "Weighing up to three hundred pounds of pure muscle, the Jaguar has jaws powerful enough to pierce an alligator skull and crush a turtle shell in a single snap.",
         "act3_hunt": "Unlike other cats who avoid water, it swims silently beneath river currents, launching an explosive underwater ambush that drags massive caimans right out of the river.",
         "act4_behavior": "It stalks through dense jungle leaves without making a single sound, moving like a phantom through the shadows.",
@@ -59,13 +59,13 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "jaguar walking rainforest vertical",
             "wild jaguar resting branch 4k"
         ],
-        "hashtags": ["#jaguar", "#bigcats", "#wildlife", "#animals", "#nature", "#predators", "#amazon"]
+        "hashtags": ["#wildvault", "#jaguar", "#bigcats", "#wildlife", "#animals", "#nature", "#amazon"]
     },
     "shoebill_stork": {
         "topic_id": "SHOEBILL-STORK-DINOSAUR",
         "title": "This Bird Looks Straight Out of Jurassic Park! 🦅🦖",
         "creature_name": "shoebill stork",
-        "act1_hook": "Did you know this bird looks like it walked straight out of Jurassic Park?",
+        "act1_hook": "Whatever you do, NEVER make eye contact with this bird if you encounter it in the swamp.",
         "act2_scale": "Standing over five feet tall, the Shoebill Stork has a massive dinosaur-like beak with razor-sharp curved edges.",
         "act3_hunt": "It stands completely frozen in the swamp for hours, waiting in total silence before unleashing a lightning-fast strike that crushes lungfish and even baby crocodiles in seconds.",
         "act4_behavior": "When it locks eyes on you, it performs the chilling death stare—gazing unblinkingly straight into your soul with cold predator eyes.",
@@ -79,13 +79,13 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "shoebill stork swamp wild nature 4k vertical",
             "shoebill stork beak bill clapping 4k"
         ],
-        "hashtags": ["#shoebill", "#shoebillstork", "#wildlife", "#animals", "#nature", "#jurassicpark", "#birds"]
+        "hashtags": ["#wildvault", "#shoebill", "#shoebillstork", "#wildlife", "#animals", "#nature", "#birds"]
     },
     "harpy_eagle": {
         "topic_id": "HARPY-EAGLE-APEX-RAPTOR",
         "title": "The Terrifying Apex Raptor of the Rainforest! 🦅🌴",
         "creature_name": "harpy eagle",
-        "act1_hook": "Deep in the Amazon rainforest lives an apex predator with talons larger than a grizzly bear's claws!",
+        "act1_hook": "Scientists were terrified when they first measured this raptor's talons—they are officially larger than a grizzly bear's claws.",
         "act2_scale": "The Harpy Eagle possesses wings spanning nearly seven feet and rear talons over five inches long capable of crushing bones instantly.",
         "act3_hunt": "It glides silently through dense tree branches at fifty miles per hour, snatching monkeys and sloths straight off the treetops with devastating power.",
         "act4_behavior": "With eyesight eight times sharper than a human, it can spot a small animal moving from over six hundred feet away.",
@@ -99,13 +99,13 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "rainforest canopy flight bird of prey 4k",
             "wild eagle perched tree rainforest 4k vertical"
         ],
-        "hashtags": ["#harpyeagle", "#eagles", "#birdsofprey", "#wildlife", "#nature", "#amazonrainforest"]
+        "hashtags": ["#wildvault", "#harpyeagle", "#eagles", "#birdsofprey", "#wildlife", "#nature"]
     },
     "mantis_shrimp": {
         "topic_id": "MANTIS-SHRIMP-SONIC-PUNCH",
         "title": "The Ocean Creature with a Bullet-Speed Punch! 🦐💥",
         "creature_name": "mantis shrimp",
-        "act1_hook": "This tiny ocean creature punches with the same acceleration as a gunshot bullet!",
+        "act1_hook": "This tiny creature is officially banned from public aquariums because it can literally shatter bulletproof glass with one punch.",
         "act2_scale": "The Mantis Shrimp may look colorful and small, but its club-like arms are reinforced with shock-absorbing layers stronger than bulletproof glass.",
         "act3_hunt": "It stalks unsuspecting crabs on the reef and strikes at fifty miles per hour, boiling the surrounding water and shattering thick shells in a single blow.",
         "act4_behavior": "It possesses the most complex eyes on planet Earth, seeing sixteen primary colors and invisible polarized light that humans can't even dream of.",
@@ -119,7 +119,7 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "colorful coral reef ocean wildlife 4k vertical",
             "deep ocean glowing marine life 4k vertical"
         ],
-        "hashtags": ["#mantisshrimp", "#ocean", "#marinelife", "#wildlife", "#nature", "#sea"]
+        "hashtags": ["#wildvault", "#mantisshrimp", "#ocean", "#marinelife", "#wildlife", "#nature"]
     }
 }
 
