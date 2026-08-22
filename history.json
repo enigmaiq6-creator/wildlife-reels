@@ -173,8 +173,14 @@
       "title": "IMAGE_format_7_breaking_news",
       "published_at": "2026-08-22T18:40:17.773901",
       "post_id": ""
+    },
+    {
+      "topic_id": "QUAD-TITANS",
+      "title": "IMAGE_format_8_quad_collage",
+      "published_at": "2026-08-22T18:42:15.311716",
+      "post_id": ""
     }
   ],
-  "total_published": 29,
-  "last_updated": "2026-08-22T18:40:17.773901"
+  "total_published": 30,
+  "last_updated": "2026-08-22T18:42:15.311724"
 }
