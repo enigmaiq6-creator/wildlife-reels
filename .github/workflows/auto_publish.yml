@@ -2,24 +2,22 @@ name: Wild Vault - Wildlife Video Generator & Publisher
 
 on:
   schedule:
-    # 6 publicaciones automáticas al día (Horarios de mayor engagement)
-    - cron: '0 9 * * *'   # 4:00 AM COT / 11:00 AM CET
-    - cron: '0 11 * * *'  # 6:00 AM COT / 1:00 PM CET
-    - cron: '0 13 * * *'  # 8:00 AM COT / 3:00 PM CET
-    - cron: '0 17 * * *'  # 12:00 PM COT / 7:00 PM CET
-    - cron: '0 21 * * *'  # 4:00 PM COT / 11:00 PM CET
-    - cron: '0 1 * * *'   # 8:00 PM COT
+    # 4 Publicaciones estratégicas al día (Horarios pico ideales Anti-Spam de Facebook Reels)
+    - cron: '0 13 * * *'  # 8:00 AM COT / 9:00 AM EST (Pico de la mañana)
+    - cron: '0 17 * * *'  # 12:00 PM COT / 1:00 PM EST (Pico del mediodía)
+    - cron: '0 21 * * *'  # 4:00 PM COT / 5:00 PM EST (Pico de la tarde)
+    - cron: '0 1 * * *'   # 8:00 PM COT / 9:00 PM EST (Pico de la noche)
   workflow_dispatch:
     inputs:
       mode:
-        description: "Modo: 'single' (Micro-doc 1 animal) o 'top' (Cuenta regresiva #3-#1)"
+        description: "Modo: 'single' (Micro-doc 1 animal), 'top' (Cuenta regresiva #3-#1) o 'auto'"
         required: false
-        default: "single"
+        default: "auto"
         type: choice
         options:
+          - auto
           - single
           - top
-          - auto
       topic:
         description: "Tema o animal específico (ej. mantis_shrimp, orca_hunter, harpy_eagle o dejar vacío)"
         required: false
@@ -76,15 +74,27 @@ jobs:
           FACEBOOK_PAGE_ID: ${{ secrets.FB_PAGE_ID || secrets.WILDLIFE_FB_PAGE_ID || secrets.FACEBOOK_PAGE_ID || '1269051872959609' }}
           FACEBOOK_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN || secrets.WILDLIFE_FB_ACCESS_TOKEN || secrets.FACEBOOK_ACCESS_TOKEN }}
         run: |
-          MODE="${{ github.event.inputs.mode || 'single' }}"
+          INPUT_MODE="${{ github.event.inputs.mode || 'auto' }}"
           TOPIC="${{ github.event.inputs.topic || '' }}"
           
-          CMD="python auto_pipeline.py --mode $MODE"
+          # Si el modo es 'auto', alternar entre single y top según la hora
+          if [ "$INPUT_MODE" = "auto" ]; then
+            HOUR=$(date -u +%H)
+            if [ "$HOUR" -eq 17 ] || [ "$HOUR" -eq 1 ]; then
+              FINAL_MODE="top"
+            else
+              FINAL_MODE="single"
+            fi
+          else
+            FINAL_MODE="$INPUT_MODE"
+          fi
+          
+          CMD="python auto_pipeline.py --mode $FINAL_MODE"
           if [ -n "$TOPIC" ]; then
             CMD="$CMD --topic \"$TOPIC\""
           fi
           
-          echo "Executing: $CMD"
+          echo "Ejecutando Modo: $FINAL_MODE | Comando: $CMD"
           eval $CMD
 
       - name: Commit and Push History State
