@@ -135,3 +135,54 @@ class FacebookPublisher:
         except Exception as e:
             print(f"[FacebookPublisher] [!] Excepcion al publicar Reel: {e}")
             return None
+
+    def publish_photo(
+        self,
+        image_path: Path,
+        caption: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Sube y publica una foto en la página de Facebook de Wild Vault.
+        """
+        image_path = Path(image_path)
+        if not image_path.exists():
+            print(f"[FacebookPublisher] [!] Error: La imagen no existe en {image_path}")
+            return None
+
+        if not self.is_configured():
+            print("[FacebookPublisher] [!] Error: FB_PAGE_ID o FB_PAGE_ACCESS_TOKEN no configurados en .env")
+            return None
+
+        file_size = image_path.stat().st_size
+        print(f"\n[FacebookPublisher] [INICIANDO SUBIDA DE FOTO A WILD VAULT]")
+        print(f"  -> Pagina: Wild Vault (ID: {self.page_id})")
+        print(f"  -> Archivo: {image_path.name} ({file_size / 1024:.2f} KB)")
+
+        url = f"https://graph.facebook.com/v19.0/{self.page_id}/photos"
+        payload = {
+            "caption": caption,
+            "access_token": self.access_token,
+            "published": "true"
+        }
+
+        try:
+            with open(image_path, "rb") as f:
+                files = {"source": (image_path.name, f, "image/jpeg")}
+                res = requests.post(url, data=payload, files=files, timeout=60)
+
+            if res.status_code != 200:
+                print(f"[FacebookPublisher] [!] Error publicando foto: {res.text}")
+                return None
+
+            result = res.json()
+            photo_id = result.get("id")
+            post_id = result.get("post_id") or photo_id
+            print(f"\n[FacebookPublisher] [¡IMAGEN PUBLICADA CON ÉXITO EN WILD VAULT!]")
+            print(f"  -> Photo ID: {photo_id}")
+            print(f"  -> Post ID: {post_id}")
+            print(f"  -> Link: https://www.facebook.com/{self.page_id}/photos/{photo_id}")
+            return result
+        except Exception as e:
+            print(f"[FacebookPublisher] [!] Excepción al publicar foto: {e}")
+            return None
+

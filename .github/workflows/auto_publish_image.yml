@@ -1,0 +1,87 @@
+name: Wild Vault - Wildlife Image Generator & Publisher
+
+on:
+  schedule:
+    # 2 Publicaciones de imágenes al día (Horarios complementarios a los Reels)
+    - cron: '0 15 * * *'  # 10:00 AM COT / 11:00 AM EST (Media mañana)
+    - cron: '0 23 * * *'  # 6:00 PM COT / 7:00 PM EST (Atardecer)
+  workflow_dispatch:
+    inputs:
+      format:
+        description: "Formato de imagen (dejar vacío para selección aleatoria entre los 8 formatos)"
+        required: false
+        default: ""
+        type: choice
+        options:
+          - ""
+          - format_1_taxonomic_catalog
+          - format_2_real_vs_illustrated
+          - format_3_curiosity_pip
+          - format_5_creature_profile
+          - format_6_vintage_guide
+          - format_7_breaking_news
+          - format_8_quad_collage
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Setup Google Cloud Credentials
+        env:
+          GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -n "$GCP_SERVICE_ACCOUNT_JSON" ]; then
+            mkdir -p credentials
+            echo "$GCP_SERVICE_ACCOUNT_JSON" > credentials/gcp_service_account.json
+            echo "Google Cloud Vertex AI credentials configured."
+          fi
+
+      - name: Run Wildlife Image Generator & Publisher
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID || secrets.WILDLIFE_FB_PAGE_ID || secrets.FACEBOOK_PAGE_ID || '1269051872959609' }}
+          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN || secrets.WILDLIFE_FB_ACCESS_TOKEN || secrets.FACEBOOK_ACCESS_TOKEN }}
+          FACEBOOK_PAGE_ID: ${{ secrets.FB_PAGE_ID || secrets.WILDLIFE_FB_PAGE_ID || secrets.FACEBOOK_PAGE_ID || '1269051872959609' }}
+          FACEBOOK_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN || secrets.WILDLIFE_FB_ACCESS_TOKEN || secrets.FACEBOOK_ACCESS_TOKEN }}
+        run: |
+          FORMAT="${{ github.event.inputs.format || '' }}"
+          CMD="python auto_image_pipeline.py"
+          if [ -n "$FORMAT" ]; then
+            CMD="$CMD --format \"$FORMAT\""
+          fi
+          echo "Ejecutando: $CMD"
+          eval $CMD
+
+      - name: Commit and Push History State
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add history.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(history): update published image topics [skip ci]" && git push origin master)
+
+      - name: Save Image Output Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wildvault-image-output
+          path: output/images/
+          retention-days: 5
