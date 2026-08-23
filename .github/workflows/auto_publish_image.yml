@@ -25,6 +25,8 @@ on:
           - format_6_vintage_guide
           - format_7_breaking_news
           - format_8_quad_collage
+  repository_dispatch:
+    types: [trigger-wildlife-images]
 
 permissions:
   contents: write
