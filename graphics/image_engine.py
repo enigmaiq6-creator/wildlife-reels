@@ -57,13 +57,19 @@ class ImageEngine:
         canvas = Image.new("RGB", (cls.WIDTH, cls.HEIGHT), (15, 16, 18))
         draw = ImageDraw.Draw(canvas)
 
-        # Título superior
-        font_title = FontManager.get_font("black", 58)
+        # Título superior con ajuste dinámico de tamaño
+        title_font_size = 52
+        font_title = FontManager.get_font("black", title_font_size)
+        title_bbox = draw.textbbox((0, 0), title.upper(), font=font_title)
+        while (title_bbox[2] - title_bbox[0]) > (cls.WIDTH - 80) and title_font_size > 28:
+            title_font_size -= 4
+            font_title = FontManager.get_font("black", title_font_size)
+            title_bbox = draw.textbbox((0, 0), title.upper(), font=font_title)
+
         font_name = FontManager.get_font("bold", 24)
         font_sci = FontManager.get_font("italic", 20)
 
         # Encabezado
-        title_bbox = draw.textbbox((0, 0), title.upper(), font=font_title)
         tw = title_bbox[2] - title_bbox[0]
         draw.text(((cls.WIDTH - tw) // 2, 45), title.upper(), font=font_title, fill=(255, 215, 0)) # Amarillo / Oro
 
@@ -273,7 +279,15 @@ class ImageEngine:
         canvas = Image.new("RGB", (cls.WIDTH, cls.HEIGHT), (242, 234, 216))
         draw = ImageDraw.Draw(canvas)
 
-        font_title = FontManager.get_font("serif", 46)
+        # Título vintage con ajuste dinámico
+        title_font_size = 44
+        font_title = FontManager.get_font("serif", title_font_size)
+        title_bbox = draw.textbbox((0, 0), title.upper(), font=font_title)
+        while (title_bbox[2] - title_bbox[0]) > (cls.WIDTH - 80) and title_font_size > 24:
+            title_font_size -= 4
+            font_title = FontManager.get_font("serif", title_font_size)
+            title_bbox = draw.textbbox((0, 0), title.upper(), font=font_title)
+
         draw.text((cls.WIDTH // 2, 50), title.upper(), font=font_title, fill=(35, 25, 20), anchor="mm")
 
         # Separador ornamental
