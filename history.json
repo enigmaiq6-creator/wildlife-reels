@@ -125,8 +125,14 @@
       "title": "Colossal Squid: The Deep Abyss Monster",
       "published_at": "2026-08-23T14:12:42.789751",
       "post_id": ""
+    },
+    {
+      "topic_id": "CATALOG-OWLS",
+      "title": "IMAGE_format_1_taxonomic_catalog",
+      "published_at": "2026-08-23T14:35:37.266298",
+      "post_id": ""
     }
   ],
-  "total_published": 21,
-  "last_updated": "2026-08-23T14:12:42.789765"
+  "total_published": 22,
+  "last_updated": "2026-08-23T14:35:37.266309"
 }
