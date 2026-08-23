@@ -203,8 +203,14 @@
       "title": "IMAGE_format_6_vintage_guide",
       "published_at": "2026-08-23T03:54:00.375033",
       "post_id": ""
+    },
+    {
+      "topic_id": "CATALOG-BIG-CATS",
+      "title": "IMAGE_format_1_taxonomic_catalog",
+      "published_at": "2026-08-23T11:21:10.362135",
+      "post_id": ""
     }
   ],
-  "total_published": 34,
-  "last_updated": "2026-08-23T03:54:00.375043"
+  "total_published": 35,
+  "last_updated": "2026-08-23T11:21:10.362144"
 }
