@@ -66,7 +66,7 @@ class MediaManager:
             YouTubeWildlifeHarvester.harvest_creature_vault(primary_creature)
 
         if creature_folder.exists():
-            local_candidates = sorted([c for c in creature_folder.glob("*.mp4") if c.stat().st_size > 10000])
+            local_candidates = [c for c in creature_folder.glob("*.mp4") if c.stat().st_size > 10000]
             if local_candidates:
                 action_clean = action_description.lower().split("_")[0]
                 # Buscar candidatos que coincidan con la acción Y que NO hayan sido usados todavía
@@ -75,6 +75,7 @@ class MediaManager:
                 
                 # Si hay uno no usado de la acción exacta:
                 if unused_action_matched:
+                    random.shuffle(unused_action_matched)
                     chosen = unused_action_matched[0]
                     self.used_local_clips.append(chosen.name)
                     shutil.copy(chosen, output_file)
@@ -84,6 +85,7 @@ class MediaManager:
                 # Si no hay de esa acción exacta pero hay otros videos locales no usados:
                 unused_general = [c for c in local_candidates if c.name not in self.used_local_clips]
                 if unused_general:
+                    random.shuffle(unused_general)
                     chosen = unused_general[0]
                     self.used_local_clips.append(chosen.name)
                     shutil.copy(chosen, output_file)
