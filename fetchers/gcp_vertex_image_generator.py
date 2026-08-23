@@ -12,13 +12,16 @@ import google.auth.transport.requests
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 CREDENTIALS_PATH = BASE_DIR / "credentials" / "gcp_service_account.json"
+CACHE_DIR = BASE_DIR / "assets" / "image_cache"
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 class GCPVertexImageGenerator:
     """
-    Generador de Imágenes de Ultra Alta Definición utilizando Google Cloud Vertex AI
-    y los créditos del proyecto de Google Cloud (facebookbot-502117).
-    Incluye sistema de reintentos y fallback a IA de respaldo para garantizar
-    que NUNCA se produzca una imagen vacía o negra.
+    Generador de Imágenes Inteligente con Optimización Extrema de Costos y Créditos:
+    1. Tier 1 (Costo $0): Busca fotos reales en Pexels 4K / Wikimedia Commons si es una especie viva.
+    2. Tier 2 (Créditos Google Cloud): Invoca Vertex AI (facebookbot-502117) para escenas inéditas,
+       híbridos, prehistoria y cuando no hay stock gratuito.
+    3. Tier 3 (Costo $0): Respaldo IA gratuito de alta definición (Pollinations Flux).
     """
 
     _creds = None
@@ -45,14 +48,45 @@ class GCPVertexImageGenerator:
             return None
 
     @classmethod
+    def _search_free_stock_photo(cls, query_prompt: str, output_path: Path) -> bool:
+        """
+        Tier 1 (Ahorro Máximo - $0 Costo):
+        Descarga fotos profesionales de Pexels 4K o Wikimedia para ahorrar créditos de Google Cloud.
+        """
+        # Si el prompt es de animales extintos o anime, saltar a Vertex AI
+        forbidden_stock = ["prehistoric", "extinct", "anime", "illustration", "hybrid", "transparent head", "drawing", "glowing eyes"]
+        if any(w in query_prompt.lower() for w in forbidden_stock):
+            return False
+
+        # Limpiar palabras clave para búsqueda de stock
+        clean_q = query_prompt.replace("isolated", "").replace("studio portrait", "").replace("black background", "").replace("white background", "").strip()
+        
+        # 1. Pexels Photo API
+        pexels_key = os.environ.get("PEXELS_API_KEY", "")
+        if pexels_key:
+            try:
+                p_url = f"https://api.pexels.com/v1/search?query={urllib.parse.quote(clean_q)}&per_page=3&orientation=portrait"
+                p_resp = requests.get(p_url, headers={"Authorization": pexels_key}, timeout=8)
+                if p_resp.status_code == 200:
+                    photos = p_resp.json().get("photos", [])
+                    if photos:
+                        img_url = photos[0].get("src", {}).get("large2x") or photos[0].get("src", {}).get("large")
+                        if img_url:
+                            img_data = requests.get(img_url, timeout=12).content
+                            if len(img_data) > 10000:
+                                output_path.write_bytes(img_data)
+                                print(f"[GCPVertexAI] [AHORRO DE CRÉDITOS] Foto 4K obtenida de Pexels ($0.00) -> {output_path.name}")
+                                return True
+            except Exception:
+                pass
+
+        return False
+
+    @classmethod
     def _fallback_generate(cls, prompt: str, output_path: Path) -> bool:
         """
-        Generador de Respaldo de Alta Definición si Vertex AI sufre Rate-Limit (429).
-        Garantiza que SIEMPRE exista una imagen real del animal.
+        Tier 3 (Costo $0): Generador IA de respaldo si Vertex AI no está disponible.
         """
-        print(f"[GCPVertexAI] [!] Activando generador de respaldo de alta definición para: '{prompt[:45]}...'")
-        
-        # 1. Intento con Pollinations AI (Flux / SDXL)
         clean_prompt = f"National geographic photography of {prompt}, high detail 4k award winning wildlife photo, studio lighting"
         encoded_prompt = urllib.parse.quote(clean_prompt)
         url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1080&height=1350&nologo=true&seed={int(time.time()*1000)%100000}"
@@ -65,30 +99,10 @@ class GCPVertexImageGenerator:
                 data = resp.read()
                 if len(data) > 10000:
                     output_path.write_bytes(data)
-                    print(f"[GCPVertexAI] [+] Imagen generada con éxito vía Respaldo IA ({len(data)} bytes) -> {output_path.name}")
+                    print(f"[GCPVertexAI] [+] Imagen generada vía Respaldo IA Gratuito -> {output_path.name}")
                     return True
         except Exception as e:
-            print(f"[GCPVertexAI] [!] Error en respaldo Pollinations: {e}")
-
-        # 2. Intento con Pexels Photo API si está disponible
-        pexels_key = os.environ.get("PEXELS_API_KEY", "")
-        if pexels_key:
-            try:
-                search_q = prompt.split("isolated")[0].split("portrait")[0].strip()
-                p_url = f"https://api.pexels.com/v1/search?query={urllib.parse.quote(search_q)}&per_page=3&orientation=portrait"
-                p_resp = requests.get(p_url, headers={"Authorization": pexels_key}, timeout=10)
-                if p_resp.status_code == 200:
-                    photos = p_resp.json().get("photos", [])
-                    if photos:
-                        img_url = photos[0].get("src", {}).get("large2x") or photos[0].get("src", {}).get("large")
-                        if img_url:
-                            img_data = requests.get(img_url, timeout=15).content
-                            if len(img_data) > 10000:
-                                output_path.write_bytes(img_data)
-                                print(f"[GCPVertexAI] [+] Foto de Pexels 4K descargada ({len(img_data)} bytes) -> {output_path.name}")
-                                return True
-            except Exception as pe:
-                print(f"[GCPVertexAI] [!] Error en respaldo Pexels: {pe}")
+            print(f"[GCPVertexAI] [!] Error en respaldo gratuito: {e}")
 
         return False
 
@@ -97,15 +111,20 @@ class GCPVertexImageGenerator:
         cls,
         prompt: str,
         output_path: Path,
-        aspect_ratio: str = "9:16"
+        prefer_free_stock: bool = True
     ) -> bool:
         """
-        Genera una fotografía fotorrealista de alta definición usando Google Cloud Vertex AI
-        con reintentos automáticos y fallback garantizado.
+        Genera una fotografía fotorrealista de alta definición optimizando al máximo los créditos de Google Cloud.
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        token = cls._get_auth_token()
 
+        # 1. Intentar obtener foto gratuita en Tier 1 para ahorrar créditos
+        if prefer_free_stock:
+            if cls._search_free_stock_photo(prompt, output_path):
+                return True
+
+        # 2. Tier 2: Usar Google Cloud Vertex AI (facebookbot-502117)
+        token = cls._get_auth_token()
         if token:
             url = f"https://{cls._location}-aiplatform.googleapis.com/v1beta1/projects/{cls._project_id}/locations/{cls._location}/publishers/google/models/gemini-2.5-flash-image:generateContent"
             headers = {
@@ -130,13 +149,11 @@ class GCPVertexImageGenerator:
                 }
             }
 
-            print(f"[GCPVertexAI] [GENERANDO IMAGEN CON GOOGLE CLOUD VERTEX AI] '{prompt[:50]}...'")
+            print(f"[GCPVertexAI] [GENERANDO CON CRÉDITOS GOOGLE CLOUD] '{prompt[:50]}...'")
 
-            # Intentar con reintentos si ocurre 429
-            max_attempts = 2
-            for attempt in range(max_attempts):
+            for attempt in range(2):
                 try:
-                    resp = requests.post(url, headers=headers, json=payload, timeout=40)
+                    resp = requests.post(url, headers=headers, json=payload, timeout=35)
                     if resp.status_code == 200:
                         data = resp.json()
                         candidates = data.get("candidates", [])
@@ -148,18 +165,15 @@ class GCPVertexImageGenerator:
                                 if b64_data:
                                     img_bytes = base64.b64decode(b64_data)
                                     output_path.write_bytes(img_bytes)
-                                    print(f"[GCPVertexAI] [IMAGEN GOOGLE CLOUD GENERADA CON EXITO!] ({len(img_bytes)} bytes) -> {output_path.name}")
+                                    print(f"[GCPVertexAI] [IMAGEN GOOGLE CLOUD GENERADA] ({len(img_bytes)} bytes) -> {output_path.name}")
                                     return True
                     elif resp.status_code == 429:
-                        print(f"[GCPVertexAI] [!] Rate Limit 429 en intento {attempt + 1}. Esperando 3 segundos...")
-                        time.sleep(3)
+                        time.sleep(2)
                         continue
                     else:
-                        print(f"[GCPVertexAI] [!] Error Vertex AI ({resp.status_code}): {resp.text[:120]}")
                         break
-                except Exception as e:
-                    print(f"[GCPVertexAI] [!] Excepción en llamada Vertex AI: {e}")
+                except Exception:
                     break
 
-        # Si Vertex AI no está disponible o falló con 429, ejecutar el generador de respaldo
+        # 3. Tier 3: Si Vertex AI falló o alcanzó límite, usar respaldo gratuito
         return cls._fallback_generate(prompt, output_path)
