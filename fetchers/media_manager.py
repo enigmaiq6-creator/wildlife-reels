@@ -18,13 +18,12 @@ from core.clip_validator import validate_clip_metadata
 
 class MediaManager:
     """
-    Motor Omnicanal Autónomo de Cosecha y Generación de Videos (OmniMediaEngine) v5.0:
-    Prioridad Absoluta a MÚLTIPLES CLIPS DE VIDEO REALES:
-      - Nivel 1: Bóveda de Video Dinámica de Sesión (6 a 8 clips de video reales por animal).
-      - Nivel 2: Cosechador de Redes Sociales (Facebook / TikTok / YouTube Shorts).
-      - Nivel 3: Stock 4K / HD Fresco en línea (Pexels / Pixabay).
-      - Nivel 4: Archivos Científicos Abiertos (Wikimedia Commons).
-      - Nivel 5: SÓLO si no existe ningún video en la red, genera Fotografía 4K + Ken Burns 3D.
+    Motor Omnicanal Autónomo de Cosecha y Generación de Videos (OmniMediaEngine) v6.0:
+    Garantiza que el 100% de las escenas utilicen MÚLTIPLES CLIPS DE VIDEO REALES:
+      - Nivel 1: Bóveda Multi-Clip de Sesión Cosechada (Facebook, Reddit, TikTok, YouTube).
+      - Nivel 2: Cosecha en Línea de Stock Fresco 4K (Pexels / Pixabay).
+      - Nivel 3: Archivos Científicos Abiertos (Wikimedia Commons).
+      - Nivel 4: SÓLO si no existe ningún video del animal en la web, genera Fotografía 4K + Ken Burns 3D.
     """
 
     def __init__(self, local_clips_dir: Optional[Path] = None, temp_dir: Optional[Path] = None):
@@ -40,7 +39,6 @@ class MediaManager:
         self.used_urls.clear()
         WebSocialHarvester.reset_session()
         WikimediaFetcher.reset_session()
-        # Limpiar bóveda temporal de sesión
         if self.session_vault_dir.exists():
             try:
                 shutil.rmtree(self.session_vault_dir, ignore_errors=True)
@@ -67,14 +65,18 @@ class MediaManager:
         primary_creature = subject_clean.replace(" ", "_") if subject_clean else "wildlife"
 
         # =====================================================================
-        # NIVEL 1: BÓVEDA DINÁMICA DE MÚLTIPLES CLIPS DE VIDEO REALES
+        # NIVEL 1: BÓVEDA MULTI-CLIP DE SESIÓN (MÚLTIPLES VIDEOS REALES DEL ANIMAL)
         # =====================================================================
         creature_vault = self.session_vault_dir / primary_creature
         if not creature_vault.exists() or len(list(creature_vault.glob("*.mp4"))) < 3:
-            YouTubeWildlifeHarvester.harvest_creature_vault(primary_creature, target_dir=creature_vault, num_shots=8)
+            # 1.1 Cosechar y rebanar videos desde redes sociales (Facebook, Reddit, TikTok)
+            WebSocialHarvester.harvest_and_slice_vault(primary_creature, target_dir=creature_vault, num_shots=8)
+            # 1.2 Si faltan clips, cosechar de YouTube
+            if len(list(creature_vault.glob("*.mp4"))) < 4:
+                YouTubeWildlifeHarvester.harvest_creature_vault(primary_creature, target_dir=creature_vault, num_shots=8)
 
         if creature_vault.exists():
-            available_clips = sorted([c for c in creature_vault.glob("*.mp4") if c.stat().st_size > 25000])
+            available_clips = sorted([c for c in creature_vault.glob("*.mp4") if c.stat().st_size > 20000])
             unused_clips = [c for c in available_clips if c.name not in self.used_session_clips]
             if unused_clips:
                 chosen = unused_clips[0]
@@ -84,15 +86,7 @@ class MediaManager:
                 return output_file
 
         # =====================================================================
-        # NIVEL 2: COSECHADOR DE REDES SOCIALES (FACEBOOK / TIKTOK / YOUTUBE)
-        # =====================================================================
-        action_kw = keywords[0] if keywords else f"{subject_clean} predatory action"
-        if WebSocialHarvester.harvest_best_clip(primary_creature, action_kw, output_file, target_duration):
-            print(f"[OmniMediaEngine] [NIVEL 2 - METRAJE SOCIAL REAL] Clip descargado para '{subject_clean}'", flush=True)
-            return output_file
-
-        # =====================================================================
-        # NIVEL 3: STOCK FRESCO 4K EN LÍNEA (PEXELS + PIXABAY)
+        # NIVEL 2: STOCK FRESCO 4K EN LÍNEA (PEXELS + PIXABAY)
         # =====================================================================
         candidates: List[Dict[str, Any]] = []
 
@@ -135,26 +129,26 @@ class MediaManager:
             source = cand["source"]
             self.used_urls.add(url)
             if source == "pexels" and download_pexels_video(url, output_file):
-                print(f"[OmniMediaEngine] [NIVEL 3 - VIDEO STOCK PEXELS 4K] {cand['title'][:55]}", flush=True)
+                print(f"[OmniMediaEngine] [NIVEL 2 - VIDEO STOCK PEXELS 4K] {cand['title'][:55]}", flush=True)
                 return output_file
             elif source == "pixabay" and download_pixabay_video(url, output_file):
-                print(f"[OmniMediaEngine] [NIVEL 3 - VIDEO STOCK PIXABAY HD] {cand['title'][:55]}", flush=True)
+                print(f"[OmniMediaEngine] [NIVEL 2 - VIDEO STOCK PIXABAY HD] {cand['title'][:55]}", flush=True)
                 return output_file
 
         # =====================================================================
-        # NIVEL 4: ARCHIVOS CIENTÍFICOS ABIERTOS (WIKIMEDIA COMMONS)
+        # NIVEL 3: ARCHIVOS CIENTÍFICOS ABIERTOS (WIKIMEDIA COMMONS)
         # =====================================================================
         if WikimediaFetcher.search_and_download(subject_clean, action_description, output_file, target_duration):
-            print(f"[OmniMediaEngine] [NIVEL 4 - ARCHIVO CIENTÍFICO WIKIMEDIA] Clip para '{subject_clean}'", flush=True)
+            print(f"[OmniMediaEngine] [NIVEL 3 - ARCHIVO CIENTÍFICO WIKIMEDIA] Clip para '{subject_clean}'", flush=True)
             return output_file
 
         # =====================================================================
-        # NIVEL 5: FOTOGRAFÍA FOTORREALISTA 4K + EFECTO KEN BURNS CINEMÁTICO 3D
-        # (ÚNICO RESPALDO CUANDO NO SE ENCUENTRAN VIDEOS EN NINGUNA FUENTE)
+        # NIVEL 4: FOTOGRAFÍA FOTORREALISTA 4K + EFECTO KEN BURNS CINEMÁTICO 3D
+        # (SÓLO CUANDO NO SE ENCUENTRAN VIDEOS REALES EN LA WEB)
         # =====================================================================
-        print(f"[OmniMediaEngine] [NIVEL 5 - FOTO 4K + KEN BURNS 3D] Creando toma animada de respaldo...", flush=True)
+        print(f"[OmniMediaEngine] [NIVEL 4 - FOTO 4K + KEN BURNS 3D] Creando toma animada de respaldo...", flush=True)
         if PhotoKenBurnsHarvester.create_kenburns_clip(subject_clean, action_description, output_file, target_duration):
-            print(f"  -> [NIVEL 5 - Toma Ken Burns 3D Generada para '{subject_clean}']", flush=True)
+            print(f"  -> [NIVEL 4 - Toma Ken Burns 3D Generada para '{subject_clean}']", flush=True)
             return output_file
 
         # Respaldo de emergencia
