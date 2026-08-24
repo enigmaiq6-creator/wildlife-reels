@@ -268,13 +268,14 @@ def run_top_countdown_pipeline(force_topic: str = "", voice_key: str = DEFAULT_V
     hook_dur = hook_synth["duration"]
     print(f"[Voz] Duración del Gancho: {hook_dur:.2f}s", flush=True)
 
-    # Clip inicial de alta tensión
+    # Clip inicial de alta tensión dinámico para el Top
+    first_creature = items[-1].get("creature_name", "predator") if items else "predator"
     total_shot_counter += 1
     raw_hook_clip = media_manager.fetch_clip_for_scene(
         scene_id=total_shot_counter,
-        keywords=["wildlife cinematic predator 4k vertical", "wolf eyes staring 4k"],
-        required_subject="wildlife",
-        action_description="hook_reveal",
+        keywords=[f"{first_creature} predator attack strike 4k", f"{first_creature} extreme close up eyes 4k", f"{first_creature} wild hunting"],
+        required_subject=first_creature,
+        action_description="predator_reveal",
         target_duration=hook_dur
     )
     norm_hook = TEMP_DIR / f"shot_{total_shot_counter:02d}_norm.mp4"

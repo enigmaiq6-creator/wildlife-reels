@@ -9,12 +9,7 @@ class AITopGenerator:
     """
     Generador Autónomo de Videos TOP / Cuenta Regresiva (#3, #2, #1) con IA (Groq):
     - Crea guiones de alto impacto y retención viral estilo YouTube Shorts / Pesca Voraz.
-    - Estructura de 50-60 segundos:
-        - Gancho Inicial (0-5s)
-        - #3 (5-20s)
-        - #2 (20-35s)
-        - #1 (35-50s)
-        - Pregunta / CTA de Cierre (50-58s)
+    - Cuenta con más de 50 temáticas distintas y control estricto de no-repetición de animales.
     """
 
     GROQ_MODELS = [
@@ -24,12 +19,45 @@ class AITopGenerator:
     ]
 
     TOP_THEMES = [
-        "Top 3 Most Terrifying Animal Encounters Caught on Camera",
-        "Top 3 Deadliest Rainforest Predators on Earth",
+        "Top 3 Most Lethal Venomous Animals in the World",
         "Top 3 Deep Ocean Monsters That Stalk the Abyss",
         "Top 3 Animal Strikes That Move Faster Than a Bullet",
-        "Top 3 Prehistoric Birds Still Alive Today",
-        "Top 3 Animals That Hunt in Complete Silence"
+        "Top 3 Prehistoric Birds and Beasts Still Alive Today",
+        "Top 3 Predators That Hunt in Complete Absolute Silence",
+        "Top 3 Most Fearless Animals That Never Back Down",
+        "Top 3 River Monsters with Terrifying Jaws",
+        "Top 3 Microscopic Killers with Deadly Superpowers",
+        "Top 3 Animals with the Highest Bite Force on Earth",
+        "Top 3 Masters of Camouflage You Will Never See Coming",
+        "Top 3 Arctic Apex Hunters Surviving Sub-Zero Temperatures",
+        "Top 3 Deadly Creatures with Incurable Neurotoxins",
+        "Top 3 Aerial Assassins That Dive at Extreme Speeds",
+        "Top 3 Rainforest Predators with Night Vision",
+        "Top 3 Animals That Can Produce Lethal Electric Shocks or Heat",
+        "Top 3 Ocean Monsters with Glowing Bioluminescent Traps",
+        "Top 3 Desert Survival Monsters That Never Drink Water",
+        "Top 3 Insect Swarms Capable of Taking Down Giant Prey",
+        "Top 3 Underwater Ambushes Caught on High Speed Cameras",
+        "Top 3 Living Fossils That Outlived the Dinosaurs",
+        "Top 3 Pack Hunters with the Highest Kill Success Rates",
+        "Top 3 Creatures with Bulletproof Armor and Natural Shields",
+        "Top 3 Cave-Dwelling Predators That Hunt in Pitch Black",
+        "Top 3 Animals with Weaponized Tails and Venomous Stingers",
+        "Top 3 Bizarre Creatures That Look Like Extraterrestrial Aliens"
+    ]
+
+    DIVERSE_CREATURE_POOL = [
+        "Inland Taipan", "Pistol Shrimp", "Honey Badger", "Peregrine Falcon",
+        "Box Jellyfish", "Golden Poison Frog", "Electric Eel", "Blue-Ringed Octopus",
+        "Orca", "Wolverine", "Cassowary", "Cone Snail", "Nile Crocodile",
+        "Bull Shark", "Goblin Shark", "Driver Ants", "Sydney Funnel-Web Spider",
+        "Deathstalker Scorpion", "Barreleye Fish", "Harpy Eagle", "Komodo Dragon",
+        "Shoebill Stork", "Mantis Shrimp", "Jaguar", "Great White Shark",
+        "African Crowned Eagle", "Siberian Tiger", "Goliath Tigerfish", "Vampire Bat",
+        "Giant Freshwater Stingray", "Alligator Snapping Turtle", "Tarantula Hawk Wasp",
+        "Secretary Bird", "Bearded Vulture", "Hammerhead Shark", "Moray Eel",
+        "Giant Anteater", "Stonefish", "Black Mamba", "King Cobra", "Green Anaconda",
+        "Snow Leopard", "Leopard Seal", "Colossal Squid", "Osprey", "Grizzly Bear"
     ]
 
     def __init__(self, primary_key: Optional[str] = None, backup_key: Optional[str] = None):
@@ -39,36 +67,48 @@ class AITopGenerator:
         self.endpoint = "https://api.groq.com/openai/v1/chat/completions"
 
     def generate_top_script(self, seen_topics: Optional[List[str]] = None) -> Optional[Dict[str, Any]]:
-        """Genera un guion de Top 3 en inglés simple y dinámico."""
+        """Genera un guion de Top 3 en inglés simple, dinámico y 100% fresco."""
         if not self.api_keys:
             print("[AITopGenerator] [!] No hay llaves de Groq configuradas. Usando catálogo de respaldo.")
             return None
 
-        chosen_theme = random.choice(self.TOP_THEMES)
+        seen_topics = seen_topics or []
+        seen_str = ", ".join(seen_topics[-30:]) if seen_topics else "none"
 
-        prompt = f"""You are a master viral video producer creating a TOP 3 COUNTDOWN YouTube Short / Facebook Reel about: '{chosen_theme}'.
+        # Filtrar temáticas vistas
+        available_themes = [
+            t for t in self.TOP_THEMES
+            if not any(w in [s.lower() for s in seen_topics] for w in t.lower().split() if len(w) > 4)
+        ]
+        if not available_themes:
+            available_themes = self.TOP_THEMES
 
-VIRAL HOOK & PACING RULES (FIRST 3 SECONDS MUST STOP THE SCROLL):
-1. HOOK (0-3 SECONDS):
-   - MUST be an immediate curiosity-gap hook that forces the viewer to stay until #1.
-   - Example 1: "These three creatures possess abilities so terrifying, scientists couldn't believe they were real."
-   - Example 2: "Whatever you do, NEVER get close to number one on this list."
-   - Example 3: "Number one on this list has a strike that literally shatters bulletproof glass."
-2. STRUCTURE:
-   - hook: 1 punchy curiosity-gap sentence opening the countdown (0-3s).
-   - items: EXACTLY 3 items in descending order (#3, #2, #1).
-     Each item must contain:
-     - rank: integer (3, 2, or 1)
-     - badge: string like '#3: THE [BADGE NAME]' (e.g. '#3: THE DINOSAUR BIRD')
-     - creature_name: the specific animal (e.g. 'shoebill stork', 'jaguar', 'great white shark', 'harpy eagle', 'orca', 'mantis shrimp')
-     - text: 2 dramatic sentences starting with 'Number [three/two/one]: The [Animal Name]...' describing its shocking trait or attack.
-     - action_type: one of ('predator_reveal', 'teeth_jaws', 'stealth_stalking', 'explosive_strike', 'death_stare_eyes', 'wild_habitat')
-   - climax_cta: 1 closing question asking viewers which one was the most terrifying and to follow Wild Vault.
-   - hashtags: 6 viral hashtags (e.g. ['#wildvault', '#wildlife', '#animals', '#top3', '#predators', '#nature']).
+        chosen_theme = random.choice(available_themes)
+        suggested_sample = random.sample(self.DIVERSE_CREATURE_POOL, 8)
+
+        prompt = f"""You are an elite viral nature video director producing a TOP 3 COUNTDOWN YouTube Short / Facebook Reel.
+THEME: '{chosen_theme}'.
+
+MANDATORY ANTI-REPETITION RULES:
+1. DO NOT REPEAT previously featured species: [{seen_str}].
+2. Choose 3 COMPLETELY DISTINCT creatures fitting the theme from diverse global fauna (Suggested options: {", ".join(suggested_sample)}).
+3. The first 3 seconds (HOOK) must be unique and directly tease the terrifying nature of #1.
+
+STRUCTURE:
+- hook: 1 punchy curiosity-gap sentence opening the countdown (0-3s).
+- items: EXACTLY 3 items in descending order (#3, #2, #1).
+  Each item must contain:
+  - rank: integer (3, 2, or 1)
+  - badge: string like '#3: THE [BADGE NAME]' (e.g. '#3: THE 5000-VOLT ASSASSIN')
+  - creature_name: the specific animal name in English (e.g. 'electric eel', 'inland taipan', 'honey badger')
+  - text: 2 dramatic sentences starting with 'Number [three/two/one]: The [Animal Name]...' describing its shocking trait or attack.
+  - action_type: one of ('predator_reveal', 'teeth_jaws', 'stealth_stalking', 'explosive_strike', 'death_stare_eyes', 'wild_habitat')
+- climax_cta: 1 closing question asking viewers which one was the most terrifying and to follow Wild Vault.
+- hashtags: 6 viral hashtags (e.g. ['#wildvault', '#wildlife', '#animals', '#top3', '#predators', '#nature']).
 
 Respond ONLY with valid JSON matching this schema:
 {{
-  "topic_id": "TOP_SLUG",
+  "topic_id": "TOP_UNIQUE_SLUG",
   "title": "CATCHY_TITLE",
   "hook": "STRING",
   "items": [
@@ -109,15 +149,15 @@ Respond ONLY with valid JSON matching this schema:
                     data = {
                         "model": model_name,
                         "messages": [
-                            {"role": "system", "content": "You are a specialized viral countdown video scriptwriter. Output JSON only."},
+                            {"role": "system", "content": "You are a specialized viral countdown video scriptwriter. Output strictly valid JSON only."},
                             {"role": "user", "content": prompt}
                         ],
-                        "temperature": 0.7,
-                        "max_tokens": 800,
+                        "temperature": 0.75,
+                        "max_tokens": 900,
                         "response_format": {"type": "json_object"}
                     }
                     req = urllib.request.Request(self.endpoint, data=json.dumps(data).encode('utf-8'), headers=headers)
-                    with urllib.request.urlopen(req, timeout=12) as response:
+                    with urllib.request.urlopen(req, timeout=15) as response:
                         res = json.loads(response.read().decode('utf-8'))
                         raw_json = res['choices'][0]['message']['content']
                         parsed = json.loads(raw_json)
@@ -125,6 +165,7 @@ Respond ONLY with valid JSON matching this schema:
                             print(f"[AITopGenerator] [+] Guion Top 3 generado con éxito: '{parsed.get('title')}'")
                             return parsed
                 except Exception as e:
+                    print(f"[AITopGenerator] [!] Error con modelo {model_name} (Key {key_idx}): {e}")
                     continue
 
         return None
