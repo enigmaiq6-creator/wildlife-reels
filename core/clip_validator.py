@@ -3,13 +3,29 @@ from typing import List, Dict, Any, Tuple, Optional
 
 # Palabras prohibidas globales que arruinan un documental de vida salvaje
 GLOBAL_BANNED_WORDS = {
-    "aquarium", "tank", "zoo", "cage", "diver", "divers", "scuba", "swimmer", 
-    "swimming pool", "pool", "person", "human", "people", "man", "woman", 
-    "tourist", "tourists", "boat", "ship", "cartoon", "animation", "3d", 
-    "3d illustration", "toy", "statue", "museum", "drawing", "illustration", 
-    "wall", "china", "beijing", "woodpecker", "egret", "heron", "pigeon", 
-    "monkey", "beaver", "basket", "farm", "domestic", "pet", "dog", "cat", 
-    "kitten", "puppy", "city", "street", "car", "traffic"
+    # 1. Humanos, personas, caras y presentadores hablando (CERO PERSONAS HABLANDO)
+    "person", "people", "man", "woman", "guy", "girl", "boy", "human", "humans",
+    "tourist", "tourists", "diver", "divers", "scuba", "swimmer", "face", "faces",
+    "talking", "selfie", "hands", "speaker", "presenter", "host", "narrator", 
+    "influencer", "streamer", "youtuber", "vlogger", "anchor", "reacting",
+    
+    # 2. Formatos con subtítulos quemados, podcasts, reacciones y vlogs (CERO DOBLE SUBTÍTULO)
+    "podcast", "interview", "vlog", "vlogs", "reaction", "reactions", "review", 
+    "commentary", "storytime", "explaining", "explained", "subtitles", "captions", 
+    "tiktok", "shorts", "reels", "challenge", "prank", "news", "studio", 
+    "microphone", "mic", "podcast clip",
+    
+    # 3. Entornos artificiales o cautiverio
+    "aquarium", "tank", "zoo", "cage", "enclosure", "pool", "swimming pool", 
+    "pet", "domestic", "farm", "city", "street", "car", "traffic", "house", 
+    "room", "indoor", "boat", "ship",
+    
+    # 4. Artefactos no reales o animaciones
+    "cartoon", "animation", "3d", "3d illustration", "toy", "statue", 
+    "museum", "drawing", "illustration", "puppet", "cgi", "render",
+    
+    # 5. Falsos positivos de animales no objetivo
+    "woodpecker", "egret", "heron", "pigeon", "beaver", "basket", "wall", "china", "beijing"
 }
 
 # Filtros negativos y positivos específicos por especie
