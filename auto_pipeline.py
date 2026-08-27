@@ -196,11 +196,17 @@ def run_single_creature_pipeline(force_topic: str = "", voice_key: str = DEFAULT
     if auto_publish:
         fb_pub = FacebookPublisher()
         if fb_pub.is_configured():
+            auto_comment = (
+                f"🔥 WILD VAULT QUESTION: Have you ever seen a {creature_name} up close in real life? "
+                f"Rate its power from 1 to 10 below! 👇🐾\n\n"
+                f"💡 Notice: This educational video was created with AI assistance. Follow @WildVault for daily 4K wildlife shorts!"
+            )
             fb_pub.publish_reel(
                 video_path=final_output,
                 title=title,
-                description=f"Discover the untamed secrets of the {creature_name}! 🦅🌿 Follow Wild Vault for daily 4K micro-docs!",
-                hashtags=" ".join(hashtags)
+                description=f"Discover the untamed secrets of the {creature_name}! 🦅🌿 Which fact surprised you the most?",
+                hashtags=" ".join(hashtags),
+                comment_text=auto_comment
             )
 
     print(f"\n=================================================================")
@@ -427,11 +433,17 @@ def run_top_countdown_pipeline(force_topic: str = "", voice_key: str = DEFAULT_V
     if auto_publish:
         fb_pub = FacebookPublisher()
         if fb_pub.is_configured():
+            auto_comment = (
+                f"🔥 WILD VAULT POLL: Which of these 3 creatures would win in an ultimate survival showdown? "
+                f"Drop your vote below! 💬👇\n\n"
+                f"💡 Notice: This educational countdown was created with AI assistance. Follow @WildVault for daily wildlife battles!"
+            )
             fb_pub.publish_reel(
                 video_path=final_output,
                 title=title,
                 description=f"{title}\n\nWhich moment shocked you the most? Drop your vote in the comments and follow Wild Vault!",
-                hashtags=" ".join(hashtags)
+                hashtags=" ".join(hashtags),
+                comment_text=auto_comment
             )
 
     print(f"\n=================================================================")

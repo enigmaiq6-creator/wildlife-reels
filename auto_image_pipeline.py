@@ -163,9 +163,14 @@ def run_image_pipeline(forced_format: str = "", auto_publish: bool = True) -> Op
     if auto_publish:
         fb_pub = FacebookPublisher()
         if fb_pub.is_configured():
+            photo_comment = (
+                f"🌿 WILD VAULT COMMUNITY: What is the most extraordinary wildlife fact you know? Share it below! 💬👇\n\n"
+                f"💡 Notice: This educational content was produced with AI assistance. Follow @WildVault for daily wildlife posts!"
+            )
             fb_pub.publish_photo(
                 image_path=final_output_path,
-                caption=full_caption
+                caption=full_caption,
+                comment_text=photo_comment
             )
 
     print(f"\n=================================================================")

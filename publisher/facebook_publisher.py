@@ -1,51 +1,76 @@
 import os
 import time
-import json
 import requests
 from pathlib import Path
 from typing import Optional, Dict, Any
+from dotenv import load_dotenv
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-def load_env_file():
-    env_file = BASE_DIR / ".env"
-    if env_file.exists():
-        with open(env_file, "r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if line and not line.startswith("#") and "=" in line:
-                    k, v = line.split("=", 1)
-                    os.environ[k.strip()] = v.strip().strip('"').strip("'")
-
-load_env_file()
+load_dotenv()
 
 class FacebookPublisher:
     """
-    Publicador Automático Oficial a Facebook Reels (Wild Vault)
-    utilizando Facebook Graph API v19.0
+    Publicador Oficial de Contenido en Facebook (Meta Graph API v19.0) para Wild Vault:
+    - Sube y publica Reels (Videos 9:16) con descripción y hashtags en inglés.
+    - Sube y publica Imágenes multi-formato (1080x1350) con descripciones completas.
+    - Incluye etiqueta de transparencia y descargo de responsabilidad de IA (AI Transparency).
+    - Publica automáticamente el primer comentario interactivo (Auto-Comment Poll / Question) en inglés.
     """
 
-    def __init__(self, page_id: Optional[str] = None, access_token: Optional[str] = None):
-        load_env_file()
-        self.page_id = page_id or os.environ.get("FB_PAGE_ID", "1269051872959609")
-        self.access_token = access_token or os.environ.get("FB_PAGE_ACCESS_TOKEN", "")
+    def __init__(self):
+        self.page_id = (
+            os.getenv("FACEBOOK_PAGE_ID") or 
+            os.getenv("FB_PAGE_ID", "122180816492897912")
+        )
+        self.access_token = (
+            os.getenv("FACEBOOK_ACCESS_TOKEN") or 
+            os.getenv("FB_PAGE_ACCESS_TOKEN", "")
+        )
 
     def is_configured(self) -> bool:
+        """Verifica si las credenciales están presentes."""
         return bool(self.page_id and self.access_token)
+
+    def post_comment(self, object_id: str, message: str) -> Optional[Dict[str, Any]]:
+        """
+        Publica un comentario de alto engagement en el Reel o Foto de Facebook.
+        """
+        if not self.is_configured() or not object_id or not message:
+            return None
+
+        url = f"https://graph.facebook.com/v19.0/{object_id}/comments"
+        payload = {
+            "message": message,
+            "access_token": self.access_token
+        }
+
+        try:
+            print(f"[FacebookPublisher] [+] Publicando auto-comentario de interacción en objeto '{object_id}'...")
+            res = requests.post(url, data=payload, timeout=20)
+            if res.status_code == 200:
+                result = res.json()
+                print(f"[FacebookPublisher] [✓] Auto-comentario publicado con éxito en Facebook (ID: {result.get('id')})")
+                return result
+            else:
+                print(f"[FacebookPublisher] [!] Nota: Comentario no publicado ({res.status_code}): {res.text}")
+        except Exception as e:
+            print(f"[FacebookPublisher] [!] Excepción publicando comentario: {e}")
+        return None
 
     def publish_reel(
         self,
         video_path: Path,
         title: str,
         description: str,
-        hashtags: Optional[str] = None
+        hashtags: str = "",
+        comment_text: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         """
-        Sube y publica un video en formato Reel en la página de Facebook.
+        Sube y publica un video en Facebook Reels con Meta Graph API en 4 pasos.
+        Incluye descargo de IA y auto-comentario.
         """
         video_path = Path(video_path)
         if not video_path.exists():
-            print(f"[FacebookPublisher] [!] Error: El video no existe en {video_path}")
+            print(f"[FacebookPublisher] [!] Error: El archivo de video no existe en {video_path}")
             return None
 
         if not self.is_configured():
@@ -53,9 +78,18 @@ class FacebookPublisher:
             return None
 
         file_size = video_path.stat().st_size
+        
+        # Etiqueta obligatoria y profesional de transparencia de IA en inglés
+        ai_transparency_footer = (
+            "\n\n---\n"
+            "🤖 AI Transparency: Content produced with AI assistance for wildlife education & entertainment.\n"
+            "✨ Produced by Wild Vault"
+        )
+
         full_caption = f"{title}\n\n{description}"
         if hashtags:
             full_caption += f"\n\n{hashtags}"
+        full_caption += ai_transparency_footer
 
         print(f"\n[FacebookPublisher] [INICIANDO SUBIDA A FACEBOOK REELS]")
         print(f"  -> Pagina: Wild Vault (ID: {self.page_id})")
@@ -131,6 +165,13 @@ class FacebookPublisher:
             print(f"  -> Video ID: {video_id}")
             print(f"  -> Post ID: {post_id}")
             print(f"  -> Link: https://www.facebook.com/{self.page_id}/videos/{video_id}")
+
+            # PASO 5: Auto-Comentario interactivo
+            if comment_text:
+                time.sleep(4)
+                # Intentar publicar en el post_id y video_id
+                self.post_comment(post_id, comment_text)
+
             return result
         except Exception as e:
             print(f"[FacebookPublisher] [!] Excepcion al publicar Reel: {e}")
@@ -139,7 +180,8 @@ class FacebookPublisher:
     def publish_photo(
         self,
         image_path: Path,
-        caption: str
+        caption: str,
+        comment_text: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         """
         Sube y publica una foto en la página de Facebook de Wild Vault.
@@ -153,36 +195,41 @@ class FacebookPublisher:
             print("[FacebookPublisher] [!] Error: FB_PAGE_ID o FB_PAGE_ACCESS_TOKEN no configurados en .env")
             return None
 
-        file_size = image_path.stat().st_size
-        print(f"\n[FacebookPublisher] [INICIANDO SUBIDA DE FOTO A WILD VAULT]")
+        ai_transparency_footer = (
+            "\n\n---\n"
+            "🤖 AI Transparency: Content produced with AI assistance for wildlife education & entertainment.\n"
+            "✨ Produced by Wild Vault"
+        )
+        full_caption = caption + ai_transparency_footer
+
+        print(f"\n[FacebookPublisher] [PUBLICANDO FOTO EN FACEBOOK]")
         print(f"  -> Pagina: Wild Vault (ID: {self.page_id})")
-        print(f"  -> Archivo: {image_path.name} ({file_size / 1024:.2f} KB)")
+        print(f"  -> Imagen: {image_path.name}")
 
         url = f"https://graph.facebook.com/v19.0/{self.page_id}/photos"
         payload = {
-            "caption": caption,
-            "access_token": self.access_token,
-            "published": "true"
+            "caption": full_caption,
+            "access_token": self.access_token
         }
 
         try:
-            with open(image_path, "rb") as f:
-                files = {"source": (image_path.name, f, "image/jpeg")}
+            with open(image_path, "rb") as img_f:
+                files = {"source": img_f}
                 res = requests.post(url, data=payload, files=files, timeout=60)
 
-            if res.status_code != 200:
+            if res.status_code == 200:
+                data = res.json()
+                post_id = data.get("post_id") or data.get("id")
+                print(f"[FacebookPublisher] [¡FOTO PUBLICADA CON EXITO!] ID: {data.get('id')}")
+                
+                if comment_text and post_id:
+                    time.sleep(3)
+                    self.post_comment(post_id, comment_text)
+
+                return data
+            else:
                 print(f"[FacebookPublisher] [!] Error publicando foto: {res.text}")
                 return None
-
-            result = res.json()
-            photo_id = result.get("id")
-            post_id = result.get("post_id") or photo_id
-            print(f"\n[FacebookPublisher] [¡IMAGEN PUBLICADA CON ÉXITO EN WILD VAULT!]")
-            print(f"  -> Photo ID: {photo_id}")
-            print(f"  -> Post ID: {post_id}")
-            print(f"  -> Link: https://www.facebook.com/{self.page_id}/photos/{photo_id}")
-            return result
         except Exception as e:
-            print(f"[FacebookPublisher] [!] Excepción al publicar foto: {e}")
+            print(f"[FacebookPublisher] [!] Excepcion al publicar foto: {e}")
             return None
-

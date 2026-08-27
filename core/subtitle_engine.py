@@ -51,12 +51,15 @@ Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour,
 Style: ViralText,Arial Black,{font_size},&H00FFFFFF,&H0000FFFF,&H00000000,&H80000000,-1,0,0,0,100,100,1,0,1,6.0,3.5,2,40,40,{margin_v},1
 Style: ImpactText,Arial Black,{font_size + 8},&H0000D4FF,&H00FFFFFF,&H00000000,&H90000000,-1,0,0,0,110,110,1,0,1,7.0,4.0,2,30,30,{margin_v},1
 Style: HookViralText,Arial Black,{font_size + 10},&H0000FFFF,&H00FFFFFF,&H00000000,&HA0000000,-1,0,0,0,115,115,1,0,1,8.0,4.5,2,25,25,{margin_v},1
+Style: AIDisclosure,Arial Bold,24,&H80FFFFFF,&H00000000,&H80000000,&H00000000,0,0,0,0,100,100,0,0,1,1.5,0.0,7,40,40,50,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
 
-        events = []
+        events = [
+            f"Dialogue: 0,0:00:00.00,{format_ass_time(total_video_duration)},AIDisclosure,,0,0,0,,{{\\an7}}🤖 AI Generated Content"
+        ]
         highlight_color = "\\c&H0000FFFF&"   # Oro Neón
         white_color = "\\c&H00FFFFFF&"       # Blanco Puro
         impact_color = "\\c&H0015D4FF&"      # Oro Brillante Intenso
