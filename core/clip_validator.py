@@ -116,6 +116,16 @@ SPECIES_RULES: Dict[str, Dict[str, Any]] = {
         "required_any": ["wolf", "wolves", "canis lupus", "timber wolf", "gray wolf"],
         "banned": ["dog", "husky", "puppy", "fox", "coyote", "jackal"],
         "primary_name": "gray wolf"
+    },
+    "honey_badger": {
+        "required_any": ["honey badger", "badger", "mellivora capensis", "ratel", "savanna"],
+        "banned": ["cat", "dog", "zoo", "cage", "pet", "ferret", "skunk", "raccoon", "opossum"],
+        "primary_name": "honey badger"
+    },
+    "electric_eel": {
+        "required_any": ["electric eel", "electrophorus", "eel"],
+        "banned": ["snake", "aquarium", "tank", "recipe", "cooking"],
+        "primary_name": "electric eel"
     }
 }
 
