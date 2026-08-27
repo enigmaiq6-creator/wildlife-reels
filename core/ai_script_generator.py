@@ -202,6 +202,10 @@ Respond ONLY with valid JSON matching this schema:
                             print(f"[AIScriptGenerator] [SUCCESS] Created Micro-Doc ({chosen_hook_style}): '{script_data['topic_id']}' - {script_data['title']}")
                             return script_data
 
+                except Exception as e:
+                    print(f"[AIScriptGenerator] [!] Error con modelo {model_name} (Key {key_idx}): {e}")
+                    continue
+
         # Respaldo con Google Gemini si está configurado
         gemini_key = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("GEMINI_API_KEY_2", "").strip()
         if gemini_key:
