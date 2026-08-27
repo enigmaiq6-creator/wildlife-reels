@@ -64,7 +64,7 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
     "shoebill_stork": {
         "topic_id": "SHOEBILL-STORK-DINOSAUR",
         "title": "This Bird Looks Straight Out of Jurassic Park! 🦅🦖",
-        "creature_name": "shoebill stork",
+        "creature_name": "shoebill",
         "act1_hook": "Whatever you do, NEVER make eye contact with this bird if you encounter it in the swamp.",
         "act2_scale": "Standing over five feet tall, the Shoebill Stork has a massive dinosaur-like beak with razor-sharp curved edges.",
         "act3_hunt": "It stands completely frozen in the swamp for hours, waiting in total silence before unleashing a lightning-fast strike that crushes lungfish and even baby crocodiles in seconds.",
@@ -120,6 +120,66 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "deep ocean glowing marine life 4k vertical"
         ],
         "hashtags": ["#wildvault", "#mantisshrimp", "#ocean", "#marinelife", "#wildlife", "#nature"]
+    },
+    "komodo_dragon": {
+        "topic_id": "KOMODO-DRAGON-ISLAND-BEHEMOTH",
+        "title": "The Last Living Giant Dragon on Earth! 🦎🔥",
+        "creature_name": "komodo dragon",
+        "act1_hook": "If you are bitten by this three-hundred-pound monster, you will not die from the bite itself—you will die from what follows.",
+        "act2_scale": "Reaching ten feet in length and packing sixty razor-sharp serrated teeth, the Komodo Dragon is the largest living lizard in the world.",
+        "act3_hunt": "It delivers a single venomous bite loaded with anticoagulants that send prey into shock, then stalks them patiently for days across the volcanic island.",
+        "act4_behavior": "Its forked yellow tongue can taste the scent of a dying deer on the wind from over six miles away.",
+        "act5_twist": "Female Komodo Dragons can reproduce without a male through a rare biological process called parthenogenesis.",
+        "act6_climax_cta": "Would you ever explore the volcanic island where dragons still rule? Tell us in the comments and follow Wild Vault for daily beasts!",
+        "pexels_keywords": [
+            "komodo dragon walking island 4k vertical",
+            "komodo dragon tongue close up 4k",
+            "giant lizard reptile walking wild 4k",
+            "komodo dragon eyes close up 4k vertical",
+            "volcanic island beach nature 4k vertical",
+            "wild reptile predator tropical 4k vertical"
+        ],
+        "hashtags": ["#wildvault", "#komododragon", "#reptiles", "#dragons", "#wildlife", "#nature", "#predators"]
+    },
+    "peregrine_falcon": {
+        "topic_id": "PEREGRINE-FALCON-SONIC-MISSILE",
+        "title": "The Fastest Living Thing on Planet Earth! 🦅⚡",
+        "creature_name": "falcon",
+        "act1_hook": "Nothing on Earth can escape this creature once it locks on—because it moves faster than a Formula One race car.",
+        "act2_scale": "The Peregrine Falcon is an aerodynamic masterpiece, equipped with specialized baffles in its nostrils so its lungs don't explode at extreme velocities.",
+        "act3_hunt": "From thousands of feet in the sky, it folds its wings into a tear-drop missile and dives at two hundred and forty miles per hour, striking prey with a clenched talon that instantly decapitates them mid-air.",
+        "act4_behavior": "Its eyes can process one hundred and thirty frames per second, allowing it to navigate bullet-speed dives with surgical precision.",
+        "act5_twist": "They can survive in virtually every corner of the planet, even nesting on top of the world's tallest skyscrapers.",
+        "act6_climax_cta": "What's more impressive: its insane 240 MPH speed or its precision accuracy? Cast your vote below and follow Wild Vault!",
+        "pexels_keywords": [
+            "peregrine falcon flying sky 4k vertical",
+            "falcon close up head eyes 4k",
+            "bird of prey dive hunting slow motion 4k",
+            "falcon perched cliff edge 4k vertical",
+            "aerial flying high altitude sky 4k vertical",
+            "wild falcon wings spread cinematic 4k"
+        ],
+        "hashtags": ["#wildvault", "#falcon", "#peregrinefalcon", "#speed", "#birds", "#wildlife", "#nature"]
+    },
+    "honey_badger": {
+        "topic_id": "HONEY-BADGER-FEARLESS-TITAN",
+        "title": "The Creature That Literally Does Not Care! 🦡💥",
+        "creature_name": "honey badger",
+        "act1_hook": "Lions, leopards, and venomous cobras all share one rule in the African savannah: NEVER pick a fight with this little beast.",
+        "act2_scale": "The Honey Badger possesses rubbery, quarter-inch thick skin so tough that machetes and porcupine quills bounce right off it.",
+        "act3_hunt": "It fearlessly charges directly into beehives, takes down venomous puff adders, and fights off entire prides of lions without taking a single step backward.",
+        "act4_behavior": "If bitten by a lethal viper, its immune system temporarily shuts down, sleeps off the neurotoxin for two hours, and wakes up to finish eating the snake.",
+        "act5_twist": "The Guinness Book of World Records officially crowned it the most fearless animal in the entire world.",
+        "act6_climax_cta": "Rate the Honey Badger's courage from 1 to 100 in the comments and follow Wild Vault for daily untamed nature!",
+        "pexels_keywords": [
+            "honey badger walking savanna 4k vertical",
+            "honey badger wild animal digging 4k",
+            "african savanna wildlife nature 4k vertical",
+            "honey badger aggressive predator 4k",
+            "wild badger in grass 4k vertical",
+            "african wildlife predator close up 4k"
+        ],
+        "hashtags": ["#wildvault", "#honeybadger", "#fearless", "#wildlife", "#animals", "#nature", "#savannah"]
     }
 }
 

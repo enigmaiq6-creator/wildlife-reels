@@ -56,9 +56,27 @@ def run_single_creature_pipeline(force_topic: str = "", voice_key: str = DEFAULT
         topic_data = ai_gen.generate_wildlife_script(seen_topics=seen_topics)
         if not topic_data:
             all_topics = get_all_wildlife_topics()
-            available = [t for t in all_topics if t not in seen_topics]
+            seen_normalized = {s.lower().replace("-", "_").strip() for s in seen_topics}
+            
+            # Filtrar temas que nunca hayan sido publicados (ni por clave, ni por slug, ni por nombre)
+            available = []
+            for k in all_topics:
+                item = WILDLIFE_CATALOG[k]
+                k_norm = k.lower().replace("-", "_")
+                t_id_norm = item.get("topic_id", "").lower().replace("-", "_")
+                c_name = item.get("creature_name", "").lower().replace("-", "_")
+                
+                already_seen = any(
+                    k_norm in s or s in k_norm or
+                    t_id_norm in s or s in t_id_norm or
+                    (len(c_name) > 3 and c_name in s)
+                    for s in seen_normalized
+                )
+                if not already_seen:
+                    available.append(k)
+                    
             chosen_key = available[0] if available else all_topics[0]
-            print(f"[Pipeline] [!] Usando tema del catálogo de respaldo: '{chosen_key}'", flush=True)
+            print(f"[Pipeline] [!] Usando tema del catálogo de respaldo: '{chosen_key}' (Disponibles nuevos: {len(available)})", flush=True)
             topic_data = WILDLIFE_CATALOG[chosen_key]
 
     topic_id = topic_data.get("topic_id", "WILDLIFE-DOC").lower().replace(" ", "-")

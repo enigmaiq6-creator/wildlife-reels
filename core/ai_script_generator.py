@@ -202,8 +202,33 @@ Respond ONLY with valid JSON matching this schema:
                             print(f"[AIScriptGenerator] [SUCCESS] Created Micro-Doc ({chosen_hook_style}): '{script_data['topic_id']}' - {script_data['title']}")
                             return script_data
 
-                except Exception as e:
-                    print(f"[AIScriptGenerator] [!] Error con modelo {model_name} (Key {key_idx}): {e}")
-                    continue
+        # Respaldo con Google Gemini si está configurado
+        gemini_key = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("GEMINI_API_KEY_2", "").strip()
+        if gemini_key:
+            print("[AIScriptGenerator] [+] Intentando generacion con Google Gemini API...", flush=True)
+            for g_model in ["gemini-1.5-flash", "gemini-2.0-flash"]:
+                try:
+                    url = f"https://generativelanguage.googleapis.com/v1beta/models/{g_model}:generateContent?key={gemini_key}"
+                    headers = {"Content-Type": "application/json"}
+                    payload = {
+                        "contents": [
+                            {"role": "user", "parts": [{"text": f"You are an award-winning wildlife documentary scriptwriter. Always return strictly valid JSON.\n\n{prompt}"}]}
+                        ],
+                        "generationConfig": {
+                            "responseMimeType": "application/json",
+                            "temperature": 0.8
+                        }
+                    }
+                    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers)
+                    with urllib.request.urlopen(req, timeout=25) as resp:
+                        res_data = json.loads(resp.read().decode("utf-8"))
+                        text_resp = res_data["candidates"][0]["content"]["parts"][0]["text"]
+                        script_data = json.loads(text_resp)
+                        required_keys = ["topic_id", "title", "act1_hook", "act2_scale", "act3_hunt", "act4_behavior", "act5_twist", "act6_climax_cta", "pexels_keywords"]
+                        if all(k in script_data for k in required_keys):
+                            print(f"[AIScriptGenerator] [SUCCESS GEMINI] Created Micro-Doc: '{script_data['topic_id']}' - {script_data['title']}", flush=True)
+                            return script_data
+                except Exception as ge:
+                    print(f"[AIScriptGenerator] [!] Fallo Gemini {g_model}: {ge}", flush=True)
 
         return None
