@@ -5,6 +5,12 @@ import urllib.request
 import urllib.error
 from typing import Dict, Any, List, Optional
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 class AITopGenerator:
     """
     Generador Autónomo de Videos TOP / Cuenta Regresiva (#3, #2, #1) con IA (Groq):
@@ -13,9 +19,9 @@ class AITopGenerator:
     """
 
     GROQ_MODELS = [
-        "openai/gpt-oss-120b",
-        "openai/gpt-oss-20b",
-        "groq/compound-mini"
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "gemma2-9b-it"
     ]
 
     TOP_THEMES = [

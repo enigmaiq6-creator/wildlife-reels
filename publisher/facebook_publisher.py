@@ -3,9 +3,12 @@ import time
 import requests
 from pathlib import Path
 from typing import Optional, Dict, Any
-from dotenv import load_dotenv
 
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 class FacebookPublisher:
     """

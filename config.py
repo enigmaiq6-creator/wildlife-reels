@@ -1,6 +1,12 @@
 import os
 from pathlib import Path
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 # Project root directory
 BASE_DIR = Path(__file__).resolve().parent
 

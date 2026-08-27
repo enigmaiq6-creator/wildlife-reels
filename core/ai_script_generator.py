@@ -5,6 +5,12 @@ import urllib.request
 import urllib.error
 from typing import Dict, Any, List, Optional
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 class AIScriptGenerator:
     """
     Autonomous Wildlife Micro-Documentary AI Generator (Ares G Style):
@@ -20,9 +26,9 @@ class AIScriptGenerator:
     """
 
     GROQ_MODELS = [
-        "openai/gpt-oss-120b",
-        "openai/gpt-oss-20b",
-        "groq/compound-mini"
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "gemma2-9b-it"
     ]
 
     CREATURE_CANDIDATES = [
