@@ -33,14 +33,22 @@ DEFAULT_FPS = 30
 DEFAULT_VIDEO_BITRATE = "9500k"
 DEFAULT_AUDIO_BITRATE = "192k"
 
-# Neural Voices in Clear English
+# Google Cloud Text-to-Speech Ultra-Realistic Studio Documentary Voice
+GOOGLE_TTS_API_KEY = os.environ.get("GOOGLE_TTS_API_KEY", "AIzaSyDpdDhoXt8GDwJ_sEj-vjtd6HqVflN_vSY")
+
+# Neural & Studio Voices in Clear Documentary English
 VOICES = {
+    "google_studio_male": "en-US-Studio-Q",
+    "google_studio_uk": "en-GB-Studio-B",
+    "google_studio_female": "en-US-Studio-O",
+    "google_neural_dramatic": "en-US-Neural2-J",
+    "google_neural_uk": "en-GB-Neural2-B",
     "en_narrator_clear": "en-US-ChristopherNeural",
     "en_narrator_deep": "en-US-GuyNeural",
     "en_narrator_uk": "en-GB-RyanNeural"
 }
 
-DEFAULT_VOICE = "en-US-ChristopherNeural"
+DEFAULT_VOICE = "en-US-Studio-Q"
 
 # SUBTÍTULOS GRANDES DE ALTO IMPACTO (Mobile-First / Reels)
 SUBTITLE_CONFIG = {
