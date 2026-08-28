@@ -83,7 +83,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add history.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(history): update published image topics [skip ci]" && git push origin master)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(history): update published image topics [skip ci]" && git pull --rebase origin master && git push origin master)
 
       - name: Save Image Output Artifact
         uses: actions/upload-artifact@v4

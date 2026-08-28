@@ -286,7 +286,20 @@ class ContentGenerator:
             chosen_format, chosen_topic = random.choice(all_unused)
             return chosen_format, chosen_topic
 
-        # 3. If all curated are exhausted, pick any format and generate a unique variation
+        # 3. If all curated are exhausted, pick topics that are NOT in the recent 30 publications
+        recent_30 = set(list(seen_topic_ids or [])[-30:])
+        not_recent = []
+        for f_type, topic_list in cls.CURATED_TOPICS.items():
+            if format_type and f_type != format_type:
+                continue
+            for t in topic_list:
+                if t.get("topic_id") not in recent_30:
+                    not_recent.append((f_type, t))
+        if not_recent:
+            chosen_format, chosen_topic = random.choice(not_recent)
+            return chosen_format, chosen_topic
+
+        # Fallback total: pick any random topic
         chosen_format = format_type or random.choice(cls.FORMAT_TYPES)
         topic_list = cls.CURATED_TOPICS.get(chosen_format, cls.CURATED_TOPICS["format_3_curiosity_pip"])
         chosen_topic = random.choice(topic_list)

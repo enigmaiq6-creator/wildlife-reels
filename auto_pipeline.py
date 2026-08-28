@@ -274,9 +274,23 @@ def run_top_countdown_pipeline(force_topic: str = "", voice_key: str = DEFAULT_V
         topic_data = ai_top_gen.generate_top_script(seen_topics=seen_topics)
         if not topic_data:
             all_tops = get_all_top_topics()
-            available = [t for t in all_tops if t not in seen_topics]
-            chosen_key = available[0] if available else all_tops[0]
-            print(f"[Pipeline] [!] Usando Top del catálogo de respaldo: '{chosen_key}'", flush=True)
+            seen_normalized = [s.lower().replace("-", "_").strip() for s in seen_topics]
+            recent_seen = set(seen_normalized[-25:]) if len(seen_normalized) >= 25 else set(seen_normalized)
+            
+            # 1. Temas Top que nunca han salido
+            available_never = [t for t in all_tops if not any(t.lower() in s or s in t.lower() for s in seen_normalized)]
+            if available_never:
+                chosen_key = random.choice(available_never)
+                print(f"[Pipeline] [!] Usando Top INÉDITO del catálogo: '{chosen_key}' (Disponibles: {len(available_never)})", flush=True)
+            else:
+                # 2. Temas Top rotados no recientes
+                available_not_recent = [t for t in all_tops if not any(t.lower() in s or s in t.lower() for s in recent_seen)]
+                if available_not_recent:
+                    chosen_key = random.choice(available_not_recent)
+                    print(f"[Pipeline] [!] Usando Top rotado del catálogo (no reciente): '{chosen_key}'", flush=True)
+                else:
+                    chosen_key = random.choice(all_tops)
+                    print(f"[Pipeline] [!] Usando Top aleatorio del catálogo: '{chosen_key}'", flush=True)
             topic_data = TOP_CATALOG[chosen_key]
 
     topic_id = topic_data.get("topic_id", "TOP-ANIMALS").lower().replace(" ", "-")
