@@ -150,24 +150,26 @@ def validate_clip_metadata(
             return False, -100, f"Contiene palabra prohibida global: '{banned}'"
 
     # 2. Comprobar reglas específicas de la especie
+    creature_clean = target_creature.lower().replace("-", " ").replace("_", " ").strip()
+    creature_words = [w for w in creature_clean.split() if len(w) > 2]
+    root_animal = creature_words[-1] if creature_words else creature_clean
+
     creature_key = target_creature.lower().replace("-", "_").replace(" ", "_").strip()
     # Buscar regla que coincida
     rule = None
     for k, r in SPECIES_RULES.items():
-        if k in creature_key or creature_key in k:
+        if k in creature_key or creature_key in k or k in root_animal:
             rule = r
             break
 
     if not rule:
-        # Regla genérica si no está en catálogo específico
-        base_name = creature_key.split()[0]
         rule = {
-            "required_any": [base_name],
-            "banned": ["zoo", "cage", "pet", "cartoon"],
-            "primary_name": base_name
+            "required_any": [creature_clean, root_animal] + creature_words,
+            "banned": ["zoo", "cage", "pet", "cartoon", "drawing", "toy", "statue"],
+            "primary_name": creature_clean
         }
 
-    # Comprobar palabras prohibidas específicas de la especie (ej. rechazar tiburón ballena o cigüeña blanca)
+    # Comprobar palabras prohibidas específicas de la especie
     for spec_banned in rule.get("banned", []):
         if re.search(r'\b' + re.escape(spec_banned) + r'\b', text_to_check):
             return False, -100, f"Contiene especie prohibida o contexto incorrecto: '{spec_banned}'"
@@ -175,8 +177,9 @@ def validate_clip_metadata(
     # Comprobar que contenga al menos uno de los términos requeridos de la especie
     has_required = False
     matched_term = ""
-    for req in rule.get("required_any", []):
-        if re.search(r'\b' + re.escape(req) + r'\b', text_to_check):
+    terms_to_check = rule.get("required_any", []) + [creature_clean, root_animal] + creature_words
+    for req in terms_to_check:
+        if req and re.search(r'\b' + re.escape(req) + r'\b', text_to_check):
             has_required = True
             matched_term = req
             break

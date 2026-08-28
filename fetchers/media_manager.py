@@ -66,10 +66,24 @@ class MediaManager:
         # =====================================================================
         candidates: List[Dict[str, Any]] = []
 
-        # 1.1 Búsqueda en Pexels Oficial (4K Portrait & All)
+        # Construir lista exhaustiva de términos de búsqueda
+        c_words = [w for w in subject_clean.split() if len(w) >= 3]
+        root_animal = c_words[-1] if c_words else subject_clean
+
+        search_terms = [subject_clean]
         for kw in keywords:
-            # Buscar en vertical primero y luego en todas las orientaciones
-            pex_results = search_pexels_videos(f"{kw} wildlife", orientation="all", max_results=8)
+            if kw and kw not in search_terms:
+                search_terms.append(kw)
+        if root_animal != subject_clean:
+            search_terms.append(f"{root_animal} wildlife")
+            search_terms.append(root_animal)
+        if action_description:
+            search_terms.append(f"{root_animal} {action_description}")
+            search_terms.append(f"{subject_clean} {action_description}")
+
+        # 1.1 Búsqueda en Pexels Oficial (4K Portrait & All)
+        for st in search_terms:
+            pex_results = search_pexels_videos(st, orientation="all", max_results=6)
             for pex in pex_results:
                 url = pex.get('video_url', '')
                 if url in self.used_urls:
@@ -88,8 +102,8 @@ class MediaManager:
                     candidates.append({"source": "pexels", "url": url, "title": title_slug, "score": score})
 
         # 1.2 Búsqueda en Pixabay Oficial (HD)
-        for kw in keywords:
-            pix_results = search_pixabay_videos(f"{kw} animal", max_results=8)
+        for st in search_terms:
+            pix_results = search_pixabay_videos(st, max_results=6)
             for pix in pix_results:
                 url = pix.get('video_url', '')
                 if url in self.used_urls:
@@ -110,18 +124,19 @@ class MediaManager:
             url = cand["url"]
             source = cand["source"]
             self.used_urls.add(url)
+            safe_title = str(cand['title'][:55]).encode('ascii', 'ignore').decode()
             if source == "pexels" and download_pexels_video(url, output_file):
-                print(f"[CleanMediaEngine] [NIVEL 1 - PEXELS 4K LIMPIO ✨] {cand['title'][:55]} (Score: {cand['score']})", flush=True)
+                print(f"[CleanMediaEngine] [NIVEL 1 - PEXELS 4K LIMPIO] {safe_title} (Score: {cand['score']})", flush=True)
                 return output_file
             elif source == "pixabay" and download_pixabay_video(url, output_file):
-                print(f"[CleanMediaEngine] [NIVEL 1 - PIXABAY HD LIMPIO ✨] {cand['title'][:55]} (Score: {cand['score']})", flush=True)
+                print(f"[CleanMediaEngine] [NIVEL 1 - PIXABAY HD LIMPIO] {safe_title} (Score: {cand['score']})", flush=True)
                 return output_file
 
         # =====================================================================
         # NIVEL 2: ARCHIVOS CIENTÍFICOS ABIERTOS (WIKIMEDIA COMMONS)
         # =====================================================================
         if WikimediaFetcher.search_and_download(subject_clean, action_description, output_file, target_duration):
-            print(f"[CleanMediaEngine] [NIVEL 2 - ARCHIVO CIENTÍFICO WIKIMEDIA 🌿] Clip para '{subject_clean}'", flush=True)
+            print(f"[CleanMediaEngine] [NIVEL 2 - ARCHIVO CIENTIFICO WIKIMEDIA] Clip para '{subject_clean}'", flush=True)
             return output_file
 
         # =====================================================================
@@ -138,14 +153,14 @@ class MediaManager:
                 chosen = unused_clips[0]
                 self.used_session_clips.append(chosen.name)
                 shutil.copy(chosen, output_file)
-                print(f"[CleanMediaEngine] [NIVEL 3 - YOUTUBE DOCUMENTAL B-ROLL 🎬] Clip #{len(self.used_session_clips)} ({chosen.name}) para '{primary_creature}'", flush=True)
+                print(f"[CleanMediaEngine] [NIVEL 3 - YOUTUBE DOCUMENTAL B-ROLL] Clip #{len(self.used_session_clips)} ({chosen.name}) para '{primary_creature}'", flush=True)
                 return output_file
 
         # =====================================================================
         # NIVEL 4: FOTOGRAFÍA FOTORREALISTA 4K + EFECTO KEN BURNS CINEMÁTICO 3D
         # (GARANTIZA 100% EL ANIMAL Y CERO PERSONAS/TEXTOS)
         # =====================================================================
-        print(f"[CleanMediaEngine] [NIVEL 4 - FOTO 4K + KEN BURNS 3D 📷] Generando toma animada 100% de la criatura...", flush=True)
+        print(f"[CleanMediaEngine] [NIVEL 4 - FOTO 4K + KEN BURNS 3D] Generando toma animada 100% de la criatura...", flush=True)
         if PhotoKenBurnsHarvester.create_kenburns_clip(subject_clean, action_description, output_file, target_duration):
             print(f"  -> [NIVEL 4 - Toma Ken Burns 3D Generada para '{subject_clean}']", flush=True)
             return output_file

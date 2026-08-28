@@ -33,11 +33,14 @@ class YouTubeWildlifeHarvester:
             return len(existing)
 
         query_name = creature_name.lower().replace("-", " ").replace("_", " ").strip()
+        c_words = [w for w in query_name.split() if len(w) >= 3]
+        root = c_words[-1] if c_words else query_name
         search_queries = [
             f"{query_name} wildlife 4k b-roll raw footage -reaction -podcast -vlog -interview -shorts -tiktok",
             f"{query_name} bbc earth 4k -reaction -podcast -vlog -shorts -interview",
             f"{query_name} national geographic wildlife 4k -reaction -podcast -shorts",
-            f"{query_name} animal in the wild 4k -vlog -podcast"
+            f"{root} in the wild 4k bbc earth -vlog -podcast",
+            f"{root} animal nature 4k b-roll -vlog -podcast"
         ]
 
         raw_video_path = TEMP_DIR / f"{clean_creature}_doc_raw.mp4"
@@ -77,12 +80,11 @@ class YouTubeWildlifeHarvester:
                                 print(f"[YouTubeHarvester] [!] Descartado por contener persona/podcast: '{d.get('title')[:55]}'", flush=True)
                                 continue
 
-                            # Comprobar que mencione la criatura
-                            creature_tokens = [w for w in query_name.split() if len(w) > 3]
-                            if creature_tokens and not any(w in v_title for w in creature_tokens):
+                            # Comprobar que mencione la criatura o nombre raíz
+                            if not any(w in v_title for w in c_words) and root not in v_title:
                                 continue
 
-                            if v_id and 30 <= dur <= 1200:
+                            if v_id and 20 <= dur <= 1800:
                                 video_url = f"https://www.youtube.com/watch?v={v_id}"
                                 print(f"[YouTubeHarvester] [✓] Video documental aprobado: '{d.get('title')[:60]}' ({dur}s)", flush=True)
                                 break
@@ -95,15 +97,15 @@ class YouTubeWildlifeHarvester:
                 # 2. Descargar video
                 cmd_dl = [
                     "yt-dlp",
-                    "--extractor-args", "youtube:player_client=android",
-                    "-f", "best[height<=1080]/best[height<=720]/best",
+                    "--extractor-args", "youtube:player_client=web,android,ios",
+                    "-f", "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best[height<=720]/best",
                     video_url,
                     "-o", str(raw_video_path),
                     "--no-playlist",
                     "--quiet",
                     "--no-warnings"
                 ]
-                subprocess.run(cmd_dl, timeout=45)
+                subprocess.run(cmd_dl, timeout=50)
 
                 if raw_video_path.exists() and raw_video_path.stat().st_size > 100000:
                     cmd_dur = [
