@@ -227,7 +227,7 @@ def run_single_creature_pipeline(force_topic: str = "", voice_key: str = DEFAULT
     meta_path = OUTPUT_DIR / f"metadata_{topic_id}_{timestamp_str}.txt"
     with open(meta_path, "w", encoding="utf-8") as f:
         f.write(f"TITLE: {title}\n\nDESCRIPTION:\n{title}\n\n" + " ".join(hashtags) + "\n")
-    history.record_published_topic(topic_id, title)
+    history.record_published_topic(topic_id, title, creature_name=creature_name)
 
     # Publicación Automática en Facebook Reels (Wild Vault)
     if auto_publish:

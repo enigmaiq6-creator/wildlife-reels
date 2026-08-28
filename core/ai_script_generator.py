@@ -4,6 +4,7 @@ import random
 import urllib.request
 import urllib.error
 from typing import Dict, Any, List, Optional
+from pathlib import Path
 
 try:
     from dotenv import load_dotenv
@@ -97,22 +98,41 @@ class AIScriptGenerator:
         seen_topics = seen_topics or []
         seen_str = ", ".join(seen_topics[-30:]) if seen_topics else "none"
 
-        # Filtrar candidatos para que nunca se elija uno ya publicado
-        seen_words = set()
-        for s in seen_topics:
-            for w in s.lower().replace("-", " ").replace("_", " ").split():
-                if len(w) > 3:
-                    seen_words.add(w)
+        # 1. Cargar historial y extraer especies publicadas recientemente (últimos 35 temas)
+        history_file = Path("history.json")
+        entries = []
+        if history_file.exists():
+            try:
+                with open(history_file, "r", encoding="utf-8") as f:
+                    entries = json.load(f).get("published_topics", [])
+            except Exception:
+                pass
 
-        available_candidates = [
-            c for c in self.CREATURE_CANDIDATES
-            if not any(w in seen_words for w in c.lower().split("(")[0].strip().split() if len(w) > 3)
-        ]
+        recent_entries = entries[-35:] if len(entries) >= 35 else entries
+        recent_text = " ".join([
+            str(e.get("title", "")) + " " + str(e.get("topic_id", "")) + " " + str(e.get("creature_name", ""))
+            for e in recent_entries
+        ]).lower()
+
+        # 2. Filtrar candidatos de CREATURE_CANDIDATES que NO aparezcan en los últimos 35 publicados
+        available_candidates = []
+        for c in self.CREATURE_CANDIDATES:
+            main_name = c.split("(")[0].strip().lower()
+            if main_name not in recent_text and not any(p in recent_text for p in main_name.split() if len(p) > 4):
+                available_candidates.append(c)
 
         if not available_candidates:
-            available_candidates = self.CREATURE_CANDIDATES
+            recent_10_text = " ".join([
+                str(e.get("title", "")) + " " + str(e.get("topic_id", ""))
+                for e in entries[-10:]
+            ]).lower()
+            available_candidates = [
+                c for c in self.CREATURE_CANDIDATES
+                if c.split("(")[0].strip().lower() not in recent_10_text
+            ]
 
-        chosen_creature = random.choice(available_candidates)
+        chosen_creature = random.choice(available_candidates) if available_candidates else random.choice(self.CREATURE_CANDIDATES)
+        print(f"[AIScriptGenerator] [+] Especie seleccionada para micro-doc (Disponibles frescos: {len(available_candidates)}/{len(self.CREATURE_CANDIDATES)}): '{chosen_creature}'", flush=True)
 
         hook_styles = [
             "Forbidden Warning (Whatever you do, NEVER...)",
@@ -207,6 +227,9 @@ Respond ONLY with valid JSON matching this schema:
 
                 except Exception as e:
                     print(f"[AIScriptGenerator] [!] Error con modelo {model_name} (Key {key_idx}): {e}", flush=True)
+                    if "429" in str(e):
+                        import time
+                        time.sleep(2)
                     continue
 
         # Respaldo con Google Gemini si está configurado
