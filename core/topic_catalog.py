@@ -180,6 +180,66 @@ WILDLIFE_CATALOG: Dict[str, Dict[str, Any]] = {
             "african wildlife predator close up 4k"
         ],
         "hashtags": ["#wildvault", "#honeybadger", "#fearless", "#wildlife", "#animals", "#nature", "#savannah"]
+    },
+    "electric_eel": {
+        "topic_id": "ELECTRIC-EEL-860-VOLT-GENERATOR",
+        "title": "The Living 860-Volt Underwater Taser! ⚡🐍",
+        "creature_name": "electric eel",
+        "act1_hook": "Whatever you do, NEVER step into the muddy shallows of the Amazon—because this invisible monster can electrocute a horse.",
+        "act2_scale": "Growing up to eight feet long, the Electric Eel dedicates eighty percent of its body to thousands of specialized biological batteries called electrocytes.",
+        "act3_hunt": "It emits low-voltage pulses to scan the dark murky water, then discharges an explosive eight hundred and sixty volts of bio-electricity that instantly freezes prey in total paralysis.",
+        "act4_behavior": "It can even leap out of the water to press its chin against land predators, delivering maximum electric current directly into their bodies.",
+        "act5_twist": "Despite its name and snake-like shape, the Electric Eel is not an eel at all—it is a specialized variety of knifefish.",
+        "act6_climax_cta": "Could you survive an encounter with 860 volts in the wild? Tell us in the comments and follow Wild Vault for more shocking creatures!",
+        "pexels_keywords": [
+            "underwater river fish dark water 4k vertical",
+            "amazon river wildlife tropical 4k vertical",
+            "electric eel swimming murky water 4k",
+            "glowing electric energy underwater 4k vertical",
+            "underwater predatory fish swimming 4k",
+            "amazon rainforest river deep water 4k vertical"
+        ],
+        "hashtags": ["#wildvault", "#electriceel", "#amazon", "#predators", "#wildlife", "#nature"]
+    },
+    "colossal_squid": {
+        "topic_id": "COLOSSAL-SQUID-ABYSS-MONSTER",
+        "title": "The Kraken of the Frozen Abyss! 🦑❄️",
+        "creature_name": "colossal squid",
+        "act1_hook": "Deep beneath the frozen Antarctic ice sheets lurks a real-life sea monster with eyes the size of soccer balls.",
+        "act2_scale": "Weighing over a thousand pounds with tentacles lined not with suckers, but with rotating razor-sharp titanium-hard swiveling hooks.",
+        "act3_hunt": "It ambushes giant Antarctic toothfish in pitch-black water thousands of feet deep, using bioluminescent photophores to lure victims into its crushing grasp.",
+        "act4_behavior": "Its massive dinner-plate eyes are the largest eyes in the entire animal kingdom, engineered specifically to spot the faint glow of approaching sperm whales.",
+        "act5_twist": "No human has ever seen a living adult Colossal Squid hunting in its natural habitat—they remain one of Earth's greatest living enigmas.",
+        "act6_climax_cta": "Do you think even larger monsters exist undiscovered in the deep abyss? Comment below and follow Wild Vault!",
+        "pexels_keywords": [
+            "deep ocean dark abyss underwater 4k vertical",
+            "giant squid tentacle underwater 4k",
+            "bioluminescent deep sea glowing creature 4k vertical",
+            "antarctic ocean ice underwater 4k",
+            "mysterious ocean deep monster 4k vertical",
+            "dark blue deep ocean abyss 4k vertical"
+        ],
+        "hashtags": ["#wildvault", "#colossalsquid", "#deepsea", "#oceanmonsters", "#kraken", "#wildlife"]
+    },
+    "cassowary_velociraptor": {
+        "topic_id": "CASSOWARY-LIVING-VELOCIRAPTOR",
+        "title": "The World's Most Dangerous Living Dinosaur! 🐦🦖",
+        "creature_name": "cassowary",
+        "act1_hook": "If you see a giant blue neck emerging from the Australian rainforest, turn around slowly—because this bird can kill with a single kick.",
+        "act2_scale": "Standing over six feet tall with a bone-hard helmet on its head, the Cassowary is armed with five-inch dagger-like claws on its inner toes.",
+        "act3_hunt": "When provoked, it charges at thirty miles per hour and leaps seven feet into the air, driving its razor-sharp middle claw downward like a samurai sword.",
+        "act4_behavior": "It produces a deep, booming sub-bass rumble so low that human ears can barely hear it, but you can feel it vibrating through your chest.",
+        "act5_twist": "Despite its terrifying reputation, it is a vital keystone species—some rainforest trees cannot germinate without passing through a cassowary's digestive system.",
+        "act6_climax_cta": "Would you rather face this living raptor or an actual dinosaur? Cast your vote in the comments and follow Wild Vault!",
+        "pexels_keywords": [
+            "cassowary walking rainforest 4k vertical",
+            "cassowary close up head helmet eyes 4k",
+            "giant bird walking jungle nature 4k vertical",
+            "dinosaur bird tropical rainforest 4k vertical",
+            "cassowary claws legs close up 4k",
+            "australian wildlife tropical jungle 4k vertical"
+        ],
+        "hashtags": ["#wildvault", "#cassowary", "#dinosaur", "#australia", "#birds", "#wildlife", "#nature"]
     }
 }
 

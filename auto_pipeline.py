@@ -56,27 +56,46 @@ def run_single_creature_pipeline(force_topic: str = "", voice_key: str = DEFAULT
         topic_data = ai_gen.generate_wildlife_script(seen_topics=seen_topics)
         if not topic_data:
             all_topics = get_all_wildlife_topics()
-            seen_normalized = {s.lower().replace("-", "_").strip() for s in seen_topics}
+            seen_normalized = [s.lower().replace("-", "_").strip() for s in seen_topics]
+            # Últimos 35 temas para evitar a toda costa cualquier repetición reciente
+            recent_seen = set(seen_normalized[-35:]) if len(seen_normalized) >= 35 else set(seen_normalized)
             
-            # Filtrar temas que nunca hayan sido publicados (ni por clave, ni por slug, ni por nombre)
-            available = []
+            # 1. Prioridad: Temas que NUNCA hayan sido publicados en toda la historia
+            available_never_seen = []
             for k in all_topics:
                 item = WILDLIFE_CATALOG[k]
                 k_norm = k.lower().replace("-", "_")
                 t_id_norm = item.get("topic_id", "").lower().replace("-", "_")
                 c_name = item.get("creature_name", "").lower().replace("-", "_")
                 
-                already_seen = any(
-                    k_norm in s or s in k_norm or
-                    t_id_norm in s or s in t_id_norm or
-                    (len(c_name) > 3 and c_name in s)
-                    for s in seen_normalized
-                )
-                if not already_seen:
-                    available.append(k)
+                if not any(k_norm in s or s in k_norm or t_id_norm in s or s in t_id_norm or (len(c_name) > 3 and c_name in s) for s in seen_normalized):
+                    available_never_seen.append(k)
                     
-            chosen_key = available[0] if available else all_topics[0]
-            print(f"[Pipeline] [!] Usando tema del catálogo de respaldo: '{chosen_key}' (Disponibles nuevos: {len(available)})", flush=True)
+            if available_never_seen:
+                chosen_key = random.choice(available_never_seen)
+                print(f"[Pipeline] [!] Usando tema NUNCA antes publicado del catálogo: '{chosen_key}' (Inéditos: {len(available_never_seen)})", flush=True)
+            else:
+                # 2. Si ya se publicaron todos los temas del catálogo históricamente:
+                # Elegir aleatoriamente entre los temas que NO estén en los últimos 35 publicados
+                available_not_recent = []
+                for k in all_topics:
+                    item = WILDLIFE_CATALOG[k]
+                    k_norm = k.lower().replace("-", "_")
+                    t_id_norm = item.get("topic_id", "").lower().replace("-", "_")
+                    c_name = item.get("creature_name", "").lower().replace("-", "_")
+                    if not any(k_norm in s or s in k_norm or t_id_norm in s or s in t_id_norm or (len(c_name) > 3 and c_name in s) for s in recent_seen):
+                        available_not_recent.append(k)
+                
+                if available_not_recent:
+                    chosen_key = random.choice(available_not_recent)
+                    print(f"[Pipeline] [!] Usando tema antiguo rotado del catálogo (no visto recientemente): '{chosen_key}' (Disponibles: {len(available_not_recent)})", flush=True)
+                else:
+                    # En caso extremo, elegir al azar cualquier tema EXCEPTO los últimos 5 publicados
+                    last_5 = set(seen_normalized[-5:]) if seen_normalized else set()
+                    fallback_pool = [k for k in all_topics if not any(k in s or s in k for s in last_5)]
+                    chosen_key = random.choice(fallback_pool) if fallback_pool else random.choice(all_topics)
+                    print(f"[Pipeline] [!] Usando tema rotado aleatorio del catálogo: '{chosen_key}'", flush=True)
+
             topic_data = WILDLIFE_CATALOG[chosen_key]
 
     topic_id = topic_data.get("topic_id", "WILDLIFE-DOC").lower().replace(" ", "-")

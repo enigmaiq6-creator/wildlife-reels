@@ -19,9 +19,10 @@ class AITopGenerator:
     """
 
     GROQ_MODELS = [
-        "llama-3.3-70b-versatile",
-        "llama-3.1-8b-instant",
-        "gemma2-9b-it"
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+        "qwen/qwen3.6-27b",
+        "groq/compound-mini"
     ]
 
     TOP_THEMES = [
@@ -159,7 +160,7 @@ Respond ONLY with valid JSON matching this schema:
                             {"role": "user", "content": prompt}
                         ],
                         "temperature": 0.75,
-                        "max_tokens": 900,
+                        "max_tokens": 2048,
                         "response_format": {"type": "json_object"}
                     }
                     req = urllib.request.Request(self.endpoint, data=json.dumps(data).encode('utf-8'), headers=headers)

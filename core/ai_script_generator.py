@@ -26,9 +26,10 @@ class AIScriptGenerator:
     """
 
     GROQ_MODELS = [
-        "llama-3.3-70b-versatile",
-        "llama-3.1-8b-instant",
-        "gemma2-9b-it"
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+        "qwen/qwen3.6-27b",
+        "groq/compound-mini"
     ]
 
     CREATURE_CANDIDATES = [
@@ -176,7 +177,7 @@ Respond ONLY with valid JSON matching this schema:
                             {"role": "user", "content": prompt}
                         ],
                         "temperature": 0.75,
-                        "max_tokens": 1024,
+                        "max_tokens": 2048,
                         "response_format": {"type": "json_object"}
                     }
 
@@ -199,11 +200,13 @@ Respond ONLY with valid JSON matching this schema:
                         # Validación básica de estructura
                         required_keys = ["topic_id", "title", "act1_hook", "act2_scale", "act3_hunt", "act4_behavior", "act5_twist", "act6_climax_cta", "pexels_keywords"]
                         if all(k in script_data for k in required_keys):
-                            print(f"[AIScriptGenerator] [SUCCESS] Created Micro-Doc ({chosen_hook_style}): '{script_data['topic_id']}' - {script_data['title']}")
+                            safe_t = str(script_data.get('title', '')).encode('ascii', 'ignore').decode()
+                            safe_id = str(script_data.get('topic_id', '')).encode('ascii', 'ignore').decode()
+                            print(f"[AIScriptGenerator] [SUCCESS] Created Micro-Doc ({chosen_hook_style}): '{safe_id}' - {safe_t}", flush=True)
                             return script_data
 
                 except Exception as e:
-                    print(f"[AIScriptGenerator] [!] Error con modelo {model_name} (Key {key_idx}): {e}")
+                    print(f"[AIScriptGenerator] [!] Error con modelo {model_name} (Key {key_idx}): {e}", flush=True)
                     continue
 
         # Respaldo con Google Gemini si está configurado
