@@ -38,34 +38,40 @@ class PhotoKenBurnsHarvester:
         clean_creature = creature_name.lower().replace("-", " ").replace("_", " ").strip()
         clean_action = action_desc.lower().replace("_", " ").strip()
 
+        perspectives = [
+            "extreme macro close up eye stare",
+            "low angle predatory full body profile",
+            "lethal weapon teeth fangs claws detail",
+            "stalking in natural wild habitat landscape",
+            "action strike explosive motion",
+            "cinematic hero lighting documentary 4k"
+        ]
+        chosen_persp = random.choice(perspectives)
+
         # 1. Intentar generar imagen de ultra alta definición con Google Cloud Vertex AI
-        gcp_prompt = f"wild {clean_creature} {clean_action} in natural habitat, intense wildlife action"
+        gcp_prompt = f"wild {clean_creature} {clean_action}, {chosen_persp}, National Geographic photography award winning 4k"
         photo_found = GCPVertexImageGenerator.generate_image(gcp_prompt, img_temp)
 
         # 2. Respaldo en Wikimedia Commons si fuera necesario
         if not photo_found or not img_temp.exists() or img_temp.stat().st_size < 10000:
-            photo_found = cls._search_wikimedia_photo(clean_creature, clean_action, img_temp)
+            photo_found = cls._search_wikimedia_photo(clean_creature, f"{clean_action} {chosen_persp}", img_temp)
 
         # 3. Respaldo secundario
         if not photo_found or not img_temp.exists() or img_temp.stat().st_size < 10000:
-            photo_found = cls._generate_ai_photo(clean_creature, clean_action, img_temp)
+            photo_found = cls._generate_ai_photo(clean_creature, f"{clean_action} {chosen_persp}", img_temp)
 
         if not img_temp.exists() or img_temp.stat().st_size < 8000:
             return False
 
         # 3. Aplicar Efecto Ken Burns con FFmpeg
-        # Variedad de movimientos cinematográficos:
-        # - zoom_in: Acercamiento progresivo a los ojos / mandíbulas
-        # - zoom_out: Alejamiento revelando la escala
-        # - pan_vertical: Paneo de arriba hacia abajo (escaneo anatómico)
-        # - pan_horizontal: Paneo lateral de izquierda a derecha
         num_frames = int(duration * 30)
 
         motions = {
-            "zoom_in": f"zoompan=z='min(zoom+0.0018,1.28)':d={num_frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=30",
-            "zoom_out": f"zoompan=z='max(1.28-0.0018*on,1.0)':d={num_frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=30",
-            "pan_vertical": f"zoompan=z='1.20':d={num_frames}:x='iw/2-(iw/zoom/2)':y='(ih-ih/zoom)*(on/{num_frames})':s=1080x1920:fps=30",
-            "pan_horizontal": f"zoompan=z='1.20':d={num_frames}:x='(iw-iw/zoom)*(on/{num_frames})':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=30"
+            "zoom_in": f"zoompan=z='min(zoom+0.0022,1.32)':d={num_frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=30",
+            "zoom_out": f"zoompan=z='max(1.32-0.0022*on,1.0)':d={num_frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=30",
+            "pan_vertical": f"zoompan=z='1.22':d={num_frames}:x='iw/2-(iw/zoom/2)':y='(ih-ih/zoom)*(on/{num_frames})':s=1080x1920:fps=30",
+            "pan_horizontal": f"zoompan=z='1.22':d={num_frames}:x='(iw-iw/zoom)*(on/{num_frames})':y='ih/2-(ih/zoom/2)':s=1080x1920:fps=30",
+            "diagonal_sweep": f"zoompan=z='min(zoom+0.0015,1.25)':d={num_frames}:x='(iw-iw/zoom)*(on/{num_frames})':y='(ih-ih/zoom)*(on/{num_frames})':s=1080x1920:fps=30"
         }
 
         if movement_type and movement_type in motions:

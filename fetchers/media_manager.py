@@ -13,15 +13,16 @@ from fetchers.wikimedia_fetcher import WikimediaFetcher
 from fetchers.youtube_wildlife_harvester import YouTubeWildlifeHarvester
 from fetchers.photo_kenburns_harvester import PhotoKenBurnsHarvester
 from core.clip_validator import validate_clip_metadata
+from core.wildlife_taxonomy import get_taxonomy_for_creature
 
 class MediaManager:
     """
-    Motor Selectivo de Medios para Vida Salvaje (Clean Wildlife Media Engine) v7.0:
-    Garantiza CERO PERSONAS HABLANDO y CERO DOBLE SUBTÍTULO:
+    Motor Selectivo de Medios para Vida Salvaje (Clean Wildlife Media Engine) v8.0:
+    Garantiza CERO PERSONAS HABLANDO, CERO DOBLE SUBTÍTULO y CERO CLIPS REPETIDOS:
       - Nivel 1: Stock Oficial 4K Puro y Limpio (Pexels 4K & Pixabay HD) sin texto ni humanos.
       - Nivel 2: Archivos Científicos Abiertos (Wikimedia Commons).
-      - Nivel 3: Metraje Documental Filtrado de YouTube (B-Roll puro de BBC Earth / Nat Geo, descartando podcasts, vlogs y reacciones).
-      - Nivel 4: Fotografía 4K Ultra-Realista + Animación Ken Burns 3D (sólo si no hay video limpio disponible).
+      - Nivel 3: Metraje Documental Filtrado de YouTube (B-Roll puro de BBC Earth / Nat Geo).
+      - Nivel 4: Fotografía 4K Ultra-Realista + Animación Ken Burns 3D con perspectivas variadas.
     """
 
     def __init__(self, local_clips_dir: Optional[Path] = None, temp_dir: Optional[Path] = None):
@@ -36,6 +37,9 @@ class MediaManager:
         self.used_session_clips.clear()
         self.used_urls.clear()
         WikimediaFetcher.reset_session()
+        PhotoKenBurnsHarvester.create_kenburns_clip  # warm up
+        from fetchers.gcp_vertex_image_generator import GCPVertexImageGenerator
+        GCPVertexImageGenerator.reset_session()
         if self.session_vault_dir.exists():
             try:
                 shutil.rmtree(self.session_vault_dir, ignore_errors=True)
@@ -66,20 +70,32 @@ class MediaManager:
         # =====================================================================
         candidates: List[Dict[str, Any]] = []
 
-        # Construir lista exhaustiva de términos de búsqueda
-        c_words = [w for w in subject_clean.split() if len(w) >= 3]
-        root_animal = c_words[-1] if c_words else subject_clean
+        tax = get_taxonomy_for_creature(subject_clean)
 
-        search_terms = [subject_clean]
+        # Construir lista exhaustiva y variada de términos taxonómicos y cinemáticos
+        search_terms = []
+        
+        # 1. Consultas contextuales con la acción del corte
+        if action_description:
+            act_clean = action_description.replace("_", " ").strip()
+            search_terms.append(f"{subject_clean} {act_clean}")
+            for pq in tax.get("primary_queries", [])[:2]:
+                search_terms.append(f"{pq} {act_clean}")
+
+        # 2. Consultas primarias específicas de la especie
+        for pq in tax.get("primary_queries", []):
+            if pq and pq not in search_terms:
+                search_terms.append(pq)
+
+        # 3. Consultas de la familia biológica
+        for fq in tax.get("family_queries", []):
+            if fq and fq not in search_terms:
+                search_terms.append(fq)
+
+        # 4. Palabras clave del director visual
         for kw in keywords:
             if kw and kw not in search_terms:
                 search_terms.append(kw)
-        if root_animal != subject_clean:
-            search_terms.append(f"{root_animal} wildlife")
-            search_terms.append(root_animal)
-        if action_description:
-            search_terms.append(f"{root_animal} {action_description}")
-            search_terms.append(f"{subject_clean} {action_description}")
 
         # 1.1 Búsqueda en Pexels Oficial (4K Portrait & All)
         for st in search_terms:

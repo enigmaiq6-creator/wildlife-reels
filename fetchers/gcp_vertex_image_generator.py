@@ -28,6 +28,7 @@ class GCPVertexImageGenerator:
     _token = None
     _project_id = "facebookbot-502117"
     _location = "us-central1"
+    _used_photo_urls = set()
 
     @classmethod
     def _get_auth_token(cls) -> Optional[str]:
@@ -48,10 +49,14 @@ class GCPVertexImageGenerator:
             return None
 
     @classmethod
+    def reset_session(cls):
+        cls._used_photo_urls.clear()
+
+    @classmethod
     def _search_free_stock_photo(cls, query_prompt: str, output_path: Path) -> bool:
         """
         Tier 1 (Ahorro Máximo - $0 Costo):
-        Descarga fotos profesionales de Pexels 4K o Wikimedia para ahorrar créditos de Google Cloud.
+        Descarga fotos profesionales de Pexels 4K o Wikimedia garantizando CERO FOTOS REPETIDAS.
         """
         # Si el prompt es de animales extintos o anime, saltar a Vertex AI
         forbidden_stock = ["prehistoric", "extinct", "anime", "illustration", "hybrid", "transparent head", "drawing", "glowing eyes"]
@@ -61,21 +66,25 @@ class GCPVertexImageGenerator:
         # Limpiar palabras clave para búsqueda de stock
         clean_q = query_prompt.replace("isolated", "").replace("studio portrait", "").replace("black background", "").replace("white background", "").strip()
         
-        # 1. Pexels Photo API
+        # 1. Pexels Photo API con selección de fotos inéditas
         pexels_key = os.environ.get("PEXELS_API_KEY", "")
         if pexels_key:
             try:
-                p_url = f"https://api.pexels.com/v1/search?query={urllib.parse.quote(clean_q)}&per_page=3&orientation=portrait"
+                p_url = f"https://api.pexels.com/v1/search?query={urllib.parse.quote(clean_q)}&per_page=15&orientation=portrait"
                 p_resp = requests.get(p_url, headers={"Authorization": pexels_key}, timeout=8)
                 if p_resp.status_code == 200:
                     photos = p_resp.json().get("photos", [])
-                    if photos:
-                        img_url = photos[0].get("src", {}).get("large2x") or photos[0].get("src", {}).get("large")
+                    # Filtrar fotos no usadas en esta sesión
+                    unused_photos = [p for p in photos if (p.get("src", {}).get("large2x") or p.get("src", {}).get("large")) not in cls._used_photo_urls]
+                    if unused_photos:
+                        chosen_photo = random.choice(unused_photos[:5])
+                        img_url = chosen_photo.get("src", {}).get("large2x") or chosen_photo.get("src", {}).get("large")
                         if img_url:
                             img_data = requests.get(img_url, timeout=12).content
                             if len(img_data) > 10000:
+                                cls._used_photo_urls.add(img_url)
                                 output_path.write_bytes(img_data)
-                                print(f"[GCPVertexAI] [AHORRO DE CRÉDITOS] Foto 4K obtenida de Pexels ($0.00) -> {output_path.name}")
+                                print(f"[GCPVertexAI] [FOTO 4K INÉDITA #{len(cls._used_photo_urls)}] Pexels -> {output_path.name}")
                                 return True
             except Exception:
                 pass
