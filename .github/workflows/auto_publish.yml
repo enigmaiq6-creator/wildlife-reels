@@ -113,33 +113,7 @@ jobs:
           git checkout master || true
           git pull origin master --rebase || true
           if [ -f "/tmp/run_history.json" ]; then
-            python -c "
-import json
-with open('/tmp/run_history.json', 'r', encoding='utf-8') as f:
-    local_data = json.load(f)
-try:
-    with open('history.json', 'r', encoding='utf-8') as f:
-        remote_data = json.load(f)
-except Exception:
-    remote_data = {'published_topics': [], 'used_video_urls': [], 'used_image_urls': []}
-
-seen = set()
-merged_topics = []
-for t in remote_data.get('published_topics', []) + local_data.get('published_topics', []):
-    key = (t.get('topic_id', ''), t.get('published_at', ''))
-    if key not in seen:
-        seen.add(key)
-        merged_topics.append(t)
-
-remote_data['published_topics'] = merged_topics
-remote_data['total_published'] = len(merged_topics)
-remote_data['used_video_urls'] = list(set(remote_data.get('used_video_urls', []) + local_data.get('used_video_urls', [])))
-remote_data['used_image_urls'] = list(set(remote_data.get('used_image_urls', []) + local_data.get('used_image_urls', [])))
-remote_data['last_updated'] = local_data.get('last_updated', '')
-
-with open('history.json', 'w', encoding='utf-8') as f:
-    json.dump(remote_data, f, indent=2, ensure_ascii=False)
-"
+            python core/merge_history.py /tmp/run_history.json history.json
             git add history.json
             git diff --staged --quiet || (git commit -m "chore(history): update wildlife published topics [skip ci]" && git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:master)
           fi
