@@ -291,6 +291,162 @@ WILDLIFE_TAXONOMY: Dict[str, Dict[str, Any]] = {
         "primary_queries": ["driver ant colony marching", "army ants swarm jungle", "ant soldiers jaws macro", "millions of ants moving 4k"],
         "family_queries": ["ant trail rainforest floor", "macro ant biting", "swarm of ants predator", "marching ant colony"],
         "banned": ["cartoon", "picnic", "ant farm toy"]
+    },
+    "aye_aye": {
+        "required_any": ["aye aye", "lemur", "primate", "madagascar", "daubentonia"],
+        "primary_queries": ["aye aye madagascar", "aye aye long finger", "aye aye tapping tree", "lemur night eyes 4k"],
+        "family_queries": ["nocturnal primate tree", "madagascar lemur climbing", "strange primate eyes", "aye aye foraging"],
+        "banned": ["pet", "cage", "zoo", "cartoon"]
+    },
+    "caracal": {
+        "required_any": ["caracal", "cat", "feline", "wild cat", "lynx"],
+        "primary_queries": ["caracal jumping bird", "caracal tufted ears", "wild caracal running", "caracal hunting 4k"],
+        "family_queries": ["african wild cat predator", "feline leap slow motion", "caracal eyes close up", "desert cat stalking"],
+        "banned": ["pet", "kitten", "domestic cat", "leash", "house"]
+    },
+    "serval": {
+        "required_any": ["serval", "cat", "feline", "wild cat", "african cat"],
+        "primary_queries": ["serval cat jumping grass", "serval ears radar", "serval hunting savanna", "serval long legs 4k"],
+        "family_queries": ["wild serval stalking", "feline high pounce", "spotted wild cat savannah", "serval running"],
+        "banned": ["pet", "kitten", "house", "domestic"]
+    },
+    "fossa": {
+        "required_any": ["fossa", "cryptoprocta", "carnivore", "madagascar predator"],
+        "primary_queries": ["fossa madagascar predator", "fossa climbing tree", "fossa hunting lemur", "cryptoprocta ferox 4k"],
+        "family_queries": ["madagascar apex carnivore", "wild predator stalking branch", "fossa walking forest", "tree predator claws"],
+        "banned": ["zoo cage", "cartoon"]
+    },
+    "tasmanian_devil": {
+        "required_any": ["tasmanian devil", "sarcophilus", "marsupial", "carnivore"],
+        "primary_queries": ["tasmanian devil growling jaws", "tasmanian devil teeth bone", "tasmanian devil walking", "tasmanian devil 4k"],
+        "family_queries": ["carnivorous marsupial night", "fierce wild animal teeth", "tasmanian wildlife predator", "devil animal eating"],
+        "banned": ["looney tunes", "cartoon", "taz", "toy"]
+    },
+    "platypus": {
+        "required_any": ["platypus", "ornithorhynchus", "monotreme", "aquatic animal"],
+        "primary_queries": ["platypus swimming underwater", "platypus bill river", "platypus diving wild 4k", "australian platypus creek"],
+        "family_queries": ["monotreme swimming stream", "duck billed platypus foraging", "australian river animal", "platypus beaver tail"],
+        "banned": ["phineas and ferb", "perry", "cartoon", "toy", "plush"]
+    },
+    "pufferfish": {
+        "required_any": ["pufferfish", "blowfish", "tetraodontidae", "puffer", "porcupinefish"],
+        "primary_queries": ["pufferfish inflating spikes", "blowfish swimming reef", "spotted pufferfish ocean", "porcupinefish eyes 4k"],
+        "family_queries": ["inflated fish coral reef", "tropical puffer fish underwater", "spiky fish swimming", "reef predator fish"],
+        "banned": ["sushi", "cooking", "restaurant", "fugu plate", "dish"]
+    },
+    "axolotl": {
+        "required_any": ["axolotl", "salamander", "ambystoma", "amphibian"],
+        "primary_queries": ["axolotl swimming gills", "pink axolotl underwater", "axolotl face close up", "mexican salamander 4k"],
+        "family_queries": ["aquatic salamander wild", "amphibian swimming freshwater", "axolotl feathery gills", "rare freshwater creature"],
+        "banned": ["minecraft", "toy", "plush", "drawing"]
+    },
+    "black_panther": {
+        "required_any": ["panther", "black leopard", "black jaguar", "melanistic leopard", "feline"],
+        "primary_queries": ["black panther stalking jungle", "black leopard eyes glowing", "black panther roar", "melanistic jaguar 4k"],
+        "family_queries": ["dark predator walking rainforest", "black feline muscles", "panther drinking water", "black apex predator"],
+        "banned": ["marvel", "wakanda", "movie", "costume", "actor"]
+    },
+    "red_bellied_piranha": {
+        "required_any": ["piranha", "pygocentrus", "predator fish", "river fish"],
+        "primary_queries": ["red bellied piranha swimming", "piranha sharp razor teeth", "school of piranhas amazon", "piranha frenzy 4k"],
+        "family_queries": ["amazon river predator fish", "sharp toothed fish underwater", "piranha feeding water", "freshwater carnivore fish"],
+        "banned": ["movie 3d", "fake monster", "aquarium tank glass"]
+    },
+    "tiger_shark": {
+        "required_any": ["tiger shark", "shark", "galeocerdo", "predator shark"],
+        "primary_queries": ["tiger shark swimming ocean", "tiger shark stripes teeth", "giant shark underwater 4k", "apex ocean tiger shark"],
+        "family_queries": ["large shark cruising reef", "ocean predator cruising water", "shark jaws teeth close up", "shark deep ocean"],
+        "banned": ["cage diver", "swimmer", "aquarium"]
+    },
+    "archerfish": {
+        "required_any": ["archerfish", "toxotes", "shooting fish", "mangrove fish"],
+        "primary_queries": ["archerfish spitting water jet", "archerfish shooting insect", "archerfish hunting mangrove", "archer fish 4k"],
+        "family_queries": ["mangrove fish surface", "precision water jet fish", "tropical freshwater predator", "fish jumping water"],
+        "banned": ["aquarium tank glass", "cartoon"]
+    },
+    "lyrebird": {
+        "required_any": ["lyrebird", "menura", "songbird", "australian bird"],
+        "primary_queries": ["superb lyrebird tail display", "lyrebird mimicking sounds", "lyrebird dancing rainforest", "australian lyrebird 4k"],
+        "family_queries": ["forest bird singing", "dramatic bird feather display", "wild rainforest floor bird", "mimic bird wild"],
+        "banned": ["cage", "pet", "zoo"]
+    },
+    "pallas_cat": {
+        "required_any": ["pallas cat", "manul", "otocolobus", "wild cat", "feline"],
+        "primary_queries": ["pallas cat round eyes", "manul cat snow rock", "pallas cat furry face", "wild manul stalking 4k"],
+        "family_queries": ["frozen steppe wild cat", "thick fur feline rock", "pallas cat hunting pika", "small wild cat stare"],
+        "banned": ["pet", "house cat", "domestic"]
+    },
+    "manta_ray": {
+        "required_any": ["manta ray", "mobula", "giant ray", "ocean ray"],
+        "primary_queries": ["giant manta ray flying underwater", "manta ray feeding plankton", "ocean manta ray blue water", "manta ray gliding 4k"],
+        "family_queries": ["huge marine ray swimming", "manta ray wings ocean", "school of mobula rays", "underwater gentle giant"],
+        "banned": ["aquarium glass", "tourist touching"]
+    },
+    "coconut_crab": {
+        "required_any": ["coconut crab", "birgus latro", "robber crab", "giant crustacean"],
+        "primary_queries": ["giant coconut crab tree", "huge coconut crab claws", "monster robber crab island", "coconut crab walking 4k"],
+        "family_queries": ["largest land crustacean", "armored island crab", "giant crab breaking coconut", "tropical night crab"],
+        "banned": ["cooking", "boiling", "restaurant", "plate", "eating"]
+    },
+    "cuttlefish": {
+        "required_any": ["cuttlefish", "sepia", "cephalopod", "chameleon fish"],
+        "primary_queries": ["cuttlefish changing colors", "flamboyant cuttlefish reef", "cuttlefish hypnotic skin", "cuttlefish hunting 4k"],
+        "family_queries": ["cephalopod tentacles coral", "color shifting sea creature", "cuttlefish hovering water", "marine camouflage master"],
+        "banned": ["dish", "market", "fried", "calamari"]
+    },
+    "vampire_squid": {
+        "required_any": ["vampire squid", "vampyroteuthis", "deep sea squid", "abyss squid"],
+        "primary_queries": ["vampire squid glowing deep sea", "bioluminescent squid abyss", "vampyroteuthis infernalis", "deep ocean red squid 4k"],
+        "family_queries": ["abyssal cephalopod glowing", "deep sea creature floating", "black sea monster tentacles", "bioluminescence dark ocean"],
+        "banned": ["recipe", "cartoon", "toy"]
+    },
+    "frilled_shark": {
+        "required_any": ["frilled shark", "chlamydoselachus", "ancient shark", "eel shark"],
+        "primary_queries": ["frilled shark swimming abyss", "prehistoric frilled shark", "ancient deep sea shark", "frilled shark needle teeth 4k"],
+        "family_queries": ["living fossil shark ocean", "eel like shark deep water", "rare abyss monster swimming", "deep sea prehistoric fish"],
+        "banned": ["dead fish", "market", "museum specimen"]
+    },
+    "leatherback_sea_turtle": {
+        "required_any": ["leatherback turtle", "sea turtle", "dermochelys", "giant turtle"],
+        "primary_queries": ["giant leatherback sea turtle swimming", "leatherback turtle ocean deep", "massive sea turtle 4k", "leatherback turtle eating jellyfish"],
+        "family_queries": ["huge marine reptile swimming", "ocean turtle gliding water", "leatherback turtle nesting beach", "ancient marine turtle"],
+        "banned": ["aquarium", "tank", "tourist touching"]
+    },
+    "saltwater_crocodile": {
+        "required_any": ["crocodile", "saltwater crocodile", "crocodylus porosus", "salties", "alligator"],
+        "primary_queries": ["huge saltwater crocodile swimming", "saltwater crocodile jumping water", "giant crocodile jaws teeth", "crocodile murky river 4k"],
+        "family_queries": ["largest reptile predator", "crocodile death roll", "massive croc basking riverbank", "crocodile stalking surface"],
+        "banned": ["zoo cage", "crocodile farm", "leather boots", "belt"]
+    },
+    "gharial": {
+        "required_any": ["gharial", "gavialis", "crocodilian", "narrow snout crocodile"],
+        "primary_queries": ["gharial long narrow snout", "gharial crocodile swimming river", "gharial razor sharp teeth", "indian gharial 4k"],
+        "family_queries": ["fish eating crocodilian river", "rare crocodile riverbank", "gharial basking sand", "slender jaw crocodile"],
+        "banned": ["zoo cage", "farm"]
+    },
+    "gila_monster": {
+        "required_any": ["gila monster", "heloderma", "venomous lizard", "desert lizard"],
+        "primary_queries": ["gila monster walking desert", "beaded gila monster orange black", "venomous gila monster lizard 4k", "gila monster tongue flicking"],
+        "family_queries": ["armored desert lizard", "venomous reptile rocks", "beaded lizard crawling", "desert predator reptile"],
+        "banned": ["pet", "cage", "terrarium glass"]
+    },
+    "thorny_devil": {
+        "required_any": ["thorny devil", "moloch horridus", "dragon lizard", "spiny lizard"],
+        "primary_queries": ["thorny devil desert sand", "spiky thorny devil lizard", "moloch horridus walking", "australian thorny devil 4k"],
+        "family_queries": ["spiny camouflage lizard", "desert dragon drinking water", "armored reptile walking sand", "thorny lizard eating ants"],
+        "banned": ["pet", "cartoon", "toy"]
+    },
+    "snowy_owl": {
+        "required_any": ["snowy owl", "bubo scandiacus", "white owl", "arctic owl", "raptor"],
+        "primary_queries": ["snowy owl flying snow", "white snowy owl yellow eyes", "snowy owl hunting tundra", "snowy owl landing 4k"],
+        "family_queries": ["arctic predator bird flying", "white raptor eyes stare", "snowy owl perched snow", "winter bird of prey"],
+        "banned": ["harry potter", "cage", "pet", "drawing"]
+    },
+    "giant_japanese_salamander": {
+        "required_any": ["giant salamander", "andrias", "japanese salamander", "amphibian dragon"],
+        "primary_queries": ["giant japanese salamander river", "massive river salamander", "ancient amphibian river bed", "andrias japonicus 4k"],
+        "family_queries": ["freshwater river dragon", "huge salamander underwater", "rare river amphibian rock", "giant salamander breathing"],
+        "banned": ["cooking", "restaurant", "aquarium glass"]
     }
 }
 

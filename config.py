@@ -18,8 +18,11 @@ SFX_DIR = ASSETS_DIR / "sfx"
 CLIPS_DIR = ASSETS_DIR / "clips"
 TEMP_DIR = BASE_DIR / "temp"
 OUTPUT_DIR = BASE_DIR / "output"
+CREDENTIALS_DIR = BASE_DIR / "credentials"
+CREDENTIALS_PATH = CREDENTIALS_DIR / "gcp_service_account.json"
+GCP_PROJECT_ID = os.environ.get("GCP_PROJECT_ID", "facebookbot-502117")
 
-for folder in [ASSETS_DIR, MUSIC_DIR, FONTS_DIR, SFX_DIR, CLIPS_DIR, TEMP_DIR, OUTPUT_DIR]:
+for folder in [ASSETS_DIR, MUSIC_DIR, FONTS_DIR, SFX_DIR, CLIPS_DIR, TEMP_DIR, OUTPUT_DIR, CREDENTIALS_DIR]:
     folder.mkdir(parents=True, exist_ok=True)
 
 # Video Resolutions

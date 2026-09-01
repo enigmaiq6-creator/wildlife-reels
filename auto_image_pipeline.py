@@ -157,7 +157,11 @@ def run_image_pipeline(forced_format: str = "", auto_publish: bool = True) -> Op
     print(f"\n[ImagePipeline] [¡IMAGEN COMPILADA CON ÉXITO! 🎨] ({final_output_path.stat().st_size / 1024:.1f} KB) -> {final_output_path}")
 
     # 3. Guardar registro en el historial
-    history.record_published_topic(topic_id, f"IMAGE_{format_type}")
+    history.record_published_topic(
+        topic_id=topic_id,
+        title=f"IMAGE_{format_type}",
+        images_used=list(GCPVertexImageGenerator.get_used_photos())
+    )
 
     # 4. Publicar automáticamente en Facebook Page (Wild Vault)
     if auto_publish:

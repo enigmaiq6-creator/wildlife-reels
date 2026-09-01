@@ -26,8 +26,11 @@ def search_pixabay_videos(keyword: str, max_results: int = 3) -> List[dict]:
                 videos = hit.get("videos", {})
                 v_data = videos.get("medium") or videos.get("large") or videos.get("small") or videos.get("tiny")
                 if v_data and "url" in v_data and v_data["url"]:
+                    p_id = str(hit.get("id", ""))
                     found.append({
                         "source": "pixabay",
+                        "video_id": f"pixabay_{p_id}" if p_id else "",
+                        "web_url": hit.get("pageURL", ""),
                         "title": hit.get("tags", keyword),
                         "video_url": v_data["url"],
                         "duration": hit.get("duration", 5)

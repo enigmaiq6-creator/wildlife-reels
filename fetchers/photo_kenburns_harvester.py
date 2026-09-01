@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import random
 import urllib.request
@@ -7,6 +8,11 @@ import subprocess
 from pathlib import Path
 from typing import Optional, List
 from config import TEMP_DIR
+
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except Exception:
+    pass
 from core.clip_validator import validate_clip_metadata
 from fetchers.gcp_vertex_image_generator import GCPVertexImageGenerator
 

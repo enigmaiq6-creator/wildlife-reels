@@ -7,28 +7,35 @@ import urllib.request
 import requests
 from pathlib import Path
 from typing import Optional
+from typing import Optional, Set
 from google.oauth2 import service_account
 import google.auth.transport.requests
+from config import GCP_PROJECT_ID, CREDENTIALS_PATH
+from core.history_manager import HistoryManager
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-CREDENTIALS_PATH = BASE_DIR / "credentials" / "gcp_service_account.json"
 CACHE_DIR = BASE_DIR / "assets" / "image_cache"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 class GCPVertexImageGenerator:
     """
-    Generador de Imágenes Inteligente con Optimización Extrema de Costos y Créditos:
-    1. Tier 1 (Costo $0): Busca fotos reales en Pexels 4K / Wikimedia Commons si es una especie viva.
-    2. Tier 2 (Créditos Google Cloud): Invoca Vertex AI (facebookbot-502117) para escenas inéditas,
-       híbridos, prehistoria y cuando no hay stock gratuito.
-    3. Tier 3 (Costo $0): Respaldo IA gratuito de alta definición (Pollinations Flux).
+    Generador Híbrido Inteligente de Imágenes de Alta Calidad:
+      1. Tier 1 ($0 Costo): Búsqueda de fotografía 4K inédita en Pexels/Wikimedia (cero fotos repetidas).
+      2. Tier 2 (Google Cloud Vertex AI): Generación con Gemini Imagen 3 en GCP (facebookbot-502117).
+      3. Tier 3 ($0 Costo Respaldo): Generador IA gratuito de alta resolución.
     """
 
     _creds = None
     _token = None
-    _project_id = "facebookbot-502117"
+    _project_id = GCP_PROJECT_ID or "facebookbot-502117"
     _location = "us-central1"
-    _used_photo_urls = set()
+    _used_photo_urls: Set[str] = set()
+
+    @classmethod
+    def get_used_photos(cls) -> Set[str]:
+        if not cls._used_photo_urls:
+            cls._used_photo_urls = HistoryManager().get_used_image_urls()
+        return cls._used_photo_urls
 
     @classmethod
     def _get_auth_token(cls) -> Optional[str]:
@@ -50,7 +57,7 @@ class GCPVertexImageGenerator:
 
     @classmethod
     def reset_session(cls):
-        cls._used_photo_urls.clear()
+        cls._used_photo_urls = HistoryManager().get_used_image_urls()
 
     @classmethod
     def _search_free_stock_photo(cls, query_prompt: str, output_path: Path) -> bool:
@@ -74,8 +81,15 @@ class GCPVertexImageGenerator:
                 p_resp = requests.get(p_url, headers={"Authorization": pexels_key}, timeout=8)
                 if p_resp.status_code == 200:
                     photos = p_resp.json().get("photos", [])
-                    # Filtrar fotos no usadas en esta sesión
-                    unused_photos = [p for p in photos if (p.get("src", {}).get("large2x") or p.get("src", {}).get("large")) not in cls._used_photo_urls]
+                    # Filtrar fotos no usadas históricamente ni en esta sesión
+                    current_used = cls.get_used_photos()
+                    unused_photos = []
+                    for p in photos:
+                        p_id = f"pexels_photo_{p.get('id', '')}"
+                        p_url_web = p.get('url', '')
+                        img_url = p.get("src", {}).get("large2x") or p.get("src", {}).get("large")
+                        if img_url not in current_used and p_id not in current_used and p_url_web not in current_used:
+                            unused_photos.append(p)
                     if unused_photos:
                         chosen_photo = random.choice(unused_photos[:5])
                         img_url = chosen_photo.get("src", {}).get("large2x") or chosen_photo.get("src", {}).get("large")
@@ -83,6 +97,9 @@ class GCPVertexImageGenerator:
                             img_data = requests.get(img_url, timeout=12).content
                             if len(img_data) > 10000:
                                 cls._used_photo_urls.add(img_url)
+                                p_id = f"pexels_photo_{chosen_photo.get('id', '')}"
+                                if p_id:
+                                    cls._used_photo_urls.add(p_id)
                                 output_path.write_bytes(img_data)
                                 print(f"[GCPVertexAI] [FOTO 4K INÉDITA #{len(cls._used_photo_urls)}] Pexels -> {output_path.name}")
                                 return True

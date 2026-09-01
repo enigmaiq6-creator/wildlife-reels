@@ -43,8 +43,11 @@ def search_pexels_videos(keyword: str, orientation: str = "portrait", max_result
                         break
                         
                 if hd_file:
+                    v_id = str(v.get("id", ""))
                     found.append({
                         "source": "pexels",
+                        "video_id": f"pexels_{v_id}" if v_id else "",
+                        "web_url": video_url_slug,
                         "title": video_url_slug,
                         "tags": video_url_slug,
                         "video_url": hd_file,

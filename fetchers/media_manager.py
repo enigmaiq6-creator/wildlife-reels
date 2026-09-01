@@ -1,4 +1,5 @@
 import os
+import sys
 import re
 import random
 import shutil
@@ -7,6 +8,11 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple, Set
 from config import TEMP_DIR, ASSETS_DIR
 
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except Exception:
+    pass
+
 from fetchers.pexels_fetcher import search_pexels_videos, download_pexels_video
 from fetchers.pixabay_fetcher import search_pixabay_videos, download_pixabay_video
 from fetchers.wikimedia_fetcher import WikimediaFetcher
@@ -14,10 +20,11 @@ from fetchers.youtube_wildlife_harvester import YouTubeWildlifeHarvester
 from fetchers.photo_kenburns_harvester import PhotoKenBurnsHarvester
 from core.clip_validator import validate_clip_metadata
 from core.wildlife_taxonomy import get_taxonomy_for_creature
+from core.history_manager import HistoryManager
 
 class MediaManager:
     """
-    Motor Selectivo de Medios para Vida Salvaje (Clean Wildlife Media Engine) v8.0:
+    Motor Selectivo de Medios para Vida Salvaje (Clean Wildlife Media Engine) v9.0:
     Garantiza CERO PERSONAS HABLANDO, CERO DOBLE SUBTÍTULO y CERO CLIPS REPETIDOS:
       - Nivel 1: Stock Oficial 4K Puro y Limpio (Pexels 4K & Pixabay HD) sin texto ni humanos.
       - Nivel 2: Archivos Científicos Abiertos (Wikimedia Commons).
@@ -31,11 +38,12 @@ class MediaManager:
         self.session_vault_dir = self.temp_dir / "session_vault"
         self.session_vault_dir.mkdir(parents=True, exist_ok=True)
         self.used_session_clips: List[str] = []
-        self.used_urls: Set[str] = set()
+        self.history_mgr = HistoryManager()
+        self.used_urls: Set[str] = self.history_mgr.get_used_video_urls()
 
     def reset_session(self):
         self.used_session_clips.clear()
-        self.used_urls.clear()
+        self.used_urls = self.history_mgr.get_used_video_urls()
         WikimediaFetcher.reset_session()
         PhotoKenBurnsHarvester.create_kenburns_clip  # warm up
         from fetchers.gcp_vertex_image_generator import GCPVertexImageGenerator
@@ -102,7 +110,9 @@ class MediaManager:
             pex_results = search_pexels_videos(st, orientation="all", max_results=6)
             for pex in pex_results:
                 url = pex.get('video_url', '')
-                if url in self.used_urls:
+                vid_id = pex.get('video_id', '')
+                web_url = pex.get('web_url', '')
+                if url in self.used_urls or (vid_id and vid_id in self.used_urls) or (web_url and web_url in self.used_urls):
                     continue
                 title_slug = pex.get('title', '').lower()
                 tags_slug = pex.get('tags', '').lower()
@@ -115,14 +125,23 @@ class MediaManager:
                     target_action=action_description
                 )
                 if is_valid:
-                    candidates.append({"source": "pexels", "url": url, "title": title_slug, "score": score})
+                    candidates.append({
+                        "source": "pexels",
+                        "url": url,
+                        "vid_id": vid_id,
+                        "web_url": web_url,
+                        "title": title_slug,
+                        "score": score
+                    })
 
         # 1.2 Búsqueda en Pixabay Oficial (HD)
         for st in search_terms:
             pix_results = search_pixabay_videos(st, max_results=6)
             for pix in pix_results:
                 url = pix.get('video_url', '')
-                if url in self.used_urls:
+                vid_id = pix.get('video_id', '')
+                web_url = pix.get('web_url', '')
+                if url in self.used_urls or (vid_id and vid_id in self.used_urls) or (web_url and web_url in self.used_urls):
                     continue
                 tags_str = pix.get('tags', '').lower()
                 is_valid, score, reason = validate_clip_metadata(
@@ -132,19 +151,37 @@ class MediaManager:
                     target_action=action_description
                 )
                 if is_valid:
-                    candidates.append({"source": "pixabay", "url": url, "title": tags_str, "score": score})
+                    candidates.append({
+                        "source": "pixabay",
+                        "url": url,
+                        "vid_id": vid_id,
+                        "web_url": web_url,
+                        "title": tags_str,
+                        "score": score
+                    })
 
         candidates.sort(key=lambda x: x["score"], reverse=True)
 
         for cand in candidates:
             url = cand["url"]
             source = cand["source"]
-            self.used_urls.add(url)
+            vid_id = cand.get("vid_id", "")
+            web_url = cand.get("web_url", "")
             safe_title = str(cand['title'][:55]).encode('ascii', 'ignore').decode()
             if source == "pexels" and download_pexels_video(url, output_file):
+                self.used_urls.add(url)
+                if vid_id:
+                    self.used_urls.add(vid_id)
+                if web_url:
+                    self.used_urls.add(web_url)
                 print(f"[CleanMediaEngine] [NIVEL 1 - PEXELS 4K LIMPIO] {safe_title} (Score: {cand['score']})", flush=True)
                 return output_file
             elif source == "pixabay" and download_pixabay_video(url, output_file):
+                self.used_urls.add(url)
+                if vid_id:
+                    self.used_urls.add(vid_id)
+                if web_url:
+                    self.used_urls.add(web_url)
                 print(f"[CleanMediaEngine] [NIVEL 1 - PIXABAY HD LIMPIO] {safe_title} (Score: {cand['score']})", flush=True)
                 return output_file
 

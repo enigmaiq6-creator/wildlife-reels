@@ -80,7 +80,33 @@ class AIScriptGenerator:
         "Hammerhead Shark (The 360-Degree Electro-Sensor Predator)",
         "Moray Eel (The Double-Jawed Reef Stalker)",
         "Goliath Tigerfish (The Monster with Crocodile Teeth)",
-        "Giant Anteater (The Bear-Killing Clawed Phantom)"
+        "Giant Anteater (The Bear-Killing Clawed Phantom)",
+        "Gharial (The Fish-Slicing Narrow-Jawed Crocodile)",
+        "Tasmanian Devil (The Bone-Snapping Marsupial Demon)",
+        "Fossa (The Madagascar Apex Lemur Stalker)",
+        "Platypus (The Venomous Egg-Laying Chimera)",
+        "Pufferfish (The Deadly Tetrodotoxin Balloon)",
+        "Axolotl (The Regenerating Aquatic God)",
+        "Black Panther (The Melanin Ghost of the Jungle)",
+        "Red-Bellied Piranha (The River Frenzy Predator)",
+        "Tiger Shark (The Ocean Garbage Can with Serrated Blades)",
+        "Archerfish (The Underwater Sniper)",
+        "Lyrebird (The Master Mimic of the Forest)",
+        "Pallas Cat (The Heaviest-Furred Frozen Predator)",
+        "Caracal (The 10-Foot Aerial Bird Snatcher)",
+        "Serval (The Ultrasonic Radar Hunter)",
+        "Aye-Aye (The Tap-Hunting Skeletal Finger Primate)",
+        "Manta Ray (The Ocean Stealth Wing)",
+        "Coconut Crab (The Giant Tree-Climbing Armor Beast)",
+        "Cuttlefish (The Hypnotic Shape-Shifting Chameleon of the Sea)",
+        "Vampire Squid (The Deep Abyss Bioluminescent Cloak)",
+        "Frilled Shark (The Living Ancient Eel Shark)",
+        "Leatherback Sea Turtle (The Giant Jellyfish Hunter)",
+        "Saltwater Crocodile (The Earth's Largest Living Reptile)",
+        "Gila Monster (The Venomous Desert Armor Lizard)",
+        "Thorny Devil (The Desert Moisture Harvester)",
+        "Snowy Owl (The Arctic Silent Sky Hunter)",
+        "Giant Japanese Salamander (The River Dragon)"
     ]
 
     def __init__(self, primary_key: Optional[str] = None, backup_key: Optional[str] = None):
@@ -95,44 +121,42 @@ class AIScriptGenerator:
             print("[AIScriptGenerator] [!] No Groq API keys configured. Using fallback catalog.")
             return None
 
-        seen_topics = seen_topics or []
-        seen_str = ", ".join(seen_topics[-30:]) if seen_topics else "none"
-
-        # 1. Cargar historial y extraer especies publicadas recientemente (últimos 35 temas)
-        history_file = Path("history.json")
-        entries = []
-        if history_file.exists():
-            try:
-                with open(history_file, "r", encoding="utf-8") as f:
-                    entries = json.load(f).get("published_topics", [])
-            except Exception:
-                pass
-
-        recent_entries = entries[-35:] if len(entries) >= 35 else entries
-        recent_text = " ".join([
+        # 1. Cargar historial persistente completo
+        from core.history_manager import HistoryManager
+        history_mgr = HistoryManager()
+        data = history_mgr.load_history()
+        entries = data.get("published_topics", [])
+        
+        all_published_text = " ".join([
             str(e.get("title", "")) + " " + str(e.get("topic_id", "")) + " " + str(e.get("creature_name", ""))
-            for e in recent_entries
+            for e in entries
         ]).lower()
 
-        # 2. Filtrar candidatos de CREATURE_CANDIDATES que NO aparezcan en los últimos 35 publicados
-        available_candidates = []
+        # 2. Prioridad 1: Especies que NUNCA hayan aparecido en toda la historia
+        available_never_seen = []
         for c in self.CREATURE_CANDIDATES:
             main_name = c.split("(")[0].strip().lower()
-            if main_name not in recent_text and not any(p in recent_text for p in main_name.split() if len(p) > 4):
-                available_candidates.append(c)
+            if main_name not in all_published_text and not any(p in all_published_text for p in main_name.split() if len(p) > 4):
+                available_never_seen.append(c)
 
-        if not available_candidates:
-            recent_10_text = " ".join([
-                str(e.get("title", "")) + " " + str(e.get("topic_id", ""))
-                for e in entries[-10:]
+        if available_never_seen:
+            chosen_creature = random.choice(available_never_seen)
+            print(f"[AIScriptGenerator] [+] Especie 100% INÉDITA seleccionada (Inéditas: {len(available_never_seen)}/{len(self.CREATURE_CANDIDATES)}): '{chosen_creature}'", flush=True)
+        else:
+            # 3. Si ya se usaron todas las criaturas, filtrar las que NO estén en las últimas 45
+            recent_entries = entries[-45:] if len(entries) >= 45 else entries
+            recent_text = " ".join([
+                str(e.get("title", "")) + " " + str(e.get("topic_id", "")) + " " + str(e.get("creature_name", ""))
+                for e in recent_entries
             ]).lower()
             available_candidates = [
                 c for c in self.CREATURE_CANDIDATES
-                if c.split("(")[0].strip().lower() not in recent_10_text
+                if c.split("(")[0].strip().lower() not in recent_text and not any(p in recent_text for p in c.split("(")[0].strip().lower().split() if len(p) > 4)
             ]
+            chosen_creature = random.choice(available_candidates) if available_candidates else random.choice(self.CREATURE_CANDIDATES)
+            print(f"[AIScriptGenerator] [+] Especie rotada seleccionada (Disponibles frescos: {len(available_candidates)}/{len(self.CREATURE_CANDIDATES)}): '{chosen_creature}'", flush=True)
 
-        chosen_creature = random.choice(available_candidates) if available_candidates else random.choice(self.CREATURE_CANDIDATES)
-        print(f"[AIScriptGenerator] [+] Especie seleccionada para micro-doc (Disponibles frescos: {len(available_candidates)}/{len(self.CREATURE_CANDIDATES)}): '{chosen_creature}'", flush=True)
+        seen_str = ", ".join([str(e.get("topic_id", "")) for e in entries[-30:]]) if entries else "none"
 
         hook_styles = [
             "Forbidden Warning (Whatever you do, NEVER...)",

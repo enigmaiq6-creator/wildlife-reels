@@ -1,8 +1,14 @@
+import sys
 import json
 import subprocess
 from pathlib import Path
 from typing import Optional, List
 from config import TEMP_DIR
+
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except Exception:
+    pass
 
 class YouTubeWildlifeHarvester:
     """

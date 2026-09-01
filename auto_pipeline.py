@@ -227,7 +227,13 @@ def run_single_creature_pipeline(force_topic: str = "", voice_key: str = DEFAULT
     meta_path = OUTPUT_DIR / f"metadata_{topic_id}_{timestamp_str}.txt"
     with open(meta_path, "w", encoding="utf-8") as f:
         f.write(f"TITLE: {title}\n\nDESCRIPTION:\n{title}\n\n" + " ".join(hashtags) + "\n")
-    history.record_published_topic(topic_id, title, creature_name=creature_name)
+    history.record_published_topic(
+        topic_id=topic_id,
+        title=title,
+        creature_name=creature_name,
+        clips_used=list(media_manager.used_urls),
+        images_used=list(GCPVertexImageGenerator.get_used_photos())
+    )
 
     # Publicación Automática en Facebook Reels (Wild Vault)
     if auto_publish:
@@ -478,7 +484,13 @@ def run_top_countdown_pipeline(force_topic: str = "", voice_key: str = DEFAULT_V
     meta_path = OUTPUT_DIR / f"metadata_{topic_id}_{timestamp_str}.txt"
     with open(meta_path, "w", encoding="utf-8") as f:
         f.write(f"TITLE: {title}\n\nDESCRIPTION:\n{title}\n\n" + " ".join(hashtags) + "\n")
-    history.record_published_topic(topic_id, title)
+    history.record_published_topic(
+        topic_id=topic_id,
+        title=title,
+        creature_name="top-countdown",
+        clips_used=list(media_manager.used_urls),
+        images_used=list(GCPVertexImageGenerator.get_used_photos())
+    )
 
     # Publicación Automática en Facebook Reels (Wild Vault)
     if auto_publish:
