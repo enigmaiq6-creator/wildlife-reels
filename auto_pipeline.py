@@ -32,6 +32,7 @@ from core.subtitle_engine import SubtitleEngine
 from core.video_composer import VideoComposer
 from core.audio_sfx_engine import generate_cinematic_whoosh, generate_ambient_cinematic_music
 from fetchers.media_manager import MediaManager
+from fetchers.gcp_vertex_image_generator import GCPVertexImageGenerator
 from publisher.facebook_publisher import FacebookPublisher
 from core.history_manager import HistoryManager
 
