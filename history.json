@@ -637,10 +637,17 @@
       "creature_name": "Nile Crocodile",
       "published_at": "2026-09-01T12:05:19",
       "post_id": ""
+    },
+    {
+      "topic_id": "coconut-crab-giant-armor-beast",
+      "title": "The Hidden Assassin: Coconut Crab",
+      "creature_name": "Coconut Crab",
+      "published_at": "2026-09-01T23:25:37.090143",
+      "post_id": ""
     }
   ],
-  "total_published": 105,
-  "last_updated": "2026-09-01T23:00:18.970391",
+  "total_published": 106,
+  "last_updated": "2026-09-01T23:25:37.090157",
   "used_video_urls": [],
   "used_image_urls": []
 }
