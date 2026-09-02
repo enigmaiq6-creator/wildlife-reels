@@ -665,10 +665,17 @@
       "creature_name": "Gharial",
       "published_at": "2026-09-02T07:16:37.929974",
       "post_id": ""
+    },
+    {
+      "topic_id": "CATALOG-BIG-CATS",
+      "title": "IMAGE_format_1_taxonomic_catalog",
+      "creature_name": "",
+      "published_at": "2026-09-02T07:49:32.287105",
+      "post_id": ""
     }
   ],
-  "total_published": 109,
-  "last_updated": "2026-09-02T07:16:37.929990",
+  "total_published": 110,
+  "last_updated": "2026-09-02T07:49:32.287116",
   "used_video_urls": [],
   "used_image_urls": []
 }
