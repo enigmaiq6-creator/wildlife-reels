@@ -651,10 +651,17 @@
       "creature_name": "Red-Bellied Piranha",
       "published_at": "2026-09-01T23:39:09.205290",
       "post_id": ""
+    },
+    {
+      "topic_id": "CATALOG-OWLS",
+      "title": "IMAGE_format_1_taxonomic_catalog",
+      "creature_name": "",
+      "published_at": "2026-09-02T02:42:43.947019",
+      "post_id": ""
     }
   ],
-  "total_published": 107,
-  "last_updated": "2026-09-01T23:39:09.205304",
+  "total_published": 108,
+  "last_updated": "2026-09-02T02:42:43.947029",
   "used_video_urls": [],
   "used_image_urls": []
 }
