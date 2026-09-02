@@ -658,10 +658,17 @@
       "creature_name": "",
       "published_at": "2026-09-02T02:42:43.947019",
       "post_id": ""
+    },
+    {
+      "topic_id": "gharial-fish-slicing-narrow-jawed-crocodile",
+      "title": "Gharial: The Fish‑Slicing Assassin",
+      "creature_name": "Gharial",
+      "published_at": "2026-09-02T07:16:37.929974",
+      "post_id": ""
     }
   ],
-  "total_published": 108,
-  "last_updated": "2026-09-02T02:42:43.947029",
+  "total_published": 109,
+  "last_updated": "2026-09-02T07:16:37.929990",
   "used_video_urls": [],
   "used_image_urls": []
 }
